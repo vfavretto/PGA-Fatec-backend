@@ -9,17 +9,17 @@ export class CreateUserDto {
   @IsOptional()
   @IsEmail()
   @MaxLength(255)
-  email?: string;
+  email?: string | null;
 
   @IsOptional()
   @IsString()
   @MaxLength(30)
-  nome_usuario?: string;
+  nome_usuario?: string | null;
 
   @IsOptional()
   @IsString()
   @MaxLength(30)
-  senha?: string;
+  senha?: string | null;
 
   @IsEnum(TipoUsuario)
   tipo_usuario: TipoUsuario;
