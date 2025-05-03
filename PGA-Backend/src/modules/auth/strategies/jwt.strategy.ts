@@ -25,14 +25,24 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: any) {
     // Verificar se o usuário ainda existe no banco de dados
     const user = await this.prisma.pessoa.findUnique({
-      where: { pessoa_id: payload.sub },
-      select: { pessoa_id: true, email: true, nome: true },
+      where: { 
+        pessoa_id: Number(payload.pessoa_id) // Convertendo para número e usando o campo correto
+      },
+      select: {
+        pessoa_id: true,
+        email: true,
+        nome: true
+      }
     });
 
     if (!user) {
       throw new UnauthorizedException('Usuário não existe ou token inválido');
     }
 
-    return { pessoa_id: payload.sub, email: payload.email, nome: user.nome };
+    return {
+      pessoa_id: user.pessoa_id,
+      email: user.email,
+      nome: user.nome
+    };
   }
 }
