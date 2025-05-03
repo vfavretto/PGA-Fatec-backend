@@ -1,4 +1,5 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength, Matches } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, MinLength, Matches, IsEnum } from 'class-validator';
+import { TipoUsuario } from '@prisma/client';
 
 export class RegisterDto {
   @IsString({ message: 'O nome deve ser uma string' })
@@ -16,4 +17,8 @@ export class RegisterDto {
     message: 'A senha deve conter pelo menos uma letra maiúscula, uma letra minúscula e um número ou caractere especial',
   })
   senha: string;
-} 
+
+  @IsEnum(TipoUsuario, { message: 'Tipo de usuário inválido' })
+  @IsNotEmpty({ message: 'O tipo de usuário é obrigatório' })
+  tipo_usuario: TipoUsuario;
+}

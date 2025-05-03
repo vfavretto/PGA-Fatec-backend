@@ -1,18 +1,12 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from '../../config/prisma.service';
+import { PrismaService } from '../../../config/prisma.service';
 import * as bcrypt from 'bcrypt';
-import { LoginDto } from './dto/login.dto';
-import { TokenDto } from './dto/token.dto';
 
 @Injectable()
-export class AuthService {
-  constructor(
-    private prisma: PrismaService,
-    private jwtService: JwtService,
-  ) {}
+export class ValidateUserService {
+  constructor(private prisma: PrismaService) {}
 
-  async validateUser(email: string, password: string): Promise<any> {
+  async execute(email: string, password: string): Promise<any> {
     try {
       const user = await this.prisma.pessoa.findUnique({
         where: { email },
@@ -45,12 +39,5 @@ export class AuthService {
       }
       throw new UnauthorizedException('Erro na autenticação');
     }
-  }
-
-  async login(user: any): Promise<TokenDto> {
-    const payload = { email: user.email, sub: user.pessoa_id };
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
   }
 }
