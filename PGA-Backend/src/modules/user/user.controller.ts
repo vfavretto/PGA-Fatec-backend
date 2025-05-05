@@ -6,6 +6,8 @@ import { GetUserService } from './services/get-user.service';
 import { UpdateUserService } from './services/update-user.service';
 import { DeleteUserService } from './services/delete-user.service';
 import { Prisma } from '@prisma/client';
+import { Public } from '../auth/decorators/is-public.decorator';
+import { RegisterDto } from '../auth/dto/register.dto';
 
 @Controller('users')
 export class UserController {
@@ -17,8 +19,9 @@ export class UserController {
     private readonly deleteUser: DeleteUserService,
   ) {}
 
+  @Public()
   @Post()
-  async create(@Body() data: Prisma.PessoaCreateInput) {
+  async create(@Body() data: RegisterDto) {
     return this.createUser.execute(data);
   }
 
