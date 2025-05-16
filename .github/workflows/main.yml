@@ -2,81 +2,85 @@ name: PGA/Backend
 
 on:
   push:
-    branches: 
+    branches:
       - main
       - develop
       - 'feature/**'
       - 'hotfix/**'
   pull_request:
-    branches: 
+    branches:
       - main
       - develop
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
         token: ${{ secrets.GH_TOKEN }}
-    
+
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '22'
-    
+
     - name: Install dependencies
       run: npm install
       working-directory: ./PGA-Backend
-    
+
     - name: Run linter
       run: npm run lint || true
-    
+      working-directory: ./PGA-Backend
+
     - name: Run tests
       run: npm test
-      
+      working-directory: ./PGA-Backend
+
     # Versionamento Semântico
     - name: Install semver
       run: npm install -g semver
-    
+      working-directory: ./PGA-Backend # Can be kept or removed
+
     - name: Create initial tag if not exists
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
+        # These git commands operate on the repository root
+        git config --global user.name 'github-actions'
+        git config --global user.email 'github-actions@github.com'
         if [ -z "$(git tag)" ]; then
-          git config --global user.name 'github-actions'
-          git config --global user.email 'github-actions@github.com'
           git tag -a v0.0.0 -m "Initial release"
           git push origin v0.0.0
         fi
-    
+
     - name: Calculate and generate new version
       if: github.ref == 'refs/heads/main'
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
-        # Fetch tags
+        # Fetch tags from the repository root
         git fetch --tags
-        
-        # Get last tag
+
+        # Get last tag from the repository root
         LAST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
         if [ -z "$LAST_TAG" ]; then
           LAST_TAG="v0.0.0"
         fi
-        
+
         echo "Última tag: $LAST_TAG"
-        
-        # Get commits since last tag
+
+        # Get commits since last tag (from repository root)
         COMMITS=$(git log ${LAST_TAG}..HEAD --pretty=format:"%s")
-        
+
         # Initialize version increment flags
         MAJOR=0
         MINOR=0
         PATCH=0
-        
+
         # Analyze commit messages
         for COMMIT in "$COMMITS"; do
           if [[ "$COMMIT" == *"BREAKING CHANGE"* ]]; then
@@ -87,11 +91,11 @@ jobs:
             PATCH=1
           fi
         done
-        
-        # Calculate new version
+
+        # Calculate new version using semver (which is globally available)
         CURRENT_VERSION=${LAST_TAG#v}
         NEW_VERSION=$CURRENT_VERSION
-        
+
         if [[ $MAJOR -eq 1 ]]; then
           NEW_VERSION=$(semver -i major $CURRENT_VERSION)
         elif [[ $MINOR -eq 1 ]]; then
@@ -99,27 +103,31 @@ jobs:
         elif [[ $PATCH -eq 1 ]]; then
           NEW_VERSION=$(semver -i patch $CURRENT_VERSION)
         fi
-        
+
         echo "Nova versão: $NEW_VERSION"
         echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
-    
+
     - name: Update package.json version
       if: github.ref == 'refs/heads/main' && env.new_version != ''
       run: |
+        # npm version needs to run in the directory containing package.json
         npm version ${{ env.new_version }} --no-git-tag-version
-    
+      working-directory: ./PGA-Backend
+
     - name: Commit and push new version
       if: github.ref == 'refs/heads/main' && env.new_version != ''
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
+        # These git commands operate on the repository root
         git config --global user.name 'github-actions'
         git config --global user.email 'github-actions@github.com'
-        git add package.json
+        # Add package.json from the correct path relative to the root
+        git add ./PGA-Backend/package.json
         git commit -m "chore(release): version ${{ env.new_version }}"
         git tag v${{ env.new_version }}
         git push origin main --tags
-    
+
     # Email Notification
     - name: Send email on failure
       if: failure()
@@ -132,11 +140,11 @@ jobs:
         subject: Workflow Failure in GitHub Actions
         body: |
           The GitHub Actions workflow for ${{ github.repository }} has failed.
-          
+
           Workflow: ${{ github.workflow }}
           Action: ${{ github.action }}
           Repository: ${{ github.repository }}
-          
+
           Check the Actions tab for more details.
         to: ${{secrets.EMAIL_DESTINO}}
         from: ${{secrets.EMAIL_ORIGEM}}
