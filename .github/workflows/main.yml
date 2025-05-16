@@ -37,7 +37,7 @@ jobs:
       working-directory: ./PGA-Backend
 
     - name: Run tests
-      run: npm test
+      run: npm run test:e2e
       working-directory: ./PGA-Backend
 
     # Versionamento Semântico
