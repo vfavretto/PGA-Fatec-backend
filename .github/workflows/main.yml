@@ -110,8 +110,12 @@ jobs:
     - name: Update package.json version
       if: github.ref == 'refs/heads/main' && env.new_version != ''
       run: |
-        # npm version needs to run in the directory containing package.json
-        npm version ${{ env.new_version }} --no-git-tag-version
+        CURRENT_VERSION=$(node -p "require('./package.json').version")
+        if [ "$CURRENT_VERSION" != "${{ env.new_version }}" ]; then
+          npm version ${{ env.new_version }} --no-git-tag-version
+        else
+          echo "Versão já está em $CURRENT_VERSION, não é necessário atualizar."
+        fi
       working-directory: ./PGA-Backend
 
     - name: Commit and push new version
