@@ -1,16 +1,198 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
+// TODO: Lista de ação projetos (anexo 2)
+
 datasource db {
-  provider = "postgresql" // Ou "mysql", "sqlite", "sqlserver", "mongodb"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-// --- Enums ---
+model Unidade {
+  unidade_id    Int     @id @default(autoincrement())
+  codigo_fnnn   String  @unique @db.VarChar(10)
+  nome_completo String  @db.VarChar(255)
+  diretor_nome  String? @db.VarChar(255)
+  cursos        Curso[]
+  pgas          PGA[]
+}
+
+model PGA {
+  pga_id            Int                   @id @default(autoincrement())
+  unidade_id        Int
+  ano               Int
+  versao            String?               @db.VarChar(10)
+  analise_cenario   String?
+  data_elaboracao   DateTime?             @db.Date
+  data_parecer_gpr  DateTime?             @db.Date
+  status            StatusPGA             @default(EmElaboracao)
+  acoesCPA          AcaoCPA[]
+  acoesProjetos     AcaoProjeto[]
+  aquisicoes        Aquisicao[]
+  unidade           Unidade               @relation(fields: [unidade_id], references: [unidade_id])
+  rotinas           RotinaInstitucional[]
+  situacoesProblema SituacaoProblema[]
+}
+
+model SituacaoProblema {
+  situacao_id Int     @id @default(autoincrement())
+  pga_id      Int
+  descricao   String
+  fonte       String? @db.VarChar(255)
+  pga         PGA     @relation(fields: [pga_id], references: [pga_id])
+}
+
+model EixoTematico {
+  eixo_id       Int           @id @default(autoincrement())
+  numero        Int           @unique
+  nome          String        @db.VarChar(255)
+  descricao     String?
+  acoesProjetos AcaoProjeto[]
+}
+
+model PrioridadeAcao {
+  prioridade_id Int           @id @default(autoincrement())
+  grau          Int           @unique
+  descricao     String        @db.VarChar(255)
+  tipo_gestao   String?       @db.VarChar(100)
+  acoesProjetos AcaoProjeto[]
+}
+
+model AcaoProjeto {
+  acao_projeto_id                        Int             @id @default(autoincrement())
+  pga_id                                 Int
+  eixo_id                                Int
+  prioridade_id                          Int
+  tema                                   String          @db.VarChar(255)
+  o_que_sera_feito                       String
+  por_que_sera_feito                     String
+  data_inicio                            DateTime?       @db.Date
+  data_final                             DateTime?       @db.Date
+  objetivos_institucionais_referenciados String?
+  obrigatorio_inclusao                   Boolean         @default(false)
+  obrigatorio_sustentabilidade           Boolean         @default(false)
+  eixo                                   EixoTematico    @relation(fields: [eixo_id], references: [eixo_id])
+  pga                                    PGA             @relation(fields: [pga_id], references: [pga_id])
+  prioridade                             PrioridadeAcao  @relation(fields: [prioridade_id], references: [prioridade_id])
+  aquisicoes                             Aquisicao[]
+  etapas                                 EtapaProcesso[]
+  pessoas                                ProjetoPessoa[]
+}
+
+model Pessoa {
+  pessoa_id            Int                   @id @default(autoincrement())
+  nome                 String                @db.VarChar(255)
+  email                String?               @unique @db.VarChar(255)
+  nome_usuario         String?               @unique @db.VarChar(30)
+  senha                String?               @db.VarChar(255)
+  tipo_usuario         TipoUsuario
+  cursos_coordenados   Curso[]
+  projetos             ProjetoPessoa[]
+  rotinas_responsaveis RotinaInstitucional[] @relation("ResponsavelRotina")
+  rotinas_participante RotinaParticipante[]
+}
+
+model ProjetoPessoa {
+  projeto_pessoa_id     Int            @id @default(autoincrement())
+  acao_projeto_id       Int
+  pessoa_id             Int
+  papel                 PapelProjeto
+  carga_horaria_semanal Int?
+  tipo_vinculo_hae      TipoVinculoHAE @default(NaoSeAplica)
+  acaoProjeto           AcaoProjeto    @relation(fields: [acao_projeto_id], references: [acao_projeto_id])
+  pessoa                Pessoa         @relation(fields: [pessoa_id], references: [pessoa_id])
+}
+
+model EtapaProcesso {
+  etapa_id                   Int               @id @default(autoincrement())
+  acao_projeto_id            Int
+  descricao                  String
+  entregavel_link_sei        String?           @db.VarChar(255)
+  numero_ref                 String?           @db.VarChar(50)
+  data_verificacao_prevista  DateTime?         @db.Date
+  data_verificacao_realizada DateTime?         @db.Date
+  status_verificacao         StatusVerificacao @default(Pendente)
+  acaoProjeto                AcaoProjeto       @relation(fields: [acao_projeto_id], references: [acao_projeto_id])
+}
+
+model Aquisicao {
+  aquisicao_id            Int          @id @default(autoincrement())
+  acao_projeto_id         Int?
+  pga_id                  Int
+  tipo_anexo              TipoAnexo
+  descricao_item          String       @db.VarChar(255)
+  unidade_medida          String?      @db.VarChar(50)
+  quantidade              Int
+  justificativa           String?
+  valor_unitario_estimado Decimal?     @db.Decimal(10, 2)
+  valor_total_estimado    Decimal?     @db.Decimal(10, 2)
+  acaoProjeto             AcaoProjeto? @relation(fields: [acao_projeto_id], references: [acao_projeto_id])
+  pga                     PGA          @relation(fields: [pga_id], references: [pga_id])
+}
+
+model AcaoCPA {
+  acao_cpa_id   Int     @id @default(autoincrement())
+  pga_id        Int
+  descricao     String
+  justificativa String?
+  pga           PGA     @relation(fields: [pga_id], references: [pga_id])
+}
+
+model RotinaInstitucional {
+  rotina_id           Int                  @id @default(autoincrement())
+  pga_id              Int
+  curso_id            Int?
+  tipo_rotina         TipoRotina
+  titulo              String               @db.VarChar(255)
+  descricao           String
+  periodicidade       PeriodicidadeRotina
+  data_inicio         DateTime?            @db.Date
+  data_fim            DateTime?            @db.Date
+  responsavel_id      Int
+  entregavel_esperado String?
+  status              StatusRotina         @default(Planejada)
+  curso               Curso?               @relation(fields: [curso_id], references: [curso_id])
+  pga                 PGA                  @relation(fields: [pga_id], references: [pga_id])
+  responsavel         Pessoa               @relation("ResponsavelRotina", fields: [responsavel_id], references: [pessoa_id])
+  ocorrencias         RotinaOcorrencia[]
+  participantes       RotinaParticipante[]
+}
+
+model RotinaParticipante {
+  rotina_participante_id Int                 @id @default(autoincrement())
+  rotina_id              Int
+  pessoa_id              Int
+  papel                  String?             @db.VarChar(100)
+  pessoa                 Pessoa              @relation(fields: [pessoa_id], references: [pessoa_id])
+  rotina                 RotinaInstitucional @relation(fields: [rotina_id], references: [rotina_id])
+}
+
+model RotinaOcorrencia {
+  ocorrencia_id   Int                 @id @default(autoincrement())
+  rotina_id       Int
+  data_realizacao DateTime            @db.Date
+  hora_inicio     DateTime?           @db.Time(6)
+  hora_fim        DateTime?           @db.Time(6)
+  local           String?             @db.VarChar(255)
+  pauta           String?
+  resultado       String?
+  link_ata        String?             @db.VarChar(255)
+  status          StatusOcorrencia    @default(Planejada)
+  rotina          RotinaInstitucional @relation(fields: [rotina_id], references: [rotina_id])
+}
+
+model Curso {
+  curso_id       Int                   @id @default(autoincrement())
+  unidade_id     Int
+  nome           String                @db.VarChar(255)
+  tipo           TipoCurso
+  status         StatusCurso
+  coordenador_id Int?
+  coordenador    Pessoa?               @relation(fields: [coordenador_id], references: [pessoa_id])
+  unidade        Unidade               @relation(fields: [unidade_id], references: [unidade_id])
+  rotinas        RotinaInstitucional[]
+}
 
 enum StatusPGA {
   EmElaboracao
@@ -31,9 +213,9 @@ enum PapelProjeto {
 }
 
 enum TipoVinculoHAE {
-  HAE15 @map("15")
-  HAE25 @map("25")
-  HAE40 @map("40")
+  HAE15       @map("15")
+  HAE25       @map("25")
+  HAE40       @map("40")
   NaoSeAplica
 }
 
@@ -98,189 +280,3 @@ enum StatusCurso {
   Ativo
   Inativo
 }
-
-// --- Models ---
-
-model Unidade {
-  unidade_id    Int     @id @default(autoincrement())
-  codigo_fnnn   String  @unique @db.VarChar(10)
-  nome_completo String  @db.VarChar(255)
-  diretor_nome  String? @db.VarChar(255)
-  pgas          PGA[]
-  cursos        Curso[]
-}
-
-model PGA {
-  pga_id           Int                @id @default(autoincrement())
-  unidade_id       Int
-  ano              Int
-  versao           String?            @db.VarChar(10)
-  analise_cenario  String?            @db.Text
-  data_elaboracao  DateTime?          @db.Date
-  data_parecer_gpr DateTime?          @db.Date
-  status           StatusPGA          @default(EmElaboracao)
-  unidade          Unidade            @relation(fields: [unidade_id], references: [unidade_id])
-  situacoesProblema SituacaoProblema[]
-  acoesProjetos    AcaoProjeto[]
-  aquisicoes       Aquisicao[]
-  acoesCPA         AcaoCPA[]
-  rotinas          RotinaInstitucional[]
-}
-
-model SituacaoProblema {
-  situacao_id Int    @id @default(autoincrement())
-  pga_id      Int
-  descricao   String @db.Text
-  fonte       String? @db.VarChar(255)
-  pga         PGA    @relation(fields: [pga_id], references: [pga_id])
-}
-
-model EixoTematico {
-  eixo_id       Int           @id @default(autoincrement())
-  numero        Int           @unique
-  nome          String        @db.VarChar(255)
-  descricao     String?       @db.Text
-  acoesProjetos AcaoProjeto[]
-}
-
-model PrioridadeAcao {
-  prioridade_id Int           @id @default(autoincrement())
-  grau          Int           @unique
-  descricao     String        @db.VarChar(255)
-  tipo_gestao   String?       @db.VarChar(100)
-  acoesProjetos AcaoProjeto[]
-}
-
-model AcaoProjeto {
-  acao_projeto_id                    Int             @id @default(autoincrement())
-  pga_id                             Int
-  eixo_id                            Int
-  prioridade_id                      Int
-  tema                               String          @db.VarChar(255)
-  o_que_sera_feito                   String          @db.Text
-  por_que_sera_feito                 String          @db.Text
-  data_inicio                        DateTime?       @db.Date
-  data_final                         DateTime?       @db.Date
-  objetivos_institucionais_referenciados String?         @db.Text
-  obrigatorio_inclusao             Boolean         @default(false)
-  obrigatorio_sustentabilidade       Boolean         @default(false)
-  pga                                PGA             @relation(fields: [pga_id], references: [pga_id])
-  eixo                               EixoTematico    @relation(fields: [eixo_id], references: [eixo_id])
-  prioridade                         PrioridadeAcao  @relation(fields: [prioridade_id], references: [prioridade_id])
-  pessoas                            ProjetoPessoa[]
-  etapas                             EtapaProcesso[]
-  aquisicoes                         Aquisicao[]
-}
-
-model Pessoa {
-  pessoa_id           Int                   @id @default(autoincrement())
-  nome                String                @db.VarChar(255)
-  email               String?               @unique @db.VarChar(255)
-  tipo_usuario        TipoUsuario
-  projetos            ProjetoPessoa[]
-  rotinas_responsaveis RotinaInstitucional[] @relation("ResponsavelRotina")
-  rotinas_participante RotinaParticipante[]
-  cursos_coordenados  Curso[]
-}
-
-model ProjetoPessoa {
-  projeto_pessoa_id     Int            @id @default(autoincrement())
-  acao_projeto_id       Int
-  pessoa_id             Int
-  papel                 PapelProjeto
-  carga_horaria_semanal Int?
-  tipo_vinculo_hae      TipoVinculoHAE @default(NaoSeAplica)
-  acaoProjeto           AcaoProjeto    @relation(fields: [acao_projeto_id], references: [acao_projeto_id])
-  pessoa                Pessoa         @relation(fields: [pessoa_id], references: [pessoa_id])
-}
-
-model EtapaProcesso {
-  etapa_id                  Int                @id @default(autoincrement())
-  acao_projeto_id           Int
-  descricao                 String             @db.Text
-  entregavel_link_sei     String?            @db.VarChar(255)
-  numero_ref                String?            @db.VarChar(50)
-  data_verificacao_prevista DateTime?          @db.Date
-  data_verificacao_realizada DateTime?          @db.Date
-  status_verificacao        StatusVerificacao  @default(Pendente)
-  acaoProjeto               AcaoProjeto        @relation(fields: [acao_projeto_id], references: [acao_projeto_id])
-}
-
-model Aquisicao {
-  aquisicao_id           Int        @id @default(autoincrement())
-  acao_projeto_id      Int?
-  pga_id               Int
-  tipo_anexo           TipoAnexo
-  descricao_item       String     @db.VarChar(255)
-  unidade_medida       String?    @db.VarChar(50)
-  quantidade           Int
-  justificativa        String?    @db.Text
-  valor_unitario_estimado Decimal?   @db.Decimal(10, 2)
-  valor_total_estimado   Decimal?   @db.Decimal(10, 2)
-  acaoProjeto          AcaoProjeto? @relation(fields: [acao_projeto_id], references: [acao_projeto_id])
-  pga                  PGA        @relation(fields: [pga_id], references: [pga_id])
-}
-
-model AcaoCPA {
-  acao_cpa_id Int     @id @default(autoincrement())
-  pga_id      Int
-  descricao   String  @db.Text
-  justificativa String? @db.Text
-  pga         PGA     @relation(fields: [pga_id], references: [pga_id])
-}
-
-model RotinaInstitucional {
-  rotina_id           Int                  @id @default(autoincrement())
-  pga_id              Int
-  curso_id            Int?
-  tipo_rotina         TipoRotina
-  titulo              String               @db.VarChar(255)
-  descricao           String               @db.Text
-  periodicidade       PeriodicidadeRotina
-  data_inicio         DateTime?            @db.Date
-  data_fim            DateTime?            @db.Date
-  responsavel_id      Int
-  entregavel_esperado String?              @db.Text
-  status              StatusRotina         @default(Planejada)
-  pga                 PGA                  @relation(fields: [pga_id], references: [pga_id])
-  curso               Curso?               @relation(fields: [curso_id], references: [curso_id])
-  responsavel         Pessoa               @relation("ResponsavelRotina", fields: [responsavel_id], references: [pessoa_id])
-  participantes       RotinaParticipante[]
-  ocorrencias         RotinaOcorrencia[]
-}
-
-model RotinaParticipante {
-  rotina_participante_id Int                 @id @default(autoincrement())
-  rotina_id              Int
-  pessoa_id              Int
-  papel                  String?             @db.VarChar(100)
-  rotina                 RotinaInstitucional @relation(fields: [rotina_id], references: [rotina_id])
-  pessoa                 Pessoa              @relation(fields: [pessoa_id], references: [pessoa_id])
-}
-
-model RotinaOcorrencia {
-  ocorrencia_id  Int                 @id @default(autoincrement())
-  rotina_id      Int
-  data_realizacao DateTime            @db.Date
-  hora_inicio    DateTime?           @db.Time
-  hora_fim       DateTime?           @db.Time
-  local          String?             @db.VarChar(255)
-  pauta          String?             @db.Text
-  resultado      String?             @db.Text
-  link_ata       String?             @db.VarChar(255)
-  status         StatusOcorrencia    @default(Planejada)
-  rotina         RotinaInstitucional @relation(fields: [rotina_id], references: [rotina_id])
-}
-
-model Curso {
-  curso_id       Int                   @id @default(autoincrement())
-  unidade_id     Int
-  nome           String                @db.VarChar(255)
-  tipo           TipoCurso
-  status         StatusCurso
-  coordenador_id Int?
-  unidade        Unidade               @relation(fields: [unidade_id], references: [unidade_id])
-  coordenador    Pessoa?               @relation(fields: [coordenador_id], references: [pessoa_id])
-  rotinas        RotinaInstitucional[]
-}
-
