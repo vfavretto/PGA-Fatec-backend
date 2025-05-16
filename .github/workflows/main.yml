@@ -122,7 +122,7 @@ jobs:
         # These git commands operate on the repository root
         git config --global user.name 'github-actions'
         git config --global user.email 'github-actions@github.com'
-        git add package.json
+        git add PGA-Backend/package.json
         git commit -m "chore(release): version ${{ env.new_version }}" || echo "No changes to commit"
         # Checa se a tag já existe antes de criar
         if git rev-parse "v${{ env.new_version }}" >/dev/null 2>&1; then
