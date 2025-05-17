@@ -5,8 +5,7 @@ on:
     branches:
       - main
       - develop
-      - 'feature/**'
-      - 'hotfix/**'
+
   pull_request:
     branches:
       - main
@@ -42,10 +41,12 @@ jobs:
 
     # Versionamento Semântico
     - name: Install semver
+      if: github.ref == 'refs/heads/main'
       run: npm install -g semver
       working-directory: ./PGA-Backend # Can be kept or removed
 
     - name: Create initial tag if not exists
+      if: github.ref == 'refs/heads/main'
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
