@@ -141,12 +141,12 @@ jobs:
 
     - name: Build Docker image via docker-compose
       if: github.ref == 'refs/heads/main' && env.new_version != ''
-      run: npm run docker:build # Este comando executa "docker-compose build"
+      run: docker compose build
       working-directory: ./PGA-Backend
 
     - name: Start containers for migration
       if: github.ref == 'refs/heads/main' && env.new_version != ''
-      run: docker-compose up -d api postgres # Inicia a API e o Postgres
+      run: docker-compose up -d api postgres
       working-directory: ./PGA-Backend
       
     - name: Wait for PostgreSQL to be ready
@@ -157,7 +157,7 @@ jobs:
 
     - name: Run Prisma migrations
       if: github.ref == 'refs/heads/main' && env.new_version != ''
-      run: npm run prisma:migrate:docker # Este comando executa "docker-compose exec api npx prisma migrate deploy"
+      run: docker-compose exec api npx prisma migrate deploy
       working-directory: ./PGA-Backend
       
     - name: Tag Docker image
