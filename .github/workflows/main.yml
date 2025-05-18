@@ -5,8 +5,7 @@ on:
     branches:
       - main
       - develop
-      - 'feature/**'
-      - 'hotfix/**'
+
   pull_request:
     branches:
       - main
@@ -42,10 +41,12 @@ jobs:
 
     # Versionamento Semântico
     - name: Install semver
+      if: github.ref == 'refs/heads/main'
       run: npm install -g semver
       working-directory: ./PGA-Backend # Can be kept or removed
 
     - name: Create initial tag if not exists
+      if: github.ref == 'refs/heads/main'
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
@@ -117,6 +118,68 @@ jobs:
           echo "Versão já está em $CURRENT_VERSION, não é necessário atualizar."
         fi
       working-directory: ./PGA-Backend
+
+    # Docker Build, Migrate and Push Steps (Only for main branch and if new version is set)
+    - name: Set up Docker Buildx
+      if: github.ref == 'refs/heads/main' && env.new_version != ''
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to Docker Hub
+      if: github.ref == 'refs/heads/main' && env.new_version != ''
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Create .env file for Docker Compose in CI
+      if: github.ref == 'refs/heads/main' && env.new_version != ''
+      run: |
+        echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" > .env
+        echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+        echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
+      working-directory: ./PGA-Backend
+
+    - name: Build Docker image via docker-compose
+      if: github.ref == 'refs/heads/main' && env.new_version != ''
+      run: npm run docker:build # Este comando executa "docker-compose build"
+      working-directory: ./PGA-Backend
+
+    - name: Start containers for migration
+      if: github.ref == 'refs/heads/main' && env.new_version != ''
+      run: docker-compose up -d api postgres # Inicia a API e o Postgres
+      working-directory: ./PGA-Backend
+      
+    - name: Wait for PostgreSQL to be ready
+      if: github.ref == 'refs/heads/main' && env.new_version != ''
+      run: |
+        echo "Waiting for PostgreSQL to start..."
+      working-directory: ./PGA-Backend
+
+    - name: Run Prisma migrations
+      if: github.ref == 'refs/heads/main' && env.new_version != ''
+      run: npm run prisma:migrate:docker # Este comando executa "docker-compose exec api npx prisma migrate deploy"
+      working-directory: ./PGA-Backend
+      
+    - name: Tag Docker image
+      if: github.ref == 'refs/heads/main' && env.new_version != ''
+      run: |
+        docker tag pga-backend_api ${{ secrets.DOCKERHUB_USERNAME }}/pga-backend:${{ env.new_version }}
+        docker tag pga-backend_api ${{ secrets.DOCKERHUB_USERNAME }}/pga-backend:latest
+      working-directory: ./PGA-Backend
+
+    - name: Push Docker image to Docker Hub
+      if: github.ref == 'refs/heads/main' && env.new_version != ''
+      run: |
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/pga-backend:${{ env.new_version }}
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/pga-backend:latest
+      working-directory: ./PGA-Backend
+
+    - name: Clean up Docker containers and volumes
+      # Roda sempre que os passos de Docker foram iniciados, mesmo se algum deles falhar, para limpar o runner
+      if: always() && github.ref == 'refs/heads/main' && env.new_version != ''
+      run: docker-compose down -v --remove-orphans # -v remove os volumes anônimos
+      working-directory: ./PGA-Backend
+    # End of Docker Build, Migrate and Push Steps
 
     - name: Commit and push new version
       if: github.ref == 'refs/heads/main' && env.new_version != ''
