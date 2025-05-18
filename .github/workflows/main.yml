@@ -146,7 +146,7 @@ jobs:
 
     - name: Start containers for migration
       if: github.ref == 'refs/heads/main' && env.new_version != ''
-      run: docker-compose up -d
+      run: docker compose up -d
       working-directory: ./PGA-Backend
       
     - name: Wait for PostgreSQL to be ready
@@ -157,7 +157,7 @@ jobs:
 
     - name: Run Prisma migrations
       if: github.ref == 'refs/heads/main' && env.new_version != ''
-      run: docker-compose exec api npx prisma migrate deploy
+      run: docker compose exec api npx prisma migrate deploy
       working-directory: ./PGA-Backend
       
     - name: Tag Docker image
@@ -177,7 +177,7 @@ jobs:
     - name: Clean up Docker containers and volumes
       # Roda sempre que os passos de Docker foram iniciados, mesmo se algum deles falhar, para limpar o runner
       if: always() && github.ref == 'refs/heads/main' && env.new_version != ''
-      run: docker-compose down -v --remove-orphans # -v remove os volumes anônimos
+      run: docker compose down -v --remove-orphans # -v remove os volumes anônimos
       working-directory: ./PGA-Backend
     # End of Docker Build, Migrate and Push Steps
 
