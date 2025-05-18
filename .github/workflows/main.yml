@@ -153,11 +153,22 @@ jobs:
       if: github.ref == 'refs/heads/main' && env.new_version != ''
       run: |
         echo "Waiting for PostgreSQL to start..."
+        # Tenta conectar ao PostgreSQL até ter sucesso ou timeout
+        timeout 30s bash -c 'until docker compose exec -T postgres pg_isready; do echo "Waiting for PostgreSQL..." && sleep 2; done'
+      working-directory: ./PGA-Backend
+
+    - name: Wait for API to be ready
+      if: github.ref == 'refs/heads/main' && env.new_version != ''
+      run: |
+        echo "Waiting for API to start..."
+        timeout 30s bash -c 'until docker compose logs api | grep "Nest application successfully started"; do echo "Waiting for API..." && sleep 2; done'
       working-directory: ./PGA-Backend
 
     - name: Run Prisma migrations
       if: github.ref == 'refs/heads/main' && env.new_version != ''
-      run: docker compose exec api npx prisma migrate deploy
+      run: |
+        # Adiciona flag -T para evitar problemas de TTY e aumenta memória disponível
+        docker compose exec -T -e NODE_OPTIONS="--max_old_space_size=4096" api npx prisma migrate deploy
       working-directory: ./PGA-Backend
       
     - name: Tag Docker image

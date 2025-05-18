@@ -13,8 +13,15 @@ services:
       - .env
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
+      - NODE_OPTIONS=--max_old_space_size=4096
     networks:
       - pga-network
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
 
   postgres:
     image: postgres:16-alpine
