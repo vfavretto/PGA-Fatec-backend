@@ -5,15 +5,22 @@ services:
       dockerfile: Dockerfile
     container_name: pga-api
     restart: always
+    ports:
+      - '3000:3000'
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
+      - NODE_OPTIONS="--max-old-space-size=4096"
     deploy:
       resources:
         limits:
           memory: 6G
         reservations:
           memory: 3G
-    environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
-      - NODE_OPTIONS="--max-old-space-size=4096"
+    
     networks:
       - pga-network
 
