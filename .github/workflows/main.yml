@@ -160,8 +160,26 @@ jobs:
     - name: Run Prisma migrations
       if: github.ref == 'refs/heads/main' && env.new_version != ''
       run: |
-        # Adiciona flag -T para evitar problemas de TTY e aumenta memória disponível
-        docker compose exec -T -e NODE_OPTIONS="--max_old_space_size=4096" api npx prisma migrate deploy
+        # Limpa cache e remove node_modules do container se existir
+        docker compose exec -T api rm -rf node_modules/.prisma
+        
+        # Gera prisma client novamente
+        docker compose exec -T api npx prisma generate
+        
+        # Executa as migrações com retry
+        for i in {1..3}; do
+          if docker compose exec -T \
+            -e NODE_OPTIONS="--max-old-space-size=3072" \
+            api npx prisma migrate deploy; then
+            echo "Migração concluída com sucesso"
+            exit 0
+          else
+            echo "Tentativa $i falhou, tentando novamente em 10s..."
+            sleep 10
+          fi
+        done
+        echo "Todas as tentativas falharam"
+        exit 1
       working-directory: ./PGA-Backend
       
     - name: Tag Docker image
