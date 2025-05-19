@@ -160,24 +160,37 @@ jobs:
     - name: Run Prisma migrations
       if: github.ref == 'refs/heads/main' && env.new_version != ''
       run: |
-        # Limpa cache e remove node_modules do container se existir
-        docker compose exec -T api rm -rf node_modules/.prisma
+        # Limpa recursos Docker não utilizados
+        docker system prune -f
         
-        # Gera prisma client novamente
-        docker compose exec -T api npx prisma generate
+        # Remove containers antigos se existirem
+        docker compose down -v
         
-        # Executa as migrações com retry
+        # Reinicia os containers com configurações atualizadas
+        docker compose up -d
+        
+        # Aguarda postgres estar pronto
+        echo "Aguardando PostgreSQL..."
+        timeout 30s bash -c 'until docker compose exec -T postgres pg_isready; do echo "Aguardando PostgreSQL..." && sleep 2; done'
+        
+        # Executa migrações com retry e mais memória
         for i in {1..3}; do
           if docker compose exec -T \
-            -e NODE_OPTIONS="--max-old-space-size=3072" \
-            api npx prisma migrate deploy; then
+            -e NODE_OPTIONS="--max-old-space-size=4096" \
+            api sh -c "npm cache clean --force && \
+                      rm -rf node_modules/.prisma && \
+                      npx prisma generate && \
+                      npx prisma migrate deploy"; then
             echo "Migração concluída com sucesso"
             exit 0
           else
-            echo "Tentativa $i falhou, tentando novamente em 10s..."
-            sleep 10
+            echo "Tentativa $i falhou, tentando novamente em 15s..."
+            sleep 15
           fi
         done
+        
+        # Se chegou aqui, todas as tentativas falharam
+        docker compose logs api
         echo "Todas as tentativas falharam"
         exit 1
       working-directory: ./PGA-Backend
