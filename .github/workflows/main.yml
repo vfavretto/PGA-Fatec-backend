@@ -157,13 +157,6 @@ jobs:
         timeout 30s bash -c 'until docker compose exec -T postgres pg_isready; do echo "Waiting for PostgreSQL..." && sleep 2; done'
       working-directory: ./PGA-Backend
 
-    - name: Wait for API to be ready
-      if: github.ref == 'refs/heads/main' && env.new_version != ''
-      run: |
-        echo "Waiting for API to start..."
-        timeout 30s bash -c 'until docker compose logs api | grep "Nest application successfully started"; do echo "Waiting for API..." && sleep 2; done'
-      working-directory: ./PGA-Backend
-
     - name: Run Prisma migrations
       if: github.ref == 'refs/heads/main' && env.new_version != ''
       run: |
