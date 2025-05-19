@@ -142,7 +142,10 @@ jobs:
 
     - name: Build Docker image via docker-compose
       if: github.ref == 'refs/heads/main' && env.new_version != ''
-      run: docker compose build
+      run: |
+        docker compose build --no-cache
+        # Verifica se a imagem foi construída
+        docker images | grep pga-backend
       working-directory: ./PGA-Backend
 
     - name: Start containers for migration
@@ -154,7 +157,6 @@ jobs:
       if: github.ref == 'refs/heads/main' && env.new_version != ''
       run: |
         echo "Waiting for PostgreSQL to start..."
-        # Tenta conectar ao PostgreSQL até ter sucesso ou timeout
         timeout 30s bash -c 'until docker compose exec -T postgres pg_isready; do echo "Waiting for PostgreSQL..." && sleep 2; done'
       working-directory: ./PGA-Backend
 
@@ -199,8 +201,23 @@ jobs:
     - name: Tag Docker image
       if: github.ref == 'refs/heads/main' && env.new_version != ''
       run: |
-        docker tag pga-backend_api ${{ secrets.DOCKERHUB_USERNAME }}/pga-backend:${{ env.new_version }}
-        docker tag pga-backend_api ${{ secrets.DOCKERHUB_USERNAME }}/pga-backend:latest
+        # Lista todas as imagens para debug
+        echo "Listando imagens disponíveis:"
+        docker images
+        
+        # Obtém o ID da imagem do container api
+        IMAGE_ID=$(docker compose images -q api)
+        if [ -z "$IMAGE_ID" ]; then
+          echo "Erro: Não foi possível encontrar a imagem do container api"
+          exit 1
+        fi
+        
+        # Faz o tag da imagem
+        docker tag $IMAGE_ID ${{ secrets.DOCKERHUB_USERNAME }}/pga-backend:${{ env.new_version }}
+        docker tag $IMAGE_ID ${{ secrets.DOCKERHUB_USERNAME }}/pga-backend:latest
+        
+        # Verifica se o tag foi feito corretamente
+        docker images | grep pga-backend
       working-directory: ./PGA-Backend
 
     - name: Push Docker image to Docker Hub
