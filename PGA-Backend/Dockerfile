@@ -1,9 +1,5 @@
 FROM node:23-bullseye
 
-# Otimizações de memória para Node.js
-ENV NODE_ENV=production
-ENV NODE_OPTIONS="--max-old-space-size=4096"
-
 # Instalar dependências para compilar módulos nativos
 RUN apt-get update && apt-get install -y \
     python3 \
@@ -13,7 +9,7 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Copiar apenas arquivos necessários primeiro
+# Copiar arquivos de configuração
 COPY package*.json ./
 COPY prisma ./prisma/
 
@@ -28,9 +24,6 @@ COPY . .
 
 # Construir aplicação
 RUN npm run build
-
-# Remover dependências de desenvolvimento
-RUN npm ci --only=production && npm cache clean --force
 
 EXPOSE 3000
 
