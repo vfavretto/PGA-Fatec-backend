@@ -17,9 +17,8 @@ WORKDIR /app
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Instalar apenas dependências de produção
-RUN npm ci --only=production \
-    && npm cache clean --force
+# Instalar todas as dependências para build
+RUN npm ci && npm cache clean --force
 
 # Gerar Prisma Client
 RUN npx prisma generate
@@ -29,6 +28,9 @@ COPY . .
 
 # Construir aplicação
 RUN npm run build
+
+# Remover dependências de desenvolvimento
+RUN npm ci --only=production && npm cache clean --force
 
 EXPOSE 3000
 
