@@ -18,7 +18,7 @@ COPY package*.json ./
 COPY prisma ./prisma/
 
 # Instalar todas as dependências para build
-RUN npm ci && npm cache clean --force
+RUN npm install
 
 # Gerar Prisma Client
 RUN npx prisma generate
