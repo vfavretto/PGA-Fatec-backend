@@ -14,6 +14,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
       - NODE_OPTIONS="--max-old-space-size=4096"
+      - JWT_SECRET=${JWT_SECRET}
     deploy:
       resources:
         limits:
