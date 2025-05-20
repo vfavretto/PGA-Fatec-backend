@@ -194,6 +194,17 @@ model Curso {
   rotinas        RotinaInstitucional[]
 }
 
+model Attachment1 {
+  id                         String   @id @default(uuid())
+  item                       String
+  projeto                    String
+  denominacaoOuEspecificacao String
+  quantidade                 Int      @db.Integer
+  precoTotalEstimado         Decimal    @db.Decimal(10, 2)
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
+}
+
 enum StatusPGA {
   EmElaboracao
   Submetido
@@ -279,15 +290,4 @@ enum StatusCurso {
   EmImplantacao
   Ativo
   Inativo
-}
-
-model Attachment1 {
-  id                         String   @id @default(uuid())
-  item                       String
-  projeto                    String
-  denominacaoOuEspecificacao String
-  quantidade                 Int      @db.Integer
-  precoTotalEstimado         Float    @db.Decimal(10, 2)
-  createdAt                  DateTime @default(now())
-  updatedAt                  DateTime @updatedAt
 }

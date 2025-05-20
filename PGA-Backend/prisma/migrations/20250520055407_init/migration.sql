@@ -112,7 +112,7 @@ CREATE TABLE "Pessoa" (
     "nome" VARCHAR(255) NOT NULL,
     "email" VARCHAR(255),
     "nome_usuario" VARCHAR(30),
-    "senha" VARCHAR(30),
+    "senha" VARCHAR(255),
     "tipo_usuario" "TipoUsuario" NOT NULL,
 
     CONSTRAINT "Pessoa_pkey" PRIMARY KEY ("pessoa_id")
@@ -203,8 +203,8 @@ CREATE TABLE "RotinaOcorrencia" (
     "ocorrencia_id" SERIAL NOT NULL,
     "rotina_id" INTEGER NOT NULL,
     "data_realizacao" DATE NOT NULL,
-    "hora_inicio" TIME,
-    "hora_fim" TIME,
+    "hora_inicio" TIME(6),
+    "hora_fim" TIME(6),
     "local" VARCHAR(255),
     "pauta" TEXT,
     "resultado" TEXT,
@@ -224,6 +224,20 @@ CREATE TABLE "Curso" (
     "coordenador_id" INTEGER,
 
     CONSTRAINT "Curso_pkey" PRIMARY KEY ("curso_id")
+);
+
+-- CreateTable
+CREATE TABLE "Attachment1" (
+    "id" TEXT NOT NULL,
+    "item" TEXT NOT NULL,
+    "projeto" TEXT NOT NULL,
+    "denominacaoOuEspecificacao" TEXT NOT NULL,
+    "quantidade" INTEGER NOT NULL,
+    "precoTotalEstimado" DECIMAL(10,2) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Attachment1_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -248,10 +262,10 @@ ALTER TABLE "PGA" ADD CONSTRAINT "PGA_unidade_id_fkey" FOREIGN KEY ("unidade_id"
 ALTER TABLE "SituacaoProblema" ADD CONSTRAINT "SituacaoProblema_pga_id_fkey" FOREIGN KEY ("pga_id") REFERENCES "PGA"("pga_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "AcaoProjeto" ADD CONSTRAINT "AcaoProjeto_pga_id_fkey" FOREIGN KEY ("pga_id") REFERENCES "PGA"("pga_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "AcaoProjeto" ADD CONSTRAINT "AcaoProjeto_eixo_id_fkey" FOREIGN KEY ("eixo_id") REFERENCES "EixoTematico"("eixo_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "AcaoProjeto" ADD CONSTRAINT "AcaoProjeto_eixo_id_fkey" FOREIGN KEY ("eixo_id") REFERENCES "EixoTematico"("eixo_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "AcaoProjeto" ADD CONSTRAINT "AcaoProjeto_pga_id_fkey" FOREIGN KEY ("pga_id") REFERENCES "PGA"("pga_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "AcaoProjeto" ADD CONSTRAINT "AcaoProjeto_prioridade_id_fkey" FOREIGN KEY ("prioridade_id") REFERENCES "PrioridadeAcao"("prioridade_id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -275,25 +289,25 @@ ALTER TABLE "Aquisicao" ADD CONSTRAINT "Aquisicao_pga_id_fkey" FOREIGN KEY ("pga
 ALTER TABLE "AcaoCPA" ADD CONSTRAINT "AcaoCPA_pga_id_fkey" FOREIGN KEY ("pga_id") REFERENCES "PGA"("pga_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "RotinaInstitucional" ADD CONSTRAINT "RotinaInstitucional_pga_id_fkey" FOREIGN KEY ("pga_id") REFERENCES "PGA"("pga_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "RotinaInstitucional" ADD CONSTRAINT "RotinaInstitucional_curso_id_fkey" FOREIGN KEY ("curso_id") REFERENCES "Curso"("curso_id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "RotinaInstitucional" ADD CONSTRAINT "RotinaInstitucional_curso_id_fkey" FOREIGN KEY ("curso_id") REFERENCES "Curso"("curso_id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "RotinaInstitucional" ADD CONSTRAINT "RotinaInstitucional_pga_id_fkey" FOREIGN KEY ("pga_id") REFERENCES "PGA"("pga_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "RotinaInstitucional" ADD CONSTRAINT "RotinaInstitucional_responsavel_id_fkey" FOREIGN KEY ("responsavel_id") REFERENCES "Pessoa"("pessoa_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "RotinaParticipante" ADD CONSTRAINT "RotinaParticipante_rotina_id_fkey" FOREIGN KEY ("rotina_id") REFERENCES "RotinaInstitucional"("rotina_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "RotinaParticipante" ADD CONSTRAINT "RotinaParticipante_pessoa_id_fkey" FOREIGN KEY ("pessoa_id") REFERENCES "Pessoa"("pessoa_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "RotinaParticipante" ADD CONSTRAINT "RotinaParticipante_pessoa_id_fkey" FOREIGN KEY ("pessoa_id") REFERENCES "Pessoa"("pessoa_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "RotinaParticipante" ADD CONSTRAINT "RotinaParticipante_rotina_id_fkey" FOREIGN KEY ("rotina_id") REFERENCES "RotinaInstitucional"("rotina_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "RotinaOcorrencia" ADD CONSTRAINT "RotinaOcorrencia_rotina_id_fkey" FOREIGN KEY ("rotina_id") REFERENCES "RotinaInstitucional"("rotina_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Curso" ADD CONSTRAINT "Curso_unidade_id_fkey" FOREIGN KEY ("unidade_id") REFERENCES "Unidade"("unidade_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Curso" ADD CONSTRAINT "Curso_coordenador_id_fkey" FOREIGN KEY ("coordenador_id") REFERENCES "Pessoa"("pessoa_id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Curso" ADD CONSTRAINT "Curso_coordenador_id_fkey" FOREIGN KEY ("coordenador_id") REFERENCES "Pessoa"("pessoa_id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Curso" ADD CONSTRAINT "Curso_unidade_id_fkey" FOREIGN KEY ("unidade_id") REFERENCES "Unidade"("unidade_id") ON DELETE RESTRICT ON UPDATE CASCADE;
