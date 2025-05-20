@@ -6,6 +6,7 @@ import { FindAllAttachment1Service } from '../attachment1/services/find-all-atta
 import { FindOneAttachment1Service } from '../attachment1/services/find-one-attachment1.service';
 import { UpdateAttachment1Service } from '../attachment1/services/update-attachment1.service';
 import { DeleteAttachment1Service } from '../attachment1/services/delete-attachment1.service';
+import { Public } from '../auth/decorators/is-public.decorator';
 
 @Controller('attachment1')
 export class Attachment1Controller {
@@ -17,6 +18,7 @@ export class Attachment1Controller {
     private readonly deleteService: DeleteAttachment1Service,
   ) {}
 
+  @Public()
   @Post()
   create(@Body() dto: CreateAttachment1Dto) {
     return this.createService.execute(dto);

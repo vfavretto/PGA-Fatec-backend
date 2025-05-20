@@ -6,11 +6,13 @@ import { FindAllAttachment1Service } from './services/find-all-attachment1.servi
 import { FindOneAttachment1Service } from './services/find-one-attachment1.service';
 import { UpdateAttachment1Service } from './services/update-attachment1.service';
 import { DeleteAttachment1Service } from './services/delete-attachment1.service';
+import { Attachment1Repository } from './attachment1.repository';
 
 @Module({
   imports: [PrismaModule],
   controllers: [Attachment1Controller],
   providers: [
+    Attachment1Repository,
     CreateAttachment1Service,
     FindAllAttachment1Service,
     FindOneAttachment1Service,
