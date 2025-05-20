@@ -286,8 +286,8 @@ model Attachment1 {
   item                       String
   projeto                    String
   denominacaoOuEspecificacao String
-  quantidade                 Int
-  precoTotalEstimado         Float
+  quantidade                 Int      @db.Integer
+  precoTotalEstimado         Float    @db.Decimal(10, 2)
   createdAt                  DateTime @default(now())
   updatedAt                  DateTime @updatedAt
 }

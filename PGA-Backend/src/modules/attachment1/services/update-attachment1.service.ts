@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../../config/prisma.service';
+import { Attachment1Repository } from '../attachment1.repository';
 import { UpdateAttachment1Dto } from '../dto/update-attachment1.dto';
 
 @Injectable()
 export class UpdateAttachment1Service {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly attachment1Repository: Attachment1Repository) {}
 
-  async execute(id: string, dto: UpdateAttachment1Dto) {
-    return this.prisma.attachment1.update({ where: { id }, data: dto });
+  async execute(id: string, data: UpdateAttachment1Dto) {
+    return this.attachment1Repository.update(id, data);
   }
 }

@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../../config/prisma.service';
+import { Attachment1Repository } from '../attachment1.repository';
 
 @Injectable()
 export class DeleteAttachment1Service {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly attachment1Repository: Attachment1Repository) {}
 
   async execute(id: string) {
-    return this.prisma.attachment1.delete({ where: { id } });
+    return this.attachment1Repository.delete(id);
   }
 }
