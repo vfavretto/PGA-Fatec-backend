@@ -91,7 +91,7 @@ model Pessoa {
   projetos             ProjetoPessoa[]
   rotinas_responsaveis RotinaInstitucional[] @relation("ResponsavelRotina")
   rotinas_participante RotinaParticipante[]
-}
+}     
 
 model ProjetoPessoa {
   projeto_pessoa_id     Int            @id @default(autoincrement())
@@ -279,4 +279,15 @@ enum StatusCurso {
   EmImplantacao
   Ativo
   Inativo
+}
+
+model Attachment1 {
+  id                         String   @id @default(uuid())
+  item                       String
+  projeto                    String
+  denominacaoOuEspecificacao String
+  quantidade                 Int
+  precoTotalEstimado         Float
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
 }
