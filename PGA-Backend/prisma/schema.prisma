@@ -49,22 +49,33 @@ model EixoTematico {
   nome          String        @db.VarChar(255)
   descricao     String?
   acoesProjetos AcaoProjeto[]
+  temas         Tema[]
 }
 
 model PrioridadeAcao {
   prioridade_id Int           @id @default(autoincrement())
   grau          Int           @unique
   descricao     String        @db.VarChar(255)
-  tipo_gestao   String?       @db.VarChar(100)
+  tipo_gestao   String        @db.VarChar(100)
+  detalhes      String?       @db.Text
+  acoesProjetos AcaoProjeto[]
+}
+
+model Tema {
+  tema_id       Int           @id @default(autoincrement())
+  tema_num      Int           @unique
+  eixo_id       Int           
+  eixo          EixoTematico  @relation(fields: [eixo_id], references: [eixo_id])
+  descricao     String        @db.VarChar(255)
   acoesProjetos AcaoProjeto[]
 }
 
 model AcaoProjeto {
-  acao_projeto_id                        Int             @id @default(autoincrement())
-  pga_id                                 Int
-  eixo_id                                Int
-  prioridade_id                          Int
-  tema                                   String          @db.VarChar(255)
+  acao_projeto_id Int         @id @default(autoincrement())
+  pga_id          Int
+  eixo_id         Int
+  prioridade_id   Int
+  tema_id         Int         
   o_que_sera_feito                       String
   por_que_sera_feito                     String
   data_inicio                            DateTime?       @db.Date
@@ -73,11 +84,14 @@ model AcaoProjeto {
   obrigatorio_inclusao                   Boolean         @default(false)
   obrigatorio_sustentabilidade           Boolean         @default(false)
   eixo                                   EixoTematico    @relation(fields: [eixo_id], references: [eixo_id])
+  tema                                   Tema            @relation(fields: [tema_id], references: [tema_id])
   pga                                    PGA             @relation(fields: [pga_id], references: [pga_id])
   prioridade                             PrioridadeAcao  @relation(fields: [prioridade_id], references: [prioridade_id])
   aquisicoes                             Aquisicao[]
   etapas                                 EtapaProcesso[]
   pessoas                                ProjetoPessoa[]
+  attachment1Id                          String? 
+  attachment1                            Attachment1?    @relation("Attachment1ToAcaoProjeto", fields: [attachment1Id], references: [id])
 }
 
 model Pessoa {
@@ -91,7 +105,7 @@ model Pessoa {
   projetos             ProjetoPessoa[]
   rotinas_responsaveis RotinaInstitucional[] @relation("ResponsavelRotina")
   rotinas_participante RotinaParticipante[]
-}     
+}
 
 model ProjetoPessoa {
   projeto_pessoa_id     Int            @id @default(autoincrement())
@@ -108,12 +122,21 @@ model EtapaProcesso {
   etapa_id                   Int               @id @default(autoincrement())
   acao_projeto_id            Int
   descricao                  String
-  entregavel_link_sei        String?           @db.VarChar(255)
+  entregavel_id              Int
+  entregavel_link_sei        EntregavelLinkSei @relation(fields: [entregavel_id], references: [entregavel_id])
   numero_ref                 String?           @db.VarChar(50)
   data_verificacao_prevista  DateTime?         @db.Date
   data_verificacao_realizada DateTime?         @db.Date
   status_verificacao         StatusVerificacao @default(Pendente)
   acaoProjeto                AcaoProjeto       @relation(fields: [acao_projeto_id], references: [acao_projeto_id])
+}
+
+model EntregavelLinkSei {
+  entregavel_id              Int               @id @default(autoincrement())
+  entregavel_numero          String            @unique @db.VarChar(50)
+  descricao                  String            @db.VarChar(255)
+  detalhes                   String?           @db.VarChar(500)
+  etapas                     EtapaProcesso[]
 }
 
 model Aquisicao {
@@ -195,14 +218,15 @@ model Curso {
 }
 
 model Attachment1 {
-  id                         String   @id @default(uuid())
+  id                         String        @id @default(uuid())
   item                       String
-  projeto                    String
+  projeto                    AcaoProjeto[] @relation("Attachment1ToAcaoProjeto")
   denominacaoOuEspecificacao String
-  quantidade                 Int      @db.Integer
-  precoTotalEstimado         Decimal    @db.Decimal(10, 2)
-  createdAt                  DateTime @default(now())
-  updatedAt                  DateTime @updatedAt
+  quantidade                 Int           @db.Integer
+  precoTotalEstimado         Decimal       @db.Decimal(10, 2)
+  createdAt                  DateTime      @default(now())
+  updatedAt                  DateTime      @updatedAt
+  flag                       AnexoProjetoUm
 }
 
 enum StatusPGA {
@@ -291,3 +315,11 @@ enum StatusCurso {
   Ativo
   Inativo
 }
+
+enum AnexoProjetoUm {
+  Anexo1 @map("1")
+  Anexo2 @map("2")  
+  Anexo3 @map("3")
+  Anexo4 @map("4")
+}
+
