@@ -1,12 +1,21 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, ParseIntPipe,} from "@nestjs/common";
-import { CreateProject1Service } from "../project1/services/createProject1.service";
-import { DeleteProject1Service } from "../project1/services/deleteProject1.service";
-import { FindAllProject1Service } from "../project1/services/findAllProject1.service";
-import { FindOneProject1Service } from "../project1/services/findOneProject1.service";
-import { UpdateProject1Service } from "../project1/services/updateProject1.service";
-import { Prisma } from "@prisma/client";
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+  ParseIntPipe,
+} from '@nestjs/common';
+import { CreateProject1Service } from '../project1/services/createProject1.service';
+import { DeleteProject1Service } from '../project1/services/deleteProject1.service';
+import { FindAllProject1Service } from '../project1/services/findAllProject1.service';
+import { FindOneProject1Service } from '../project1/services/findOneProject1.service';
+import { UpdateProject1Service } from '../project1/services/updateProject1.service';
+import { Prisma } from '@prisma/client';
 
-@Controller("project1")
+@Controller('project1')
 export class Project1Controller {
   constructor(
     private readonly createProject1Service: CreateProject1Service,
@@ -21,8 +30,8 @@ export class Project1Controller {
     return this.findAllProject1Service.execute();
   }
 
-  @Get(":id")
-  async findOne(@Param("id", ParseIntPipe) id: number) {
+  @Get(':id')
+  async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.findOneProject1Service.execute(id);
   }
 
@@ -31,16 +40,16 @@ export class Project1Controller {
     return this.createProject1Service.execute(data);
   }
 
-  @Put(":id")
+  @Put(':id')
   async update(
-    @Param("id", ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() data: Prisma.AcaoProjetoUncheckedUpdateInput,
   ) {
     return this.updateProject1Service.execute(id, data);
   }
 
-  @Delete(":id")
-  async delete(@Param("id", ParseIntPipe) id: number) {
+  @Delete(':id')
+  async delete(@Param('id', ParseIntPipe) id: number) {
     return this.deleteProject1Service.execute(id);
   }
 }

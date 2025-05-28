@@ -1,8 +1,16 @@
-import { Controller, Post, Get, Put, Delete, Body, Param } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Put,
+  Delete,
+  Body,
+  Param,
+} from '@nestjs/common';
 import { CreateThematicAxisDto } from './dto/create-thematicAxis.dto';
 import { UpdateThematicAxisDto } from './dto/update-thematicAxis.dto';
 import { CreateThematicAxisService } from './services/create-thematicAxis.service';
-import { FindAllThematicAxisService } from './services/find-all-thematicAxis.service'
+import { FindAllThematicAxisService } from './services/find-all-thematicAxis.service';
 import { FindOneThematicAxisService } from './services/find-one-thematicAxis.service';
 import { UpdateThematicAxisService } from './services/update-thematicAxis.service';
 import { DeleteThematicAxisService } from './services/delete-thematicAxis.service';
