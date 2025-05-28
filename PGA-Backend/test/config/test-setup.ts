@@ -14,11 +14,13 @@ export async function setupTestApp(): Promise<{
   const app = moduleRef.createNestApplication();
   const prismaService = app.get<PrismaService>(PrismaService);
 
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    transform: true,
-    forbidNonWhitelisted: true
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
 
   await app.init();
 
