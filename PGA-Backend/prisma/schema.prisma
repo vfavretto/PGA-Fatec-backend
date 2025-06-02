@@ -113,9 +113,10 @@ model ProjetoPessoa {
   pessoa_id             Int
   papel                 PapelProjeto
   carga_horaria_semanal Int?
-  tipo_vinculo_hae      TipoVinculoHAE @default(NaoSeAplica)
-  acaoProjeto           AcaoProjeto    @relation(fields: [acao_projeto_id], references: [acao_projeto_id])
-  pessoa                Pessoa         @relation(fields: [pessoa_id], references: [pessoa_id])
+  tipo_vinculo_hae_id   Int?            
+  tipo_vinculo_hae      TipoVinculoHAE? @relation(fields: [tipo_vinculo_hae_id], references: [id])
+  acaoProjeto           AcaoProjeto     @relation(fields: [acao_projeto_id], references: [acao_projeto_id])
+  pessoa                Pessoa          @relation(fields: [pessoa_id], references: [pessoa_id])
 }
 
 model EtapaProcesso {
@@ -229,6 +230,14 @@ model Attachment1 {
   flag                       AnexoProjetoUm
 }
 
+model TipoVinculoHAE {
+  id                    Int             @id @default(autoincrement())
+  sigla                 String          @unique @db.VarChar(10)
+  descricao             String          @db.VarChar(255)
+  detalhes              String?         @db.Text
+  projetos_pessoas      ProjetoPessoa[]
+}
+
 enum StatusPGA {
   EmElaboracao
   Submetido
@@ -245,13 +254,6 @@ enum TipoUsuario {
 enum PapelProjeto {
   Responsavel
   Colaborador
-}
-
-enum TipoVinculoHAE {
-  HAE15       @map("15")
-  HAE25       @map("25")
-  HAE40       @map("40")
-  NaoSeAplica
 }
 
 enum StatusVerificacao {
