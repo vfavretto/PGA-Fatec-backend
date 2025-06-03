@@ -5,7 +5,6 @@ import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/config/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { setupTestApp } from './config/test-setup';
 
 describe('API Endpoints (e2e)', () => {
   let app: INestApplication;
@@ -14,10 +13,6 @@ describe('API Endpoints (e2e)', () => {
   let authToken: string;
 
   beforeAll(async () => {
-    const setup = await setupTestApp();
-    app = setup.app;
-    prismaService = setup.prismaService;
-
     // Mock environment variables
     process.env.FRONTEND_URL = 'http://localhost:5173';
     process.env.PORT = '3001';
@@ -28,7 +23,8 @@ describe('API Endpoints (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    jwtService = moduleFixture.get<JwtService>(JwtService);
+    prismaService = app.get<PrismaService>(PrismaService);
+    jwtService = app.get<JwtService>(JwtService);
 
     // Configure app with the same settings as in main.ts
     app.enableCors({
