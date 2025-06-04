@@ -1,4 +1,26 @@
 services:
+  postgres:
+      image: postgres:16-alpine
+      container_name: pga-postgres
+      restart: always
+      ports:
+        - '5432:5432'
+      env_file:
+        - .env
+      environment:
+        - POSTGRES_USER=${POSTGRES_USER}
+        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+        - POSTGRES_DB=${POSTGRES_DB}
+      volumes:
+        - postgres_data:/var/lib/postgresql/data
+      networks:
+        - pga-network
+      healthcheck:
+        test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+        interval: 10s
+        timeout: 5s
+        retries: 5
+        start_period: 30s
   api:
     build:
       context: .
@@ -7,44 +29,19 @@ services:
     restart: always
     ports:
       - '3000:3000'
-    depends_on:
-      - postgres
     env_file:
       - .env
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
-      - NODE_OPTIONS="--max-old-space-size=4096"
-      - JWT_SECRET=${JWT_SECRET}
-    deploy:
-      resources:
-        limits:
-          memory: 6G
-        reservations:
-          memory: 3G
-    
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - pga-network
-
-  postgres:
-    image: postgres:16-alpine
-    container_name: pga-postgres
-    restart: always
-    ports:
-      - '5432:5432'
-    env_file:
-      - .env
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - pga-network
-
-volumes:
-  postgres_data:
 
 networks:
   pga-network:
     driver: bridge
+
+volumes:
+  postgres_data:    

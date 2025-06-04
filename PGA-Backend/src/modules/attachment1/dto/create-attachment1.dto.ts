@@ -1,4 +1,5 @@
-import { IsString, IsNumber, IsNotEmpty, Min } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, Min, IsEnum } from 'class-validator';
+import { AnexoProjetoUm } from '@prisma/client';
 
 export class CreateAttachment1Dto {
   @IsNotEmpty({ message: 'O item é obrigatório' })
@@ -6,8 +7,8 @@ export class CreateAttachment1Dto {
   item: string;
 
   @IsNotEmpty({ message: 'O projeto é obrigatório' })
-  @IsString({ message: 'O projeto deve ser uma string' })
-  projeto: string;
+  @IsString({ message: 'O ID do projeto deve ser uma string' })
+  projetoId: string;
 
   @IsNotEmpty({ message: 'A denominação/especificação é obrigatória' })
   @IsString({ message: 'A denominação/especificação deve ser uma string' })
@@ -22,4 +23,8 @@ export class CreateAttachment1Dto {
   @IsNumber({}, { message: 'O preço total estimado deve ser um número' })
   @Min(0, { message: 'O preço total estimado não pode ser negativo' })
   precoTotalEstimado: number;
+
+  @IsNotEmpty({ message: 'O tipo de anexo é obrigatório' })
+  @IsEnum(AnexoProjetoUm, { message: 'Tipo de anexo inválido' })
+  flag: AnexoProjetoUm;
 }
