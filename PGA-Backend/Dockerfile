@@ -13,16 +13,16 @@ WORKDIR /app
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Instalar dependências
+# Instalar todas as dependências para build
 RUN npm install
 
-# Gerar o Prisma Client
+# Gerar Prisma Client
 RUN npx prisma generate
 
-# Copiar código fonte
+# Copiar resto do código
 COPY . .
 
-# Construir a aplicação
+# Construir aplicação
 RUN npm run build
 
 EXPOSE 3000
