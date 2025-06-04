@@ -1,4 +1,4 @@
-FROM node:23-bullseye
+FROM node:slim
 
 # Instalar dependências para compilar módulos nativos
 RUN apt-get update && apt-get install -y \

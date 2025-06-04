@@ -6,8 +6,10 @@ import { FindAllProject1Service } from "./services/findAllProject1.service";
 import { FindOneProject1Service } from "./services/findOneProject1.service";
 import { UpdateProject1Service } from "./services/updateProject1.service";
 import { Project1Controller } from "./project1.controller";
+import { PrismaModule } from "@/config/prisma.module";
 
 @Module({
+  imports: [PrismaModule],
   controllers: [Project1Controller],
   providers: [
     Project1Repository,
