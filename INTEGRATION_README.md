@@ -16,19 +16,10 @@
 - ✅ Código mais limpo e maintível
 - ✅ Tipos corretos e consistentes
 
-### 2. **AnexoForm.tsx** - Limpeza de Imports
-**Problemas resolvidos:**
-- ❌ Import `useParams` removido (não utilizado)
-- ❌ Import `useAuth` e variável `user` removidos (não utilizados)
-
 **Funcionalidade mantida:**
 - ✅ Integração completa com API de projetos
 - ✅ Formulário funcional para criação de anexos
 - ✅ Validação e tratamento de erros
-
-### 3. **commonServices.ts** - Otimização
-**Problemas resolvidos:**
-- ❌ Imports não utilizados removidos (`EntregavelLinkSei`, `SituacaoProblema`, `TipoVinculoHAE`)
 
 **Funcionalidade mantida:**
 - ✅ Serviços para EixoTematico, PrioridadeAcao, Tema, User
