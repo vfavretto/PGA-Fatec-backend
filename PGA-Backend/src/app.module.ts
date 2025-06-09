@@ -23,6 +23,7 @@ import { ProjectPersonModule } from './modules/projectPerson/project-person.modu
 import { RoutineOccurrenceModule } from './modules/routineOccurrence/routine-occurrence.module';
 import { RoutineParticipantModule } from './modules/routineParticipant/routine-participant.module';
 import { UnitModule } from './modules/unit/unit.module';
+import { AuditModule } from './modules/audit/audit.module';
 
 @Module({
   imports: [
@@ -48,8 +49,8 @@ import { UnitModule } from './modules/unit/unit.module';
     ProjectPersonModule,
     RoutineOccurrenceModule,
     RoutineParticipantModule,
-    UnitModule
-    //TODO: Add other modules here
+    UnitModule,
+    AuditModule,
   ],
   providers: [
     PrismaService,
