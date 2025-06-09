@@ -55,7 +55,7 @@ export class ConfigurationSnapshotService {
       where: { ativo: true },
     });
 
-    const versoes: SituacaoProblemaVersao[] = []; // CORRIGIDO: tipo explícito
+    const versoes: SituacaoProblemaVersao[] = [];
     
     for (const situacao of situacoesAtivas) {
       try {
@@ -75,8 +75,8 @@ export class ConfigurationSnapshotService {
             ano: ano,
             codigo_categoria: situacao.codigo_categoria,
             descricao: situacao.descricao,
-            fonte: situacao.fonte ?? undefined, // CORRIGIDO: conversão null -> undefined
-            ordem: situacao.ordem ?? undefined, // CORRIGIDO: conversão null -> undefined
+            fonte: situacao.fonte ?? undefined,
+            ordem: situacao.ordem ?? undefined,
             criado_por: usuarioId,
             motivo_alteracao: `Versão criada automaticamente para ano ${ano}`,
           });
@@ -107,7 +107,7 @@ export class ConfigurationSnapshotService {
       where: { ativo: true },
     });
 
-    const versoes: EixoTematicoVersao[] = []; // CORRIGIDO: tipo explícito
+    const versoes: EixoTematicoVersao[] = [];
     
     for (const eixo of eixosAtivos) {
       try {
@@ -126,7 +126,7 @@ export class ConfigurationSnapshotService {
             ano: ano,
             numero: eixo.numero,
             nome: eixo.nome,
-            descricao: eixo.descricao ?? undefined, // CORRIGIDO: conversão null -> undefined
+            descricao: eixo.descricao ?? undefined,
             criado_por: usuarioId,
             motivo_alteracao: `Versão criada automaticamente para ano ${ano}`,
           });
@@ -156,7 +156,7 @@ export class ConfigurationSnapshotService {
       where: { ativo: true },
     });
 
-    const versoes: PrioridadeAcaoVersao[] = []; // CORRIGIDO: tipo explícito
+    const versoes: PrioridadeAcaoVersao[] = [];
     
     for (const prioridade of prioridadesAtivas) {
       try {
@@ -176,7 +176,7 @@ export class ConfigurationSnapshotService {
             grau: prioridade.grau,
             descricao: prioridade.descricao,
             tipo_gestao: prioridade.tipo_gestao,
-            detalhes: prioridade.detalhes ?? undefined, // CORRIGIDO: conversão null -> undefined
+            detalhes: prioridade.detalhes ?? undefined,
             criado_por: usuarioId,
             motivo_alteracao: `Versão criada automaticamente para ano ${ano}`,
           });
@@ -206,7 +206,7 @@ export class ConfigurationSnapshotService {
       where: { ativo: true },
     });
 
-    const versoes: TemaVersao[] = []; // CORRIGIDO: tipo explícito
+    const versoes: TemaVersao[] = [];
     
     for (const tema of temasAtivos) {
       try {
@@ -255,7 +255,7 @@ export class ConfigurationSnapshotService {
       where: { ativo: true },
     });
 
-    const versoes: EntregavelVersao[] = []; // CORRIGIDO: tipo explícito
+    const versoes: EntregavelVersao[] = [];
     
     for (const entregavel of entregaveisAtivos) {
       try {
@@ -274,7 +274,7 @@ export class ConfigurationSnapshotService {
             ano: ano,
             entregavel_numero: entregavel.entregavel_numero,
             descricao: entregavel.descricao,
-            detalhes: entregavel.detalhes ?? undefined, // CORRIGIDO: conversão null -> undefined
+            detalhes: entregavel.detalhes ?? undefined,
             criado_por: usuarioId,
             motivo_alteracao: `Versão criada automaticamente para ano ${ano}`,
           });
@@ -304,7 +304,7 @@ export class ConfigurationSnapshotService {
       where: { ativo: true },
     });
 
-    const versoes: PessoaVersao[] = []; // CORRIGIDO: tipo explícito
+    const versoes: PessoaVersao[] = [];
     
     for (const pessoa of pessoasAtivas) {
       try {
@@ -322,7 +322,7 @@ export class ConfigurationSnapshotService {
             pessoa_base_id: pessoa.pessoa_id,
             ano: ano,
             nome: pessoa.nome,
-            email: pessoa.email ?? undefined, // CORRIGIDO: conversão null -> undefined
+            email: pessoa.email ?? undefined,
             tipo_usuario: pessoa.tipo_usuario,
             criado_por: usuarioId,
             motivo_alteracao: `Versão criada automaticamente para ano ${ano}`,

@@ -1,4 +1,3 @@
-// src/modules/audit/types/audit.types.ts
 export interface ReportEntry {
   tabela: string;
   operacao: string;

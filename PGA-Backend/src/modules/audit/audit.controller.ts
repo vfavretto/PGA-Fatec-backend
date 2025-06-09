@@ -34,7 +34,6 @@ export class AuditController {
     );
   }
 
-  // 🔥 ENDPOINT QUE PRECISA FILTRAR POR ANO
   @Get('configurations/year/:ano')
   async getConfigurationsByYear(@Param('ano', ParseIntPipe) ano: number) {
     return this.auditLogService.getConfigurationsByYear(ano);
