@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased] - Major Release v1.0.0
+## Major Release v1.0.0
 
 ### 🔥 BREAKING CHANGES
 
