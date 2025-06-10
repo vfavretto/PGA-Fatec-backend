@@ -77,7 +77,3 @@ Para desenvolvedores atualizando da v0.4.x:
 - **PostgreSQL**: >=13.0
 - **Docker**: >=20.10
 - **Docker Compose**: >=2.0
-
----
-
-**⚠️ IMPORTANT**: Esta é uma versão com mudanças incompatíveis (breaking changes). Teste completamente sua aplicação antes de fazer upgrade para produção. 
