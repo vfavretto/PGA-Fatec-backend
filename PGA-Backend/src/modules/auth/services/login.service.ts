@@ -17,7 +17,8 @@ export class LoginService {
     const payload = { 
       email: user.email, 
       pessoa_id: user.pessoa_id,
-      nome: user.nome 
+      nome: user.nome,
+      tipo_usuario: user.tipo_usuario,
     };
 
     return {

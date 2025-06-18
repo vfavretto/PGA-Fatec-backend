@@ -12,9 +12,8 @@ import { TipoOperacaoAuditoria } from '@prisma/client';
 
 @Injectable()
 export class AuditInterceptor implements NestInterceptor {
-  private readonly logger = new Logger(AuditInterceptor.name);
-
   constructor(private readonly auditLogService: AuditLogService) {}
+  private readonly logger = new Logger(AuditInterceptor.name);
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
@@ -52,10 +51,19 @@ export class AuditInterceptor implements NestInterceptor {
           const endTime = Date.now();
           const duration = endTime - startTime;
 
+          // Extrair o ID correto baseado na tabela
+          let registroId = auditInfo.registroId || this.extractIdFromResponse(response, auditInfo.tabela);
+          
+          // Se ainda não temos ID, pular a auditoria
+          if (!registroId) {
+            this.logger.warn(`⚠️ Não foi possível extrair registro_id para ${auditInfo.tabela}`);
+            return;
+          }
+
           // Usar o método existente createLog do AuditLogService
           await this.auditLogService.createLog({
             tabela: auditInfo.tabela,
-            registro_id: auditInfo.registroId || response?.id || this.extractIdFromResponse(response, auditInfo.tabela),
+            registro_id: registroId,
             ano: new Date().getFullYear(),
             operacao,
             dados_antes: null, // Por enquanto null, pode ser implementado depois
@@ -64,7 +72,7 @@ export class AuditInterceptor implements NestInterceptor {
             motivo: body?.motivo || null,
           });
 
-          this.logger.log(`✅ Auditoria registrada: ${auditInfo.tabela}.${operacao} em ${duration}ms`);
+          this.logger.log(`✅ Auditoria registrada: ${auditInfo.tabela}.${operacao} (ID: ${registroId}) em ${duration}ms`);
 
         } catch (error) {
           this.logger.error(`❌ Erro ao registrar auditoria: ${error.message}`, error.stack);
@@ -90,6 +98,7 @@ export class AuditInterceptor implements NestInterceptor {
       { pattern: /\/temas/, tabela: 'tema' },
       { pattern: /\/deliverable/, tabela: 'entregavel_link_sei' },
       { pattern: /\/entregaveis/, tabela: 'entregavel_link_sei' },
+      { pattern: /\/users\/request-access/, tabela: 'solicitacao_acesso' }, // Correção aqui!
       { pattern: /\/users/, tabela: 'pessoa' },
       { pattern: /\/pessoas/, tabela: 'pessoa' },
       { pattern: /\/pga/, tabela: 'pga' },
@@ -106,10 +115,7 @@ export class AuditInterceptor implements NestInterceptor {
       registroId = parseInt(idMatch[1], 10);
     }
 
-    return {
-      tabela: mapping.tabela,
-      registroId
-    };
+    return { tabela: mapping.tabela, registroId };
   }
 
   private extractIdFromResponse(response: any, tabela: string): number | null {
@@ -126,6 +132,18 @@ export class AuditInterceptor implements NestInterceptor {
       response.entregavel_id,
       response.pessoa_id,
       response.pga_id,
+      response.solicitacao_id, // Adicionar este
+      // Para responses que retornam { data: { ... } }
+      response.data?.id,
+      response.data?.[`${tabela}_id`],
+      response.data?.solicitacao_id,
+      response.data?.situacao_id,
+      response.data?.eixo_id,
+      response.data?.prioridade_id,
+      response.data?.tema_id,
+      response.data?.entregavel_id,
+      response.data?.pessoa_id,
+      response.data?.pga_id,
     ];
 
     return possibleIds.find(id => id !== undefined && id !== null) || null;

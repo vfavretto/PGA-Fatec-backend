@@ -6,5 +6,5 @@ export class UserEntity {
   email?: string;
   nome_usuario?: string;
   tipo_usuario: TipoUsuario;
-  createdAt?: Date; // caso adicione depois
+  createdAt?: Date;
 }
