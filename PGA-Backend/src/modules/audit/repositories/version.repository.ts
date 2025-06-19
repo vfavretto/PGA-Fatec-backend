@@ -19,7 +19,6 @@ export class VersionRepository {
     return this.prisma.situacaoProblemaVersao.create({ 
       data: {
         ...data,
-        // Converter null para undefined se necessário
         fonte: data.fonte ?? undefined,
         ordem: data.ordem ?? undefined,
         criado_por: data.criado_por ?? undefined,
@@ -29,7 +28,6 @@ export class VersionRepository {
   }
 
   async getSituacoesProblemaByYear(ano: number) {
-    // Primeiro tenta buscar versões específicas do ano
     const versoes = await this.prisma.situacaoProblemaVersao.findMany({
       where: { ano, ativo_no_ano: true },
       include: { situacaoBase: true },
@@ -48,7 +46,6 @@ export class VersionRepository {
       }));
     }
 
-    // Fallback para configurações atuais
     return this.prisma.situacaoProblema.findMany({
       where: { ativo: true },
       orderBy: { codigo_categoria: 'asc' },

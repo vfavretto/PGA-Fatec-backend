@@ -8,7 +8,7 @@ export class UpdateAttachment1Dto {
 
   @IsOptional()
   @IsString({ message: 'O ID do projeto deve ser uma string' })
-  projetoId?: string; // ID do projeto relacionado
+  projetoId?: string;
 
   @IsOptional()
   @IsString({ message: 'A denominação/especificação deve ser uma string' })
