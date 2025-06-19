@@ -18,7 +18,9 @@ export class RegisterDto {
   })
   senha: string;
 
-  @IsEnum(TipoUsuario, { message: 'Tipo de usuário inválido' })
+  @IsEnum(TipoUsuario, { 
+    message: 'Tipo de usuário inválido. Deve ser um dos seguintes: Administrador, CPS, Regional, Diretor, Coordenador, Administrativo, Docente' 
+  })
   @IsNotEmpty({ message: 'O tipo de usuário é obrigatório' })
   tipo_usuario: TipoUsuario;
 }

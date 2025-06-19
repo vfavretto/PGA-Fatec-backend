@@ -14,6 +14,8 @@ model Unidade {
   diretor_nome  String? @db.VarChar(255)
   cursos        Curso[]
   pgas          PGA[]
+  solicitacoesAcesso   SolicitacaoAcesso[]
+  pessoas PessoaUnidade[]
 }
 
 model PGA {
@@ -161,6 +163,8 @@ model Pessoa {
   
   criado_em            DateTime              @default(now())
   atualizado_em        DateTime              @updatedAt
+
+  unidades PessoaUnidade[]
   
   cursos_coordenados   Curso[]
   projetos             ProjetoPessoa[]
@@ -188,6 +192,8 @@ model Pessoa {
   temasAtualizados               Tema[]                       @relation("TemaAtualizador")
   entregaveisCriados             EntregavelLinkSei[]          @relation("EntregavelCriador")
   entregaveisAtualizados         EntregavelLinkSei[]          @relation("EntregavelAtualizador")
+
+  solicitacoesProcessadas  SolicitacaoAcesso[] @relation("ProcessadorSolicitacao")
 }
 
 model ProjetoPessoa {
@@ -358,9 +364,13 @@ enum StatusPGA {
 }
 
 enum TipoUsuario {
-  Docente
+  Administrador
+  CPS
+  Regional
+  Diretor
+  Coordenador
   Administrativo
-  Gestor
+  Docente
 }
 
 enum PapelProjeto {
@@ -575,4 +585,38 @@ enum TipoOperacaoAuditoria {
   ACTIVATE
   DEACTIVATE
   SNAPSHOT_CREATED
+}
+
+model SolicitacaoAcesso {
+  solicitacao_id       Int              @id @default(autoincrement())
+  nome                 String           @db.VarChar(255)
+  email                String           @db.VarChar(255)
+  unidade_id           Int
+  status               StatusSolicitacao @default(Pendente)
+  data_solicitacao     DateTime         @default(now())
+  data_processamento   DateTime?
+  processado_por       Int?
+  tipo_usuario_concedido TipoUsuario?
+  
+  unidade              Unidade          @relation(fields: [unidade_id], references: [unidade_id])
+  processador          Pessoa?          @relation("ProcessadorSolicitacao", fields: [processado_por], references: [pessoa_id])
+}
+
+enum StatusSolicitacao {
+  Pendente
+  Aprovada
+  Rejeitada
+}
+
+model PessoaUnidade {
+  pessoa_id  Int
+  unidade_id Int
+  data_vinculo DateTime @default(now())
+  ativo      Boolean @default(true)
+  
+  // Relacionamentos
+  pessoa  Pessoa  @relation(fields: [pessoa_id], references: [pessoa_id], onDelete: Cascade)
+  unidade Unidade @relation(fields: [unidade_id], references: [unidade_id], onDelete: Cascade)
+  
+  @@id([pessoa_id, unidade_id])
 }

@@ -1,5 +1,8 @@
+import { TipoUsuario } from '@prisma/client';
+
 export interface LoginPayload {
-  email: string;
   pessoa_id: number;
+  email: string;
   nome: string;
+  tipo_usuario: TipoUsuario;
 }

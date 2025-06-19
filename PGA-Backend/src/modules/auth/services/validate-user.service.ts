@@ -15,6 +15,7 @@ export class ValidateUserService {
           email: true,
           senha: true,
           nome: true,
+          tipo_usuario: true,
         },
       });
 
