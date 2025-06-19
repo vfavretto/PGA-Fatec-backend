@@ -1,16 +1,18 @@
-import { IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsString, IsOptional, IsInt, Matches } from 'class-validator';
 
 export class CreateProblemSituationDto {
-  @IsInt()
-  @IsNotEmpty()
-  pga_id: number;
+  @IsString()
+  @Matches(/^\d+\.\d+\.\d+$/, { message: 'Código deve seguir o formato: 0.1.01' })
+  codigo_categoria: string;
 
   @IsString()
-  @IsNotEmpty()
   descricao: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   fonte?: string;
-}
 
+  @IsOptional()
+  @IsInt()
+  ordem?: number;
+}
