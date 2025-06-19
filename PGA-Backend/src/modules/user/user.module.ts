@@ -14,6 +14,7 @@ import { ResetPasswordService } from './services/reset-password.service';
 import { ListAccessRequestsService } from './services/list-access-requests.service';
 import { ProcessAccessRequestService } from './services/process-access-request.service';
 import { RequestAccessService } from './services/request-access.service';
+import { GetUsersByUnitService } from './services/get-users-by-unit.service';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { RequestAccessService } from './services/request-access.service';
     ListAccessRequestsService,
     ProcessAccessRequestService,
     RequestAccessService,
+    GetUsersByUnitService,
   ],
   controllers: [UserController],
 })

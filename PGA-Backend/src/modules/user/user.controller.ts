@@ -17,6 +17,7 @@ import { RequestAccessDto } from './dto/request-access.dto';
 import { ListAccessRequestsService } from './services/list-access-requests.service';
 import { ProcessAccessRequestService } from './services/process-access-request.service';
 import { ProcessAccessRequestDto } from './dto/process-access-request.dto';
+import { GetUsersByUnitService } from './services/get-users-by-unit.service';
 
 @Controller('users')
 export class UserController {
@@ -31,6 +32,7 @@ export class UserController {
     private readonly listAccessRequestsService: ListAccessRequestsService,
     private readonly processAccessRequestService: ProcessAccessRequestService,
     private readonly requestAccessService: RequestAccessService,
+    private readonly getUsersByUnitService: GetUsersByUnitService,
   ) {}
 
   @Public()
@@ -110,5 +112,10 @@ export class UserController {
       data.status, 
       data.tipo_usuario
     );
+  }
+
+  @Get('by-unidade/:id')
+  async findByUnidade(@Param('id', ParseIntPipe) id: number) {
+    return this.getUsersByUnitService.execute(id);
   }
 }
