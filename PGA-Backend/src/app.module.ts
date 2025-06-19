@@ -12,6 +12,18 @@ import { PriorityActionModule } from './modules/priorityAction/priority-action.m
 import { Project1Module } from './modules/project1/project1.module';
 import { ThematicAxisModule } from './modules/thematicAxis/thematicAxis.module';
 import { WorkloadHaeModule } from './modules/workloadHAE/workload-hae.module';
+import { ThemesModule } from './modules/themes/themes.module';
+import { ProblemSituationModule } from './modules/problemSituation/problemSituation.module';
+import { CourseModule } from './modules/course/course.module';
+import { CpaActionModule } from './modules/cpaAction/cpa-action.module';
+import { InstitutionalRoutineModule } from './modules/institutionalRoutine/institutional-routine.module';
+import { PgaModule } from './modules/pga/pga.module';
+import { ProcessStepModule } from './modules/processStep/process-step.module';
+import { ProjectPersonModule } from './modules/projectPerson/project-person.module';
+import { RoutineOccurrenceModule } from './modules/routineOccurrence/routine-occurrence.module';
+import { RoutineParticipantModule } from './modules/routineParticipant/routine-participant.module';
+import { UnitModule } from './modules/unit/unit.module';
+import { AuditModule } from './modules/audit/audit.module';
 
 @Module({
   imports: [
@@ -26,8 +38,19 @@ import { WorkloadHaeModule } from './modules/workloadHAE/workload-hae.module';
     PriorityActionModule,
     Project1Module,
     ThematicAxisModule,
-    WorkloadHaeModule
-    //TODO: Add other modules here
+    ThemesModule,
+    WorkloadHaeModule,
+    ProblemSituationModule,
+    CourseModule,
+    CpaActionModule,
+    InstitutionalRoutineModule,
+    PgaModule,
+    ProcessStepModule,
+    ProjectPersonModule,
+    RoutineOccurrenceModule,
+    RoutineParticipantModule,
+    UnitModule,
+    AuditModule,
   ],
   providers: [
     PrismaService,

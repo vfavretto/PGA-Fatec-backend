@@ -2,8 +2,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// TODO: Lista de ação projetos (anexo 2)
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -19,79 +17,137 @@ model Unidade {
 }
 
 model PGA {
-  pga_id            Int                   @id @default(autoincrement())
-  unidade_id        Int
-  ano               Int
-  versao            String?               @db.VarChar(10)
-  analise_cenario   String?
-  data_elaboracao   DateTime?             @db.Date
-  data_parecer_gpr  DateTime?             @db.Date
-  status            StatusPGA             @default(EmElaboracao)
-  acoesCPA          AcaoCPA[]
-  acoesProjetos     AcaoProjeto[]
-  aquisicoes        Aquisicao[]
-  unidade           Unidade               @relation(fields: [unidade_id], references: [unidade_id])
-  rotinas           RotinaInstitucional[]
-  situacoesProblema SituacaoProblema[]
+  pga_id                    Int                   @id @default(autoincrement())
+  unidade_id                Int
+  ano                       Int
+  versao                    String?               @db.VarChar(10)
+  analise_cenario           String?
+  data_elaboracao           DateTime?             @db.Date
+  data_parecer_gpr          DateTime?             @db.Date
+  status                    StatusPGA             @default(EmElaboracao)
+  configuracoes_snapshot    Json?
+  data_snapshot_criado      DateTime              @default(now())
+  usuario_criacao_id        Int?
+  acoesCPA                  AcaoCPA[]
+  acoesProjetos             AcaoProjeto[]
+  aquisicoes                Aquisicao[]
+  unidade                   Unidade               @relation(fields: [unidade_id], references: [unidade_id])
+  rotinas                   RotinaInstitucional[]
+  situacoesProblemas        PGASituacaoProblema[]
+  usuarioCriacao            Pessoa?               @relation("PGACriador", fields: [usuario_criacao_id], references: [pessoa_id])
 }
 
 model SituacaoProblema {
-  situacao_id Int     @id @default(autoincrement())
-  pga_id      Int
-  descricao   String
-  fonte       String? @db.VarChar(255)
-  pga         PGA     @relation(fields: [pga_id], references: [pga_id])
+  situacao_id         Int                 @id @default(autoincrement())
+  codigo_categoria    String              @db.VarChar(20)
+  descricao           String
+  fonte               String?             @db.VarChar(255)
+  ativo               Boolean             @default(true)
+  ordem               Int?
+
+  criado_em           DateTime            @default(now())
+  criado_por          Int?
+  atualizado_em       DateTime            @updatedAt
+  atualizado_por      Int?
+
+  pgas                PGASituacaoProblema[]
+  acoesProjetos       AcaoProjetoSituacaoProblema[]
+
+  versoes             SituacaoProblemaVersao[]
+
+  usuarioCriador      Pessoa?             @relation("SituacaoCriador", fields: [criado_por], references: [pessoa_id])
+  usuarioAtualizador  Pessoa?             @relation("SituacaoAtualizador", fields: [atualizado_por], references: [pessoa_id])
+  
+  @@index([codigo_categoria])
+  @@index([ativo])
+  @@index([criado_em])
 }
 
 model EixoTematico {
-  eixo_id       Int           @id @default(autoincrement())
-  numero        Int           @unique
-  nome          String        @db.VarChar(255)
-  descricao     String?
-  acoesProjetos AcaoProjeto[]
-  temas         Tema[]
+  eixo_id             Int             @id @default(autoincrement())
+  numero              Int             @unique
+  nome                String          @db.VarChar(255)
+  descricao           String?
+  ativo               Boolean         @default(true)
+
+  criado_em           DateTime        @default(now())
+  criado_por          Int?
+  atualizado_em       DateTime        @updatedAt
+  atualizado_por      Int?
+
+  acoesProjetos       AcaoProjeto[]
+  temas               Tema[]
+  versoes             EixoTematicoVersao[]
+
+  temaVersoes         TemaVersao[]
+  
+  usuarioCriador      Pessoa?         @relation("EixoCriador", fields: [criado_por], references: [pessoa_id])
+  usuarioAtualizador  Pessoa?         @relation("EixoAtualizador", fields: [atualizado_por], references: [pessoa_id])
 }
 
 model PrioridadeAcao {
-  prioridade_id Int           @id @default(autoincrement())
-  grau          Int           @unique
-  descricao     String        @db.VarChar(255)
-  tipo_gestao   String        @db.VarChar(100)
-  detalhes      String?       @db.Text
-  acoesProjetos AcaoProjeto[]
+  prioridade_id       Int             @id @default(autoincrement())
+  grau                Int             @unique
+  descricao           String          @db.VarChar(255)
+  tipo_gestao         String          @db.VarChar(100)
+  detalhes            String?         @db.Text
+  ativo               Boolean         @default(true)
+
+  criado_em           DateTime        @default(now())
+  criado_por          Int?
+  atualizado_em       DateTime        @updatedAt
+  atualizado_por      Int?
+  
+  acoesProjetos       AcaoProjeto[]
+
+  versoes             PrioridadeAcaoVersao[]
+  usuarioCriador      Pessoa?         @relation("PrioridadeCriador", fields: [criado_por], references: [pessoa_id])
+  usuarioAtualizador  Pessoa?         @relation("PrioridadeAtualizador", fields: [atualizado_por], references: [pessoa_id])
 }
 
 model Tema {
-  tema_id       Int           @id @default(autoincrement())
-  tema_num      Int           @unique
-  eixo_id       Int           
-  eixo          EixoTematico  @relation(fields: [eixo_id], references: [eixo_id])
-  descricao     String        @db.VarChar(255)
-  acoesProjetos AcaoProjeto[]
+  tema_id             Int             @id @default(autoincrement())
+  tema_num            Int             @unique
+  eixo_id             Int           
+  descricao           String          @db.VarChar(255)
+  ativo               Boolean         @default(true)
+
+  criado_em           DateTime        @default(now())
+  criado_por          Int?
+  atualizado_em       DateTime        @updatedAt
+  atualizado_por      Int?
+  
+  eixo                EixoTematico    @relation(fields: [eixo_id], references: [eixo_id])
+  acoesProjetos       AcaoProjeto[]
+
+  versoes             TemaVersao[]
+  usuarioCriador      Pessoa?         @relation("TemaCriador", fields: [criado_por], references: [pessoa_id])
+  usuarioAtualizador  Pessoa?         @relation("TemaAtualizador", fields: [atualizado_por], references: [pessoa_id])
 }
 
 model AcaoProjeto {
-  acao_projeto_id Int         @id @default(autoincrement())
-  pga_id          Int
-  eixo_id         Int
-  prioridade_id   Int
-  tema_id         Int         
+  acao_projeto_id                        Int         @id @default(autoincrement())
+  pga_id                                 Int
+  eixo_id                                Int
+  prioridade_id                          Int
+  tema_id                                Int
   o_que_sera_feito                       String
   por_que_sera_feito                     String
-  data_inicio                            DateTime?       @db.Date
-  data_final                             DateTime?       @db.Date
+  data_inicio                            DateTime?        @db.Date
+  data_final                             DateTime?        @db.Date
   objetivos_institucionais_referenciados String?
-  obrigatorio_inclusao                   Boolean         @default(false)
-  obrigatorio_sustentabilidade           Boolean         @default(false)
-  eixo                                   EixoTematico    @relation(fields: [eixo_id], references: [eixo_id])
-  tema                                   Tema            @relation(fields: [tema_id], references: [tema_id])
-  pga                                    PGA             @relation(fields: [pga_id], references: [pga_id])
-  prioridade                             PrioridadeAcao  @relation(fields: [prioridade_id], references: [prioridade_id])
+  obrigatorio_inclusao                   Boolean          @default(false)
+  obrigatorio_sustentabilidade           Boolean          @default(false)
+  eixo                                   EixoTematico     @relation(fields: [eixo_id], references: [eixo_id])
+  tema                                   Tema             @relation(fields: [tema_id], references: [tema_id])
+  pga                                    PGA              @relation(fields: [pga_id], references: [pga_id])
+  prioridade                             PrioridadeAcao   @relation(fields: [prioridade_id], references: [prioridade_id])
+  situacoesProblemas                     AcaoProjetoSituacaoProblema[]
   aquisicoes                             Aquisicao[]
   etapas                                 EtapaProcesso[]
   pessoas                                ProjetoPessoa[]
   attachment1Id                          String? 
-  attachment1                            Attachment1?    @relation("Attachment1ToAcaoProjeto", fields: [attachment1Id], references: [id])
+  attachment1                            Attachment1?     @relation("Attachment1ToAcaoProjeto", fields: [attachment1Id], references: [id])
 }
 
 model Pessoa {
@@ -101,10 +157,37 @@ model Pessoa {
   nome_usuario         String?               @unique @db.VarChar(30)
   senha                String?               @db.VarChar(255)
   tipo_usuario         TipoUsuario
+  ativo                Boolean               @default(true)
+  
+  criado_em            DateTime              @default(now())
+  atualizado_em        DateTime              @updatedAt
+  
   cursos_coordenados   Curso[]
   projetos             ProjetoPessoa[]
   rotinas_responsaveis RotinaInstitucional[] @relation("ResponsavelRotina")
   rotinas_participante RotinaParticipante[]
+
+  pgasCriados                    PGA[]                        @relation("PGACriador")
+  auditorias                     ConfiguracaoAuditoria[]
+  situacoesProblemasCriadas      SituacaoProblema[]           @relation("SituacaoCriador")
+  situacoesProblemasAtualizadas  SituacaoProblema[]           @relation("SituacaoAtualizador")
+  eixosCriados                   EixoTematico[]               @relation("EixoCriador")
+  eixosAtualizados               EixoTematico[]               @relation("EixoAtualizador")
+
+  situacaoVersoesCriadas         SituacaoProblemaVersao[]     @relation("SituacaoVersaoCriador")
+  eixoVersoesCriadas             EixoTematicoVersao[]         @relation("EixoVersaoCriador")
+  prioridadeVersoesCriadas       PrioridadeAcaoVersao[]       @relation("PrioridadeVersaoCriador")
+  temaVersoesCriadas             TemaVersao[]                 @relation("TemaVersaoCriador")
+  entregavelVersoesCriadas       EntregavelVersao[]           @relation("EntregavelVersaoCriador")
+  pessoaVersoesCriadas           PessoaVersao[]               @relation("PessoaVersaoCriador")
+  pessoaVersoes                  PessoaVersao[]               @relation("PessoaVersao")
+
+  prioridadesCriadas             PrioridadeAcao[]             @relation("PrioridadeCriador")
+  prioridadesAtualizadas         PrioridadeAcao[]             @relation("PrioridadeAtualizador")
+  temasCriados                   Tema[]                       @relation("TemaCriador")
+  temasAtualizados               Tema[]                       @relation("TemaAtualizador")
+  entregaveisCriados             EntregavelLinkSei[]          @relation("EntregavelCriador")
+  entregaveisAtualizados         EntregavelLinkSei[]          @relation("EntregavelAtualizador")
 }
 
 model ProjetoPessoa {
@@ -133,11 +216,22 @@ model EtapaProcesso {
 }
 
 model EntregavelLinkSei {
-  entregavel_id              Int               @id @default(autoincrement())
-  entregavel_numero          String            @unique @db.VarChar(50)
-  descricao                  String            @db.VarChar(255)
-  detalhes                   String?           @db.VarChar(500)
-  etapas                     EtapaProcesso[]
+  entregavel_id       Int               @id @default(autoincrement())
+  entregavel_numero   String            @unique @db.VarChar(50)
+  descricao           String            @db.VarChar(255)
+  detalhes            String?           @db.VarChar(500)
+  ativo               Boolean           @default(true)
+
+  criado_em           DateTime          @default(now())
+  criado_por          Int?
+  atualizado_em       DateTime          @updatedAt
+  atualizado_por      Int?
+  
+  etapas              EtapaProcesso[]
+
+  versoes             EntregavelVersao[]
+  usuarioCriador      Pessoa?           @relation("EntregavelCriador", fields: [criado_por], references: [pessoa_id])
+  usuarioAtualizador  Pessoa?           @relation("EntregavelAtualizador", fields: [atualizado_por], references: [pessoa_id])
 }
 
 model Aquisicao {
@@ -238,6 +332,24 @@ model TipoVinculoHAE {
   projetos_pessoas      ProjetoPessoa[]
 }
 
+model PGASituacaoProblema {
+  pga_id              Int
+  situacao_problema_id Int
+  pga                 PGA               @relation(fields: [pga_id], references: [pga_id])
+  situacaoProblema    SituacaoProblema  @relation(fields: [situacao_problema_id], references: [situacao_id])
+  
+  @@id([pga_id, situacao_problema_id])
+}
+
+model AcaoProjetoSituacaoProblema {
+  acao_projeto_id     Int
+  situacao_problema_id Int
+  acaoProjeto         AcaoProjeto       @relation(fields: [acao_projeto_id], references: [acao_projeto_id])
+  situacaoProblema    SituacaoProblema  @relation(fields: [situacao_problema_id], references: [situacao_id])
+  
+  @@id([acao_projeto_id, situacao_problema_id])
+}
+
 enum StatusPGA {
   EmElaboracao
   Submetido
@@ -324,4 +436,143 @@ enum AnexoProjetoUm {
   Anexo3 @map("3")
   Anexo4 @map("4")
 
+}
+
+model ConfiguracaoAuditoria {
+  auditoria_id          Int                   @id @default(autoincrement())
+  tabela                String                @db.VarChar(50)
+  registro_id           Int
+  ano                   Int
+  operacao              TipoOperacaoAuditoria
+  dados_antes           Json?
+  dados_depois          Json?
+  usuario_id            Int?
+  data_operacao         DateTime              @default(now())
+  motivo                String?               @db.Text
+  usuario               Pessoa?               @relation(fields: [usuario_id], references: [pessoa_id])
+  
+  @@index([tabela, registro_id])
+  @@index([ano])
+  @@index([data_operacao])
+}
+
+model SituacaoProblemaVersao {
+  versao_id           Int                 @id @default(autoincrement())
+  situacao_base_id    Int
+  ano                 Int
+  codigo_categoria    String              @db.VarChar(20)
+  descricao           String
+  fonte               String?             @db.VarChar(255)
+  ativo_no_ano        Boolean             @default(true)
+  ordem               Int?
+  criado_por          Int?
+  criado_em           DateTime            @default(now())
+  motivo_alteracao    String?             @db.Text
+
+  situacaoBase        SituacaoProblema    @relation(fields: [situacao_base_id], references: [situacao_id])
+  criador             Pessoa?             @relation("SituacaoVersaoCriador", fields: [criado_por], references: [pessoa_id])
+
+  @@unique([situacao_base_id, ano])
+  @@index([ano])
+}
+
+model EixoTematicoVersao {
+  versao_id           Int                 @id @default(autoincrement())
+  eixo_base_id        Int
+  ano                 Int
+  numero              Int
+  nome                String              @db.VarChar(255)
+  descricao           String?
+  ativo_no_ano        Boolean             @default(true)
+  criado_por          Int?
+  criado_em           DateTime            @default(now())
+  motivo_alteracao    String?             @db.Text
+  
+  eixoBase            EixoTematico        @relation(fields: [eixo_base_id], references: [eixo_id])
+  criador             Pessoa?             @relation("EixoVersaoCriador", fields: [criado_por], references: [pessoa_id])
+  
+  @@unique([eixo_base_id, ano])
+}
+
+model PrioridadeAcaoVersao {
+  versao_id           Int                 @id @default(autoincrement())
+  prioridade_base_id  Int
+  ano                 Int
+  grau                Int
+  descricao           String              @db.VarChar(255)
+  tipo_gestao         String              @db.VarChar(100)
+  detalhes            String?             @db.Text
+  ativo_no_ano        Boolean             @default(true)
+  criado_por          Int?
+  criado_em           DateTime            @default(now())
+  motivo_alteracao    String?             @db.Text
+  
+  prioridadeBase      PrioridadeAcao      @relation(fields: [prioridade_base_id], references: [prioridade_id])
+  criador             Pessoa?             @relation("PrioridadeVersaoCriador", fields: [criado_por], references: [pessoa_id])
+  
+  @@unique([prioridade_base_id, ano])
+}
+
+model TemaVersao {
+  versao_id           Int                 @id @default(autoincrement())
+  tema_base_id        Int
+  ano                 Int
+  tema_num            Int
+  eixo_id             Int
+  descricao           String              @db.VarChar(255)
+  ativo_no_ano        Boolean             @default(true)
+  criado_por          Int?
+  criado_em           DateTime            @default(now())
+  motivo_alteracao    String?             @db.Text
+  
+  temaBase            Tema                @relation(fields: [tema_base_id], references: [tema_id])
+  eixo                EixoTematico        @relation(fields: [eixo_id], references: [eixo_id])
+  criador             Pessoa?             @relation("TemaVersaoCriador", fields: [criado_por], references: [pessoa_id])
+  
+  @@unique([tema_base_id, ano])
+}
+
+model EntregavelVersao {
+  versao_id           Int                 @id @default(autoincrement())
+  entregavel_base_id  Int
+  ano                 Int
+  entregavel_numero   String              @db.VarChar(50)
+  descricao           String              @db.VarChar(255)
+  detalhes            String?             @db.VarChar(500)
+  ativo_no_ano        Boolean             @default(true)
+  criado_por          Int?
+  criado_em           DateTime            @default(now())
+  motivo_alteracao    String?             @db.Text
+  
+  entregavelBase      EntregavelLinkSei   @relation(fields: [entregavel_base_id], references: [entregavel_id])
+  criador             Pessoa?             @relation("EntregavelVersaoCriador", fields: [criado_por], references: [pessoa_id])
+  
+  @@unique([entregavel_base_id, ano])
+}
+
+model PessoaVersao {
+  versao_id           Int                 @id @default(autoincrement())
+  pessoa_base_id      Int
+  ano                 Int
+  nome                String              @db.VarChar(255)
+  email               String?             @db.VarChar(255)
+  tipo_usuario        TipoUsuario
+  ativo_no_ano        Boolean             @default(true)
+  criado_por          Int?
+  criado_em           DateTime            @default(now())
+  motivo_alteracao    String?             @db.Text
+  
+  pessoaBase          Pessoa              @relation("PessoaVersao", fields: [pessoa_base_id], references: [pessoa_id])
+  criador             Pessoa?             @relation("PessoaVersaoCriador", fields: [criado_por], references: [pessoa_id])
+  
+  @@unique([pessoa_base_id, ano])
+}
+
+enum TipoOperacaoAuditoria {
+  CREATE
+  UPDATE  
+  DELETE
+  ACTIVATE
+  DEACTIVATE
+  SNAPSHOT_CREATED
 }
