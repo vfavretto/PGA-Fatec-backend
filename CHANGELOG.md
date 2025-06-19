@@ -1,6 +1,68 @@
 # Changelog
 
-## [Unreleased] - Major Release v1.0.0
+## Integration Release v1.1.0
+
+### ✨ New Features
+
+#### New CRUD Modules Added
+- **Course Module** (`/course`) - Gerenciamento completo de cursos com tipos (Tecnológico, AMS, Outro) e status
+- **CPA Action Module** (`/cpa-action`) - Sistema de ações da Comissão Própria de Avaliação
+- **Institutional Routine Module** (`/institutional-routine`) - Gestão de rotinas institucionais com periodicidade e status
+- **PGA Module** (`/pga`) - Módulo principal para Plano de Gestão Acadêmica
+- **Process Step Module** (`/process-step`) - Gerenciamento de etapas de processos com status de verificação
+- **Project Person Module** (`/project-person`) - Sistema de associação de pessoas aos projetos
+- **Routine Occurrence Module** (`/routine-occurrence`) - Gestão de ocorrências de rotinas
+- **Routine Participant Module** (`/routine-participant`) - Sistema de participantes em rotinas
+- **Unit Module** (`/unit`) - Gerenciamento de unidades organizacionais
+
+#### Enhanced API Endpoints
+```
+POST|GET|PUT|DELETE /course
+POST|GET|PUT|DELETE /cpa-action
+POST|GET|PUT|DELETE /institutional-routine
+POST|GET|PUT|DELETE /pga
+POST|GET|PUT|DELETE /process-step
+POST|GET|PUT|DELETE /project-person
+POST|GET|PUT|DELETE /routine-occurrence
+POST|GET|PUT|DELETE /routine-participant
+POST|GET|PUT|DELETE /unit
+```
+
+#### Infrastructure and Integration
+- **Enhanced Package Dependencies**: Atualização e melhoria das dependências do projeto
+- **Module Integration**: Integração completa de todos os novos módulos no AppModule
+- **Comprehensive DTOs**: DTOs robustos com validações para todos os novos módulos
+- **Complete Entity Models**: Entidades completas mapeando o schema do banco de dados
+
+### 🔧 Technical Improvements
+
+#### New Entity Relationships
+- Relacionamentos complexos entre PGA, Cursos, Rotinas e Projetos
+- Sistema de status avançado para rotinas e ocorrências
+- Tipagem forte para todos os enum values do Prisma
+
+#### Enhanced Validation System
+- Validações específicas para cada tipo de curso e status
+- Validações de datas e periodicidade para rotinas
+- Validações de relacionamentos entre entidades
+
+#### Service Layer Architecture
+- Padrão consistente de services para todos os módulos
+- Separação clara entre repository, service e controller layers
+- Error handling padronizado
+
+### 📋 New Documentation
+- **INTEGRATION_README.md**: Documentação detalhada da integração entre módulos
+- Melhoria na documentação de APIs e endpoints
+
+### 🚀 Performance & Maintainability
+- Estrutura de projeto mais organizada e consistente
+- Melhores práticas de NestJS implementadas
+- Código mais limpo e manutenível
+
+---
+
+## Major Release v1.0.0
 
 ### 🔥 BREAKING CHANGES
 
@@ -80,4 +142,4 @@ Para desenvolvedores atualizando da v0.4.x:
 
 ---
 
-**⚠️ IMPORTANT**: Esta é uma versão com mudanças incompatíveis (breaking changes). Teste completamente sua aplicação antes de fazer upgrade para produção. 
+**⚠️ IMPORTANT**: Esta é uma versão com mudanças incompatíveis (breaking changes). Teste completamente sua aplicação antes de fazer upgrade para produção.
