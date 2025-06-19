@@ -1,6 +1,61 @@
 # Changelog
 
-## Integration Release v1.1.0
+## [Unreleased]
+
+### 🚧 Em Desenvolvimento
+- Novas funcionalidades sendo desenvolvidas
+
+---
+
+## [1.2.0] - 2024-12-18
+
+### ✨ New Features
+
+#### Access Management System
+- **Request Access Module**: Sistema completo de solicitação de acesso para novos usuários
+- **Access Approval Workflow**: Fluxo de aprovação/rejeição de solicitações de acesso
+- **User-Unit Relationship**: Sistema de relacionamento entre usuários e unidades (PessoaUnidade)
+- **Get Users by Unit**: Endpoint para obter usuários de uma unidade específica
+
+#### Audit System 
+- **Comprehensive Audit Module**: Sistema completo de auditoria com interceptor
+- **Audit Interceptor**: Interceptação automática de operações CRUD para logging
+- **Audit Logs**: Registro detalhado de todas as operações do sistema
+- **Audit Reporting**: Sistema de relatórios de auditoria
+
+#### Enhanced User Management
+- **User Registration Improvements**: Melhorias no sistema de registro
+- **Email Notifications**: Sistema de notificações por e-mail para aprovação de acesso
+- **Enhanced Authentication**: Melhorias no sistema de autenticação e JWT
+
+### 🔧 Technical Improvements
+
+#### Database Enhancements
+- **New Migration Files**: Migrações para sistema de auditoria e relacionamentos
+- **PessoaUnidade Table**: Nova tabela para relacionamento usuário-unidade
+- **Enhanced Schema**: Melhorias no schema do Prisma
+
+#### API Enhancements
+```
+POST /user/request-access - Solicitar acesso ao sistema
+GET /user/access-requests - Listar solicitações de acesso
+POST /user/access-requests/:id/process - Processar solicitação
+GET /user/unit/:id - Obter usuários por unidade
+```
+
+#### Service Architecture
+- **Access Request Services**: Serviços completos para gerenciamento de acesso
+- **Audit Services**: Serviços de auditoria com interceptação automática
+- **Enhanced User Services**: Melhorias nos serviços de usuário
+
+### 🔄 Database Changes
+- **Audit System Tables**: Novas tabelas para sistema de auditoria
+- **Access Request Tables**: Tabelas para gerenciamento de solicitações
+- **User-Unit Relationships**: Relacionamentos aprimorados entre usuários e unidades
+
+---
+
+## [1.1.0] - 2024-12-15
 
 ### ✨ New Features
 
@@ -62,7 +117,7 @@ POST|GET|PUT|DELETE /unit
 
 ---
 
-## Major Release v1.0.0
+## [1.0.0] - 2024-12-10
 
 ### 🔥 BREAKING CHANGES
 
@@ -139,3 +194,7 @@ Para desenvolvedores atualizando da v0.4.x:
 - **PostgreSQL**: >=13.0
 - **Docker**: >=20.10
 - **Docker Compose**: >=2.0
+
+---
+
+**⚠️ IMPORTANT**: Versões com mudanças incompatíveis (breaking changes) requerem teste completo antes do upgrade em produção.
