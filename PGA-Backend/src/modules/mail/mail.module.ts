@@ -1,6 +1,7 @@
 import { MailerModule } from '@nestjs-modules/mailer';
 import { Module } from '@nestjs/common';
 import { SendPasswordReset } from './services/sendPasswordReset.service';
+import { SendAccessApproved } from './services/sendAccessApproved.service';
 
 @Module({
   imports: [
@@ -15,11 +16,11 @@ import { SendPasswordReset } from './services/sendPasswordReset.service';
         },
       },
       defaults: {
-        from: '"Sistema PGA Fatec" <noreply@pga.com>'
+        from: '"Sistema PGA Fatec" <noreply@pga.com>',
       },
     }),
   ],
-  providers: [SendPasswordReset],
-  exports: [SendPasswordReset],
+  providers: [SendPasswordReset, SendAccessApproved],
+  exports: [SendPasswordReset, SendAccessApproved],
 })
 export class MailModule {}

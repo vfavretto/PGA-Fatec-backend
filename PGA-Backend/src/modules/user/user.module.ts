@@ -11,6 +11,10 @@ import { PrismaModule } from '@/config/prisma.module';
 import { MailModule } from '../mail/mail.module';
 import { ForgotPasswordService } from './services/forgot-password.service';
 import { ResetPasswordService } from './services/reset-password.service';
+import { ListAccessRequestsService } from './services/list-access-requests.service';
+import { ProcessAccessRequestService } from './services/process-access-request.service';
+import { RequestAccessService } from './services/request-access.service';
+import { GetUsersByUnitService } from './services/get-users-by-unit.service';
 
 @Module({
   imports: [
@@ -30,6 +34,10 @@ import { ResetPasswordService } from './services/reset-password.service';
     UpdateUserService,
     ForgotPasswordService,
     ResetPasswordService,
+    ListAccessRequestsService,
+    ProcessAccessRequestService,
+    RequestAccessService,
+    GetUsersByUnitService,
   ],
   controllers: [UserController],
 })
