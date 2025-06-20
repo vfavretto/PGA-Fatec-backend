@@ -26,7 +26,7 @@ export class Attachment1Repository {
   async findAll() {
     return this.prisma.attachment1.findMany({
       include: {
-        projeto: true // Incluir os projetos relacionados
+        projeto: true
       }
     });
   }
@@ -35,13 +35,12 @@ export class Attachment1Repository {
     return this.prisma.attachment1.findUnique({ 
       where: { id },
       include: {
-        projeto: true // Incluir os projetos relacionados
+        projeto: true
       }
     });
   }
 
   async update(id: string, dto: UpdateAttachment1Dto) {
-    // Convertemos o DTO para o formato esperado pelo Prisma
     const data: Prisma.Attachment1UpdateInput = {};
     
     if (dto.item !== undefined) data.item = dto.item;
@@ -50,7 +49,6 @@ export class Attachment1Repository {
     if (dto.precoTotalEstimado !== undefined) data.precoTotalEstimado = dto.precoTotalEstimado;
     if (dto.flag !== undefined) data.flag = dto.flag;
     
-    // Se temos um ID de projeto para conectar
     if (dto.projetoId) {
       data.projeto = {
         connect: { acao_projeto_id: parseInt(dto.projetoId) }

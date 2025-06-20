@@ -11,57 +11,53 @@ export class UserRepository {
   }
 
   async findAll(): Promise<Pessoa[]> {
-    // Incluir relacionamento com unidades
     return this.prisma.pessoa.findMany({
       include: {
         unidades: {
           include: {
-            unidade: true
-          }
-        }
-      }
+            unidade: true,
+          },
+        },
+      },
     });
   }
 
   async findById(pessoa_id: number): Promise<Pessoa | null> {
-    // Incluir relacionamento com unidades
     return this.prisma.pessoa.findUnique({
       where: { pessoa_id },
       include: {
         unidades: {
           include: {
-            unidade: true
-          }
-        }
-      }
+            unidade: true,
+          },
+        },
+      },
     });
   }
 
   async findByEmail(email: string): Promise<Pessoa | null> {
-    // Incluir relacionamento com unidades
     return this.prisma.pessoa.findUnique({
       where: { email },
       include: {
         unidades: {
           include: {
-            unidade: true
-          }
-        }
-      }
+            unidade: true,
+          },
+        },
+      },
     });
   }
 
   async findByUsername(nome_usuario: string): Promise<Pessoa | null> {
-    // Incluir relacionamento com unidades
     return this.prisma.pessoa.findUnique({
       where: { nome_usuario },
       include: {
         unidades: {
           include: {
-            unidade: true
-          }
-        }
-      }
+            unidade: true,
+          },
+        },
+      },
     });
   }
 

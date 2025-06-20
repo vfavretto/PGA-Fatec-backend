@@ -46,7 +46,7 @@ export class ProblemSituationRepository {
   async delete(id: number) {
     return this.prisma.situacaoProblema.update({
       where: { situacao_id: id },
-      data: { ativo: false }, // Soft delete
+      data: { ativo: false },
     });
   }
 

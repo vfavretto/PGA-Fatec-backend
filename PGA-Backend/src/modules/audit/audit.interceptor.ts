@@ -19,7 +19,6 @@ export class AuditInterceptor implements NestInterceptor {
     const request = context.switchToHttp().getRequest();
     const { method, url, body, params, user } = request;
     
-    // Determinar a operação baseada no método HTTP
     let operacao: TipoOperacaoAuditoria;
     switch (method) {
       case 'POST': 
@@ -33,13 +32,12 @@ export class AuditInterceptor implements NestInterceptor {
         operacao = TipoOperacaoAuditoria.DELETE; 
         break;
       default: 
-        return next.handle(); // Não auditar GET
+        return next.handle();
     }
 
-    // Extrair informações da URL
     const auditInfo = this.extractAuditInfo(url);
     if (!auditInfo) {
-      return next.handle(); // Não auditar se não conseguir extrair info
+      return next.handle();
     }
 
     const startTime = Date.now();
@@ -51,22 +49,19 @@ export class AuditInterceptor implements NestInterceptor {
           const endTime = Date.now();
           const duration = endTime - startTime;
 
-          // Extrair o ID correto baseado na tabela
           let registroId = auditInfo.registroId || this.extractIdFromResponse(response, auditInfo.tabela);
           
-          // Se ainda não temos ID, pular a auditoria
           if (!registroId) {
             this.logger.warn(`⚠️ Não foi possível extrair registro_id para ${auditInfo.tabela}`);
             return;
           }
 
-          // Usar o método existente createLog do AuditLogService
           await this.auditLogService.createLog({
             tabela: auditInfo.tabela,
             registro_id: registroId,
             ano: new Date().getFullYear(),
             operacao,
-            dados_antes: null, // Por enquanto null, pode ser implementado depois
+            dados_antes: null,
             dados_depois: operacao !== TipoOperacaoAuditoria.DELETE ? response : null,
             usuario_id: user?.pessoa_id || user?.id || null,
             motivo: body?.motivo || null,
@@ -86,7 +81,6 @@ export class AuditInterceptor implements NestInterceptor {
   }
 
   private extractAuditInfo(url: string): { tabela: string; registroId?: number } | null {
-    // Mapear URLs para nomes de tabelas baseado nas rotas existentes
     const urlMappings = [
       { pattern: /\/thematic-axis/, tabela: 'eixo_tematico' },
       { pattern: /\/eixos-tematicos/, tabela: 'eixo_tematico' },
@@ -98,17 +92,15 @@ export class AuditInterceptor implements NestInterceptor {
       { pattern: /\/temas/, tabela: 'tema' },
       { pattern: /\/deliverable/, tabela: 'entregavel_link_sei' },
       { pattern: /\/entregaveis/, tabela: 'entregavel_link_sei' },
-      { pattern: /\/users\/request-access/, tabela: 'solicitacao_acesso' }, // Correção aqui!
+      { pattern: /\/users\/request-access/, tabela: 'solicitacao_acesso' },
       { pattern: /\/users/, tabela: 'pessoa' },
       { pattern: /\/pessoas/, tabela: 'pessoa' },
       { pattern: /\/pga/, tabela: 'pga' },
     ];
 
-    // Encontrar a tabela correspondente
     const mapping = urlMappings.find(m => m.pattern.test(url));
     if (!mapping) return null;
 
-    // Extrair ID do registro (para UPDATE e DELETE)
     let registroId: number | undefined;
     const idMatch = url.match(/\/(\d+)(?:\/|$)/);
     if (idMatch) {
@@ -121,7 +113,6 @@ export class AuditInterceptor implements NestInterceptor {
   private extractIdFromResponse(response: any, tabela: string): number | null {
     if (!response) return null;
     
-    // Tentar diferentes padrões de ID baseados na tabela
     const possibleIds = [
       response.id,
       response[`${tabela}_id`],
@@ -132,8 +123,7 @@ export class AuditInterceptor implements NestInterceptor {
       response.entregavel_id,
       response.pessoa_id,
       response.pga_id,
-      response.solicitacao_id, // Adicionar este
-      // Para responses que retornam { data: { ... } }
+      response.solicitacao_id,
       response.data?.id,
       response.data?.[`${tabela}_id`],
       response.data?.solicitacao_id,

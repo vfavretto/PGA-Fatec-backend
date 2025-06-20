@@ -9,7 +9,6 @@ export class ListAccessRequestsService {
   async execute(usuarioId: number, tipoUsuario: TipoUsuario) {
     let solicitacoes: any[];
 
-    // Administrador vê todas as solicitações
     if (tipoUsuario === 'Administrador') {
       solicitacoes = await this.prisma.solicitacaoAcesso.findMany({
         include: {
@@ -33,9 +32,7 @@ export class ListAccessRequestsService {
         }
       });
     }
-    // Diretor vê apenas solicitações das unidades que ele gerencia
     else if (tipoUsuario === 'Diretor') {
-      // Buscar unidades vinculadas ao usuário
       const usuarioUnidades = await this.prisma.pessoaUnidade.findMany({
         where: { 
           pessoa_id: usuarioId,
@@ -82,12 +79,10 @@ export class ListAccessRequestsService {
         }
       });
     }
-    // Outros tipos de usuário não têm acesso às solicitações
     else {
       throw new ForbiddenException('Você não tem permissão para visualizar solicitações de acesso');
     }
 
-    // Separar entre pendentes e processadas
     const pendingRequests = solicitacoes.filter(solicitacao => solicitacao.status === 'Pendente');
     const processedRequests = solicitacoes.filter(solicitacao => 
       solicitacao.status === 'Aprovada' || solicitacao.status === 'Rejeitada'
