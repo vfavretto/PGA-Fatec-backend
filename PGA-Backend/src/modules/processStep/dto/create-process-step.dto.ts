@@ -10,9 +10,9 @@ export class CreateProcessStepDto {
   @IsString()
   descricao: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsInt()
-  entregavel_id: number;
+  entregavel_id?: number;
 
   @IsOptional()
   @IsString()

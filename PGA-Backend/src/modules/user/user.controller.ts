@@ -1,4 +1,20 @@
-import {  Controller,  Post,  Get,  Put,  Delete,  Param,  Body,  ParseIntPipe,  HttpCode,  HttpStatus, Request, BadRequestException,
+// src/user/user.controller.ts
+import {
+  Controller,
+  Post,
+  Get,
+  Put,
+  Delete,
+  Patch,
+  Param,
+  Body,
+  ParseIntPipe,
+  HttpCode,
+  HttpStatus,
+  Request,
+  BadRequestException,
+  ForbiddenException,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateUserService } from './services/create-user.service';
 import { ListUsersService } from './services/list-users.service';
@@ -17,6 +33,10 @@ import { ListAccessRequestsService } from './services/list-access-requests.servi
 import { ProcessAccessRequestService } from './services/process-access-request.service';
 import { ProcessAccessRequestDto } from './dto/process-access-request.dto';
 import { GetUsersByUnitService } from './services/get-users-by-unit.service';
+import { ChangeUserRoleDto } from './dto/change-user-role.dto';
+import { ChangeUserRoleService } from './services/change-user-role.service';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { RolesGuard } from '../auth/guards/roles.guard';
 
 @Controller('users')
 export class UserController {
@@ -32,6 +52,7 @@ export class UserController {
     private readonly processAccessRequestService: ProcessAccessRequestService,
     private readonly requestAccessService: RequestAccessService,
     private readonly getUsersByUnitService: GetUsersByUnitService,
+    private readonly changeUserRoleService: ChangeUserRoleService,
   ) {}
 
   @Public()
@@ -53,7 +74,7 @@ export class UserController {
     if (isNaN(usuarioId)) {
       throw new BadRequestException('ID do usuário inválido');
     }
-    
+
     return this.listAccessRequestsService.execute(usuarioId, tipoUsuario);
   }
 
@@ -101,20 +122,36 @@ export class UserController {
   async processAccessRequest(
     @Param('id', ParseIntPipe) id: number,
     @Request() req,
-    @Body() data: ProcessAccessRequestDto
+    @Body() data: ProcessAccessRequestDto,
   ) {
     const usuarioId = req.user.pessoa_id;
-    
+
     return this.processAccessRequestService.execute(
-      id, 
-      usuarioId, 
-      data.status, 
-      data.tipo_usuario
+      id,
+      usuarioId,
+      data.status,
+      data.tipo_usuario,
     );
   }
 
   @Get('by-unidade/:id')
   async findByUnidade(@Param('id', ParseIntPipe) id: number) {
     return this.getUsersByUnitService.execute(id);
+  }
+
+  @Patch(':id/change-role')
+  @UseGuards(RolesGuard)
+  @Roles('Administrador', 'CPS')
+  async changeRole(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() changeRoleDto: ChangeUserRoleDto,
+    @Request() req: any,
+  ) {
+    return this.changeUserRoleService.execute(
+      id,
+      changeRoleDto.novoTipo,
+      changeRoleDto.unidadeId,
+      req.user.userId,
+    );
   }
 }

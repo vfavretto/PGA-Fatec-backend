@@ -1,41 +1,73 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../config/prisma.service';
+import { BaseRepository } from '../../common/repositories/base.repository';
+import { PGA } from '@prisma/client';
 import { CreatePgaDto } from './dto/create-pga.dto';
 import { UpdatePgaDto } from './dto/update-pga.dto';
-import { StatusPGA } from '@prisma/client';
 
 @Injectable()
-export class PgaRepository {
-  constructor(private readonly prisma: PrismaService) {}
+export class PgaRepository extends BaseRepository<PGA> {
+  constructor(protected readonly prisma: PrismaService) {
+    super(prisma);
+  }
 
   async create(data: CreatePgaDto) {
     return this.prisma.pGA.create({
-      data: {
-        ...data,
-        status: data.status ?? StatusPGA.EmElaboracao,
-      },
+      data,
     });
   }
 
   async findAll() {
-    return this.prisma.pGA.findMany();
+    return this.prisma.pGA.findMany({
+      where: this.whereActive(),
+      include: {
+        unidade: true,
+      },
+      orderBy: [
+        { ano: 'desc' },
+        { unidade: { nome_completo: 'asc' } },
+      ],
+    });
   }
 
   async findOne(id: number) {
-    return this.prisma.pGA.findUnique({ where: { pga_id: id } });
+    return this.prisma.pGA.findFirst({
+      where: this.whereActive({ pga_id: id }),
+      include: {
+        unidade: true,
+        situacoesProblemas: {
+          where: this.whereActive(),
+          include: {
+            situacaoProblema: true,
+          },
+        },
+      },
+    });
   }
 
   async update(id: number, data: UpdatePgaDto) {
     return this.prisma.pGA.update({
       where: { pga_id: id },
-      data: {
-        ...data,
-        status: data.status,
-      },
+      data,
     });
   }
 
-  async remove(id: number) {
-    return this.prisma.pGA.delete({ where: { pga_id: id } });
+  async delete(id: number) {
+    return this.prisma.pGA.update({
+      where: { pga_id: id },
+      data: { ativo: false },
+    });
+  }
+
+  async findByAnoAndUnidade(ano: number, unidadeId: number) {
+    return this.prisma.pGA.findFirst({
+      where: this.whereActive({
+        ano,
+        unidade_id: unidadeId,
+      }),
+      include: {
+        unidade: true,
+      },
+    });
   }
 }

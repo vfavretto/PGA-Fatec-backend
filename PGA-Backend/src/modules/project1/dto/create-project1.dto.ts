@@ -1,6 +1,22 @@
-import { IsBoolean, IsDateString, IsInt, IsOptional, IsString, MaxLength } from "class-validator";
+import { Type } from 'class-transformer';
+import {
+  IsBoolean,
+  IsDate,
+  IsInt,
+  IsOptional,
+  IsString,
+  MaxLength,
+  IsNumber,
+} from 'class-validator';
 
 export class CreateProject1Dto {
+  @IsString()
+  codigo_projeto: string;
+
+  @IsOptional()
+  @IsString()
+  nome_projeto?: string;
+
   @IsInt()
   pga_id: number;
 
@@ -10,9 +26,8 @@ export class CreateProject1Dto {
   @IsInt()
   prioridade_id: number;
 
-  @IsString()
-  @MaxLength(255)
-  tema: string;
+  @IsInt()
+  tema_id: number;
 
   @IsString()
   o_que_sera_feito: string;
@@ -21,20 +36,32 @@ export class CreateProject1Dto {
   por_que_sera_feito: string;
 
   @IsOptional()
-  @IsDateString()
-  data_inicio?: string;
+  @Type(() => Date)
+  @IsDate()
+  data_inicio?: Date | string | null;
 
   @IsOptional()
-  @IsDateString()
-  data_final?: string;
+  @Type(() => Date)
+  @IsDate()
+  data_final?: Date | string | null;
 
   @IsOptional()
   @IsString()
-  objetivos_institucionais_referenciados?: string;
+  objetivos_institucionais_referenciados?: string | null;
 
+  @IsOptional()
   @IsBoolean()
-  obrigatorio_inclusao: boolean;
+  obrigatorio_inclusao?: boolean;
 
+  @IsOptional()
   @IsBoolean()
-  obrigatorio_sustentabilidade: boolean;
+  obrigatorio_sustentabilidade?: boolean;
+
+  @IsOptional()
+  @IsNumber()
+  custo_total_estimado?: number | null;
+
+  @IsOptional()
+  @IsString()
+  fonte_recursos?: string | null;
 }
