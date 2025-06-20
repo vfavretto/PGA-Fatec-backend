@@ -8,7 +8,8 @@ export class FindOneWorkloadHaeService {
 
   async execute(id: number): Promise<TipoVinculoHAE> {
     const result = await this.repository.findOne(id);
-    if (!result) throw new NotFoundException('Tipo de vínculo HAE não encontrado');
+    if (!result)
+      throw new NotFoundException('Tipo de vínculo HAE não encontrado');
     return result;
   }
 }

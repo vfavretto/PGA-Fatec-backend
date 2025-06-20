@@ -1,7 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '@/config/prisma.service';
 import { CreateAuditDto } from '../dto/create-audit.dto';
-import { ChangesReportResponse, AuditSummaryResponse } from '../types/audit.types';
+import {
+  ChangesReportResponse,
+  AuditSummaryResponse,
+} from '../types/audit.types';
 
 @Injectable()
 export class AuditLogService {
@@ -25,10 +28,15 @@ export class AuditLogService {
         },
       });
 
-      this.logger.log(`📝 Log de auditoria criado: ${createAuditDto.tabela}.${createAuditDto.operacao}`);
+      this.logger.log(
+        `📝 Log de auditoria criado: ${createAuditDto.tabela}.${createAuditDto.operacao}`,
+      );
       return auditLog;
     } catch (error) {
-      this.logger.error(`Erro ao criar log de auditoria: ${error.message}`, error.stack);
+      this.logger.error(
+        `Erro ao criar log de auditoria: ${error.message}`,
+        error.stack,
+      );
       throw error;
     }
   }
@@ -39,31 +47,34 @@ export class AuditLogService {
         where: { ano: year },
         include: {
           usuario: {
-            select: { nome: true }
-          }
+            select: { nome: true },
+          },
         },
-        orderBy: { data_operacao: 'desc' }
+        orderBy: { data_operacao: 'desc' },
       });
 
-      const groupedData = auditRecords.reduce((acc, record) => {
-        const key = `${record.tabela}-${record.operacao}`;
-        if (!acc[key]) {
-          acc[key] = {
-            tabela: record.tabela,
-            operacao: record.operacao,
-            count: 0,
-            registros: []
-          };
-        }
-        acc[key].count++;
-        acc[key].registros.push({
-          registro_id: record.registro_id,
-          data_operacao: record.data_operacao,
-          usuario: record.usuario?.nome || 'Sistema',
-          motivo: record.motivo
-        });
-        return acc;
-      }, {} as Record<string, any>);
+      const groupedData = auditRecords.reduce(
+        (acc, record) => {
+          const key = `${record.tabela}-${record.operacao}`;
+          if (!acc[key]) {
+            acc[key] = {
+              tabela: record.tabela,
+              operacao: record.operacao,
+              count: 0,
+              registros: [],
+            };
+          }
+          acc[key].count++;
+          acc[key].registros.push({
+            registro_id: record.registro_id,
+            data_operacao: record.data_operacao,
+            usuario: record.usuario?.nome || 'Sistema',
+            motivo: record.motivo,
+          });
+          return acc;
+        },
+        {} as Record<string, any>,
+      );
 
       const resumo = Object.values(groupedData);
 
@@ -71,15 +82,21 @@ export class AuditLogService {
         ano: year,
         resumo,
         total_operacoes: auditRecords.length,
-        timestamp: new Date()
+        timestamp: new Date(),
       };
     } catch (error) {
-      this.logger.error(`Erro ao gerar relatório de mudanças: ${error.message}`, error.stack);
+      this.logger.error(
+        `Erro ao gerar relatório de mudanças: ${error.message}`,
+        error.stack,
+      );
       throw error;
     }
   }
 
-  async getAuditSummary(startYear?: number, endYear?: number): Promise<AuditSummaryResponse> {
+  async getAuditSummary(
+    startYear?: number,
+    endYear?: number,
+  ): Promise<AuditSummaryResponse> {
     try {
       const currentYear = new Date().getFullYear();
       const inicio = startYear || currentYear - 2;
@@ -87,41 +104,56 @@ export class AuditLogService {
 
       const auditRecords = await this.prisma.configuracaoAuditoria.findMany({
         where: {
-          ano: { gte: inicio, lte: fim }
+          ano: { gte: inicio, lte: fim },
         },
-        select: { ano: true, operacao: true }
+        select: { ano: true, operacao: true },
       });
 
-      const anoData = auditRecords.reduce((acc, record) => {
-        if (!acc[record.ano]) {
-          acc[record.ano] = {
-            ano: record.ano,
-            total_operacoes: 0,
-            operacoes_por_tipo: {}
-          };
-        }
-        acc[record.ano].total_operacoes++;
-        acc[record.ano].operacoes_por_tipo[record.operacao] = 
-          (acc[record.ano].operacoes_por_tipo[record.operacao] || 0) + 1;
-        return acc;
-      }, {} as Record<number, any>);
+      const anoData = auditRecords.reduce(
+        (acc, record) => {
+          if (!acc[record.ano]) {
+            acc[record.ano] = {
+              ano: record.ano,
+              total_operacoes: 0,
+              operacoes_por_tipo: {},
+            };
+          }
+          acc[record.ano].total_operacoes++;
+          acc[record.ano].operacoes_por_tipo[record.operacao] =
+            (acc[record.ano].operacoes_por_tipo[record.operacao] || 0) + 1;
+          return acc;
+        },
+        {} as Record<number, any>,
+      );
 
       return {
         periodo: { inicio, fim },
         anos: Object.values(anoData),
-        timestamp: new Date()
+        timestamp: new Date(),
       };
     } catch (error) {
-      this.logger.error(`Erro ao gerar resumo de auditoria: ${error.message}`, error.stack);
+      this.logger.error(
+        `Erro ao gerar resumo de auditoria: ${error.message}`,
+        error.stack,
+      );
       throw error;
     }
   }
 
   async getConfigurationsByYear(ano: number) {
     try {
-      console.log(`🔍 AuditLogService - Buscando configurações para o ano: ${ano}`);
+      console.log(
+        `🔍 AuditLogService - Buscando configurações para o ano: ${ano}`,
+      );
 
-      const [situacoesProblema, eixosTematicos, prioridades, temas, entregaveis, pessoas] = await Promise.all([
+      const [
+        situacoesProblema,
+        eixosTematicos,
+        prioridades,
+        temas,
+        entregaveis,
+        pessoas,
+      ] = await Promise.all([
         this.getSituacoesProblemaByYear(ano),
         this.getEixosTematicosByYear(ano),
         this.getPrioridadesByYear(ano),
@@ -140,7 +172,7 @@ export class AuditLogService {
           entregaveis,
           pessoas,
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       console.log(`✅ Configurações encontradas para ${ano}:`, {
@@ -149,7 +181,7 @@ export class AuditLogService {
         prioridades: prioridades.length,
         temas: temas.length,
         entregaveis: entregaveis.length,
-        pessoas: pessoas.length
+        pessoas: pessoas.length,
       });
 
       return result;
@@ -163,28 +195,31 @@ export class AuditLogService {
     try {
       console.log(`📋 Buscando situações problema para ${ano}...`);
 
-      const situacoesAuditoria = await this.prisma.configuracaoAuditoria.findMany({
-        where: {
-          tabela: 'situacao_problema',
-          operacao: 'CREATE',
-          ano: { lte: ano }
-        },
-        select: { registro_id: true },
-        distinct: ['registro_id']
-      });
+      const situacoesAuditoria =
+        await this.prisma.configuracaoAuditoria.findMany({
+          where: {
+            tabela: 'situacao_problema',
+            operacao: 'CREATE',
+            ano: { lte: ano },
+          },
+          select: { registro_id: true },
+          distinct: ['registro_id'],
+        });
 
-      const situacaoIds = situacoesAuditoria.map(audit => audit.registro_id);
+      const situacaoIds = situacoesAuditoria.map((audit) => audit.registro_id);
       console.log(`📋 IDs na auditoria: [${situacaoIds.join(', ')}]`);
 
       if (situacaoIds.length > 0) {
         const situacoes = await this.prisma.situacaoProblema.findMany({
           where: {
-            situacao_id: { in: situacaoIds }
+            situacao_id: { in: situacaoIds },
           },
-          orderBy: { situacao_id: 'asc' }
+          orderBy: { situacao_id: 'asc' },
         });
-        
-        console.log(`📋 SituacoesProblema via auditoria para ${ano}: ${situacoes.length} registros`);
+
+        console.log(
+          `📋 SituacoesProblema via auditoria para ${ano}: ${situacoes.length} registros`,
+        );
         return situacoes;
       }
 
@@ -192,15 +227,16 @@ export class AuditLogService {
       const situacoes = await this.prisma.situacaoProblema.findMany({
         where: {
           criado_em: {
-            lte: endOfYear
-          }
+            lte: endOfYear,
+          },
         },
-        orderBy: { situacao_id: 'asc' }
+        orderBy: { situacao_id: 'asc' },
       });
-      
-      console.log(`📋 SituacoesProblema filtradas por criado_em para ${ano}: ${situacoes.length} registros`);
-      return situacoes;
 
+      console.log(
+        `📋 SituacoesProblema filtradas por criado_em para ${ano}: ${situacoes.length} registros`,
+      );
+      return situacoes;
     } catch (error) {
       console.error(`❌ Erro ao buscar situações problema para ${ano}:`, error);
       return [];
@@ -215,24 +251,26 @@ export class AuditLogService {
         where: {
           tabela: 'eixo_tematico',
           operacao: 'CREATE',
-          ano: { lte: ano }
+          ano: { lte: ano },
         },
         select: { registro_id: true },
-        distinct: ['registro_id']
+        distinct: ['registro_id'],
       });
 
-      const eixoIds = eixosAuditoria.map(audit => audit.registro_id);
+      const eixoIds = eixosAuditoria.map((audit) => audit.registro_id);
       console.log(`📊 IDs na auditoria: [${eixoIds.join(', ')}]`);
 
       if (eixoIds.length > 0) {
         const eixos = await this.prisma.eixoTematico.findMany({
           where: {
-            eixo_id: { in: eixoIds }
+            eixo_id: { in: eixoIds },
           },
-          orderBy: { numero: 'asc' }
+          orderBy: { numero: 'asc' },
         });
-        
-        console.log(`📊 EixosTematicos via auditoria para ${ano}: ${eixos.length} registros`);
+
+        console.log(
+          `📊 EixosTematicos via auditoria para ${ano}: ${eixos.length} registros`,
+        );
         return eixos;
       }
 
@@ -240,15 +278,16 @@ export class AuditLogService {
       const eixos = await this.prisma.eixoTematico.findMany({
         where: {
           criado_em: {
-            lte: endOfYear
-          }
+            lte: endOfYear,
+          },
         },
-        orderBy: { numero: 'asc' }
+        orderBy: { numero: 'asc' },
       });
-      
-      console.log(`📊 EixosTematicos filtrados por criado_em para ${ano}: ${eixos.length} registros`);
-      return eixos;
 
+      console.log(
+        `📊 EixosTematicos filtrados por criado_em para ${ano}: ${eixos.length} registros`,
+      );
+      return eixos;
     } catch (error) {
       console.error(`❌ Erro ao buscar eixos temáticos para ${ano}:`, error);
       return [];
@@ -259,28 +298,33 @@ export class AuditLogService {
     try {
       console.log(`⭐ Buscando prioridades para ${ano}...`);
 
-      const prioridadesAuditoria = await this.prisma.configuracaoAuditoria.findMany({
-        where: {
-          tabela: 'prioridade_acao',
-          operacao: 'CREATE',
-          ano: { lte: ano }
-        },
-        select: { registro_id: true },
-        distinct: ['registro_id']
-      });
+      const prioridadesAuditoria =
+        await this.prisma.configuracaoAuditoria.findMany({
+          where: {
+            tabela: 'prioridade_acao',
+            operacao: 'CREATE',
+            ano: { lte: ano },
+          },
+          select: { registro_id: true },
+          distinct: ['registro_id'],
+        });
 
-      const prioridadeIds = prioridadesAuditoria.map(audit => audit.registro_id);
+      const prioridadeIds = prioridadesAuditoria.map(
+        (audit) => audit.registro_id,
+      );
       console.log(`⭐ IDs na auditoria: [${prioridadeIds.join(', ')}]`);
 
       if (prioridadeIds.length > 0) {
         const prioridades = await this.prisma.prioridadeAcao.findMany({
           where: {
-            prioridade_id: { in: prioridadeIds }
+            prioridade_id: { in: prioridadeIds },
           },
-          orderBy: { grau: 'asc' }
+          orderBy: { grau: 'asc' },
         });
-        
-        console.log(`⭐ PrioridadeAcao via auditoria para ${ano}: ${prioridades.length} registros`);
+
+        console.log(
+          `⭐ PrioridadeAcao via auditoria para ${ano}: ${prioridades.length} registros`,
+        );
         return prioridades;
       }
 
@@ -288,15 +332,16 @@ export class AuditLogService {
       const prioridades = await this.prisma.prioridadeAcao.findMany({
         where: {
           criado_em: {
-            lte: endOfYear
-          }
+            lte: endOfYear,
+          },
         },
-        orderBy: { grau: 'asc' }
+        orderBy: { grau: 'asc' },
       });
-      
-      console.log(`⭐ PrioridadeAcao filtradas por criado_em para ${ano}: ${prioridades.length} registros`);
-      return prioridades;
 
+      console.log(
+        `⭐ PrioridadeAcao filtradas por criado_em para ${ano}: ${prioridades.length} registros`,
+      );
+      return prioridades;
     } catch (error) {
       console.error(`❌ Erro ao buscar prioridades para ${ano}:`, error);
       return [];
@@ -311,29 +356,31 @@ export class AuditLogService {
         where: {
           tabela: 'tema',
           operacao: 'CREATE',
-          ano: { lte: ano }
+          ano: { lte: ano },
         },
         select: { registro_id: true },
-        distinct: ['registro_id']
+        distinct: ['registro_id'],
       });
 
-      const temaIds = temasAuditoria.map(audit => audit.registro_id);
+      const temaIds = temasAuditoria.map((audit) => audit.registro_id);
       console.log(`🎯 IDs na auditoria: [${temaIds.join(', ')}]`);
 
       if (temaIds.length > 0) {
         const temas = await this.prisma.tema.findMany({
           where: {
-            tema_id: { in: temaIds }
+            tema_id: { in: temaIds },
           },
           include: {
             eixo: {
-              select: { nome: true }
-            }
+              select: { nome: true },
+            },
           },
-          orderBy: { tema_num: 'asc' }
+          orderBy: { tema_num: 'asc' },
         });
-        
-        console.log(`🎯 Temas via auditoria para ${ano}: ${temas.length} registros`);
+
+        console.log(
+          `🎯 Temas via auditoria para ${ano}: ${temas.length} registros`,
+        );
         return temas;
       }
 
@@ -341,20 +388,21 @@ export class AuditLogService {
       const temas = await this.prisma.tema.findMany({
         where: {
           criado_em: {
-            lte: endOfYear
-          }
+            lte: endOfYear,
+          },
         },
         include: {
           eixo: {
-            select: { nome: true }
-          }
+            select: { nome: true },
+          },
         },
-        orderBy: { tema_num: 'asc' }
+        orderBy: { tema_num: 'asc' },
       });
-      
-      console.log(`🎯 Temas filtrados por criado_em para ${ano}: ${temas.length} registros`);
-      return temas;
 
+      console.log(
+        `🎯 Temas filtrados por criado_em para ${ano}: ${temas.length} registros`,
+      );
+      return temas;
     } catch (error) {
       console.error(`❌ Erro ao buscar temas para ${ano}:`, error);
       return [];
@@ -365,28 +413,33 @@ export class AuditLogService {
     try {
       console.log(`📦 Buscando entregáveis para ${ano}...`);
 
-      const entregaveisAuditoria = await this.prisma.configuracaoAuditoria.findMany({
-        where: {
-          tabela: 'entregavel_link_sei',
-          operacao: 'CREATE',
-          ano: { lte: ano }
-        },
-        select: { registro_id: true },
-        distinct: ['registro_id']
-      });
+      const entregaveisAuditoria =
+        await this.prisma.configuracaoAuditoria.findMany({
+          where: {
+            tabela: 'entregavel_link_sei',
+            operacao: 'CREATE',
+            ano: { lte: ano },
+          },
+          select: { registro_id: true },
+          distinct: ['registro_id'],
+        });
 
-      const entregavelIds = entregaveisAuditoria.map(audit => audit.registro_id);
+      const entregavelIds = entregaveisAuditoria.map(
+        (audit) => audit.registro_id,
+      );
       console.log(`📦 IDs na auditoria: [${entregavelIds.join(', ')}]`);
 
       if (entregavelIds.length > 0) {
         const entregaveis = await this.prisma.entregavelLinkSei.findMany({
           where: {
-            entregavel_id: { in: entregavelIds }
+            entregavel_id: { in: entregavelIds },
           },
-          orderBy: { entregavel_id: 'asc' }
+          orderBy: { entregavel_id: 'asc' },
         });
-        
-        console.log(`📦 EntregavelLinkSei via auditoria para ${ano}: ${entregaveis.length} registros`);
+
+        console.log(
+          `📦 EntregavelLinkSei via auditoria para ${ano}: ${entregaveis.length} registros`,
+        );
         return entregaveis;
       }
 
@@ -394,15 +447,16 @@ export class AuditLogService {
       const entregaveis = await this.prisma.entregavelLinkSei.findMany({
         where: {
           criado_em: {
-            lte: endOfYear
-          }
+            lte: endOfYear,
+          },
         },
-        orderBy: { entregavel_id: 'asc' }
+        orderBy: { entregavel_id: 'asc' },
       });
-      
-      console.log(`📦 EntregavelLinkSei filtrados por criado_em para ${ano}: ${entregaveis.length} registros`);
-      return entregaveis;
 
+      console.log(
+        `📦 EntregavelLinkSei filtrados por criado_em para ${ano}: ${entregaveis.length} registros`,
+      );
+      return entregaveis;
     } catch (error) {
       console.error(`❌ Erro ao buscar entregáveis para ${ano}:`, error);
       return [];
@@ -413,70 +467,81 @@ export class AuditLogService {
     try {
       console.log(`👥 Buscando pessoas que existiam até ${ano}...`);
 
-      const pessoasAuditoria = await this.prisma.configuracaoAuditoria.findMany({
-        where: {
-          tabela: 'pessoa',
-          operacao: 'CREATE',
-          ano: { lte: ano }
+      const pessoasAuditoria = await this.prisma.configuracaoAuditoria.findMany(
+        {
+          where: {
+            tabela: 'pessoa',
+            operacao: 'CREATE',
+            ano: { lte: ano },
+          },
+          select: { registro_id: true },
+          distinct: ['registro_id'],
         },
-        select: { registro_id: true },
-        distinct: ['registro_id']
-      });
+      );
 
-      const pessoaIds = pessoasAuditoria.map(audit => audit.registro_id);
+      const pessoaIds = pessoasAuditoria.map((audit) => audit.registro_id);
       console.log(`📋 IDs de pessoas na auditoria: [${pessoaIds.join(', ')}]`);
 
       if (pessoaIds.length > 0) {
         const pessoas = await this.prisma.pessoa.findMany({
           where: {
-            pessoa_id: { in: pessoaIds }
+            pessoa_id: { in: pessoaIds },
           },
           select: {
             pessoa_id: true,
             nome: true,
             email: true,
             tipo_usuario: true,
-            criado_em: true
+            criado_em: true,
           },
-          orderBy: { pessoa_id: 'asc' }
+          orderBy: { pessoa_id: 'asc' },
         });
 
-        console.log(`👥 Pessoas via auditoria para ${ano}: ${pessoas.length} registros`);
+        console.log(
+          `👥 Pessoas via auditoria para ${ano}: ${pessoas.length} registros`,
+        );
         pessoas.forEach((pessoa, index) => {
-          console.log(`   ${index + 1}. ${pessoa.nome} (ID: ${pessoa.pessoa_id}) - Criado: ${pessoa.criado_em?.toISOString()}`);
+          console.log(
+            `   ${index + 1}. ${pessoa.nome} (ID: ${pessoa.pessoa_id}) - Criado: ${pessoa.criado_em?.toISOString()}`,
+          );
         });
 
         return pessoas;
       }
 
-      console.log(`⚠️ Nenhuma pessoa na auditoria, usando filtro por criado_em...`);
+      console.log(
+        `⚠️ Nenhuma pessoa na auditoria, usando filtro por criado_em...`,
+      );
       const endOfYear = new Date(`${ano}-12-31T23:59:59.999Z`);
-      
+
       const pessoas = await this.prisma.pessoa.findMany({
         where: {
           criado_em: {
-            lte: endOfYear
-          }
+            lte: endOfYear,
+          },
         },
         select: {
           pessoa_id: true,
           nome: true,
           email: true,
           tipo_usuario: true,
-          criado_em: true
+          criado_em: true,
         },
-        orderBy: { pessoa_id: 'asc' }
+        orderBy: { pessoa_id: 'asc' },
       });
 
-      console.log(`👥 Pessoas filtradas por criado_em para ${ano}: ${pessoas.length} registros`);
+      console.log(
+        `👥 Pessoas filtradas por criado_em para ${ano}: ${pessoas.length} registros`,
+      );
       console.log(`📅 Filtro: criado_em <= ${endOfYear.toISOString()}`);
-      
-      pessoas.forEach((pessoa, index) => {
-        console.log(`   ${index + 1}. ${pessoa.nome} (ID: ${pessoa.pessoa_id}) - Criado: ${pessoa.criado_em?.toISOString()}`);
-      });
-      
-      return pessoas;
 
+      pessoas.forEach((pessoa, index) => {
+        console.log(
+          `   ${index + 1}. ${pessoa.nome} (ID: ${pessoa.pessoa_id}) - Criado: ${pessoa.criado_em?.toISOString()}`,
+        );
+      });
+
+      return pessoas;
     } catch (error) {
       console.error(`❌ Erro ao buscar pessoas para ${ano}:`, error);
       return [];
@@ -493,10 +558,10 @@ export class AuditLogService {
       where: whereCondition,
       include: {
         usuario: {
-          select: { nome: true, email: true }
-        }
+          select: { nome: true, email: true },
+        },
       },
-      orderBy: { data_operacao: 'desc' }
+      orderBy: { data_operacao: 'desc' },
     });
   }
 
@@ -505,10 +570,10 @@ export class AuditLogService {
       where: { tabela, registro_id: registroId },
       include: {
         usuario: {
-          select: { nome: true, email: true }
-        }
+          select: { nome: true, email: true },
+        },
       },
-      orderBy: { data_operacao: 'desc' }
+      orderBy: { data_operacao: 'desc' },
     });
   }
 
@@ -517,10 +582,10 @@ export class AuditLogService {
       where: { ano },
       include: {
         usuario: {
-          select: { nome: true, email: true }
-        }
+          select: { nome: true, email: true },
+        },
       },
-      orderBy: { data_operacao: 'desc' }
+      orderBy: { data_operacao: 'desc' },
     });
   }
 
@@ -529,10 +594,10 @@ export class AuditLogService {
       where: { tabela },
       include: {
         usuario: {
-          select: { nome: true, email: true }
-        }
+          select: { nome: true, email: true },
+        },
       },
-      orderBy: { data_operacao: 'desc' }
+      orderBy: { data_operacao: 'desc' },
     });
   }
 }

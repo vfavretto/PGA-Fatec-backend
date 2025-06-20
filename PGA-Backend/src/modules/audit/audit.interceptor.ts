@@ -1,9 +1,9 @@
-import { 
-  Injectable, 
-  NestInterceptor, 
-  ExecutionContext, 
+import {
+  Injectable,
+  NestInterceptor,
+  ExecutionContext,
   CallHandler,
-  Logger 
+  Logger,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
@@ -18,20 +18,20 @@ export class AuditInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
     const { method, url, body, params, user } = request;
-    
+
     let operacao: TipoOperacaoAuditoria;
     switch (method) {
-      case 'POST': 
-        operacao = TipoOperacaoAuditoria.CREATE; 
+      case 'POST':
+        operacao = TipoOperacaoAuditoria.CREATE;
         break;
       case 'PUT':
-      case 'PATCH': 
-        operacao = TipoOperacaoAuditoria.UPDATE; 
+      case 'PATCH':
+        operacao = TipoOperacaoAuditoria.UPDATE;
         break;
-      case 'DELETE': 
-        operacao = TipoOperacaoAuditoria.DELETE; 
+      case 'DELETE':
+        operacao = TipoOperacaoAuditoria.DELETE;
         break;
-      default: 
+      default:
         return next.handle();
     }
 
@@ -41,7 +41,9 @@ export class AuditInterceptor implements NestInterceptor {
     }
 
     const startTime = Date.now();
-    this.logger.debug(`🔍 Auditando: ${method} ${url} - Tabela: ${auditInfo.tabela}`);
+    this.logger.debug(
+      `🔍 Auditando: ${method} ${url} - Tabela: ${auditInfo.tabela}`,
+    );
 
     return next.handle().pipe(
       tap(async (response) => {
@@ -49,10 +51,14 @@ export class AuditInterceptor implements NestInterceptor {
           const endTime = Date.now();
           const duration = endTime - startTime;
 
-          let registroId = auditInfo.registroId || this.extractIdFromResponse(response, auditInfo.tabela);
-          
+          const registroId =
+            auditInfo.registroId ||
+            this.extractIdFromResponse(response, auditInfo.tabela);
+
           if (!registroId) {
-            this.logger.warn(`⚠️ Não foi possível extrair registro_id para ${auditInfo.tabela}`);
+            this.logger.warn(
+              `⚠️ Não foi possível extrair registro_id para ${auditInfo.tabela}`,
+            );
             return;
           }
 
@@ -62,25 +68,35 @@ export class AuditInterceptor implements NestInterceptor {
             ano: new Date().getFullYear(),
             operacao,
             dados_antes: null,
-            dados_depois: operacao !== TipoOperacaoAuditoria.DELETE ? response : null,
+            dados_depois:
+              operacao !== TipoOperacaoAuditoria.DELETE ? response : null,
             usuario_id: user?.pessoa_id || user?.id || null,
             motivo: body?.motivo || null,
           });
 
-          this.logger.log(`✅ Auditoria registrada: ${auditInfo.tabela}.${operacao} (ID: ${registroId}) em ${duration}ms`);
-
+          this.logger.log(
+            `✅ Auditoria registrada: ${auditInfo.tabela}.${operacao} (ID: ${registroId}) em ${duration}ms`,
+          );
         } catch (error) {
-          this.logger.error(`❌ Erro ao registrar auditoria: ${error.message}`, error.stack);
+          this.logger.error(
+            `❌ Erro ao registrar auditoria: ${error.message}`,
+            error.stack,
+          );
         }
       }),
       catchError((error) => {
-        this.logger.error(`💥 Erro na operação auditada: ${method} ${url}`, error.stack);
+        this.logger.error(
+          `💥 Erro na operação auditada: ${method} ${url}`,
+          error.stack,
+        );
         throw error;
-      })
+      }),
     );
   }
 
-  private extractAuditInfo(url: string): { tabela: string; registroId?: number } | null {
+  private extractAuditInfo(
+    url: string,
+  ): { tabela: string; registroId?: number } | null {
     const urlMappings = [
       { pattern: /\/thematic-axis/, tabela: 'eixo_tematico' },
       { pattern: /\/eixos-tematicos/, tabela: 'eixo_tematico' },
@@ -98,7 +114,7 @@ export class AuditInterceptor implements NestInterceptor {
       { pattern: /\/pga/, tabela: 'pga' },
     ];
 
-    const mapping = urlMappings.find(m => m.pattern.test(url));
+    const mapping = urlMappings.find((m) => m.pattern.test(url));
     if (!mapping) return null;
 
     let registroId: number | undefined;
@@ -112,7 +128,7 @@ export class AuditInterceptor implements NestInterceptor {
 
   private extractIdFromResponse(response: any, tabela: string): number | null {
     if (!response) return null;
-    
+
     const possibleIds = [
       response.id,
       response[`${tabela}_id`],
@@ -136,6 +152,6 @@ export class AuditInterceptor implements NestInterceptor {
       response.data?.pga_id,
     ];
 
-    return possibleIds.find(id => id !== undefined && id !== null) || null;
+    return possibleIds.find((id) => id !== undefined && id !== null) || null;
   }
 }

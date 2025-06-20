@@ -8,7 +8,8 @@ export class FindOneInstitutionalRoutineService {
 
   async execute(id: number): Promise<InstitutionalRoutine> {
     const rotina = await this.repository.findOne(id);
-    if (!rotina) throw new NotFoundException('RotinaInstitucional não encontrada');
+    if (!rotina)
+      throw new NotFoundException('RotinaInstitucional não encontrada');
     return rotina;
   }
 }

@@ -7,7 +7,10 @@ import { PrioridadeAcao } from '@prisma/client';
 export class UpdatePriorityActionService {
   constructor(private readonly repository: PriorityActionRepository) {}
 
-  async execute(prioridade_id: number, dto: UpdatePriorityActionDto): Promise<PrioridadeAcao> {
+  async execute(
+    prioridade_id: number,
+    dto: UpdatePriorityActionDto,
+  ): Promise<PrioridadeAcao> {
     const exists = await this.repository.findOne(prioridade_id);
     if (!exists) throw new NotFoundException('Prioridade não encontrada');
     return this.repository.update(prioridade_id, dto);

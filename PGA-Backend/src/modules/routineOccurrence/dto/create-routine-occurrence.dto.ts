@@ -1,4 +1,12 @@
-import { IsInt, IsNotEmpty, IsOptional, IsString, IsDateString, IsEnum, MaxLength } from 'class-validator';
+import {
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsDateString,
+  IsEnum,
+  MaxLength,
+} from 'class-validator';
 import { StatusOcorrencia } from '@prisma/client';
 
 export class CreateRoutineOccurrenceDto {

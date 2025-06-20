@@ -7,7 +7,9 @@ import { InstitutionalRoutine } from '../entities/institutional-routine.entity';
 export class CreateInstitutionalRoutineService {
   constructor(private readonly repository: InstitutionalRoutineRepository) {}
 
-  async execute(data: CreateInstitutionalRoutineDto): Promise<InstitutionalRoutine> {
+  async execute(
+    data: CreateInstitutionalRoutineDto,
+  ): Promise<InstitutionalRoutine> {
     return this.repository.create(data);
   }
 }

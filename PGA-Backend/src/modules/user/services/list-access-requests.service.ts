@@ -16,81 +16,84 @@ export class ListAccessRequestsService {
             select: {
               unidade_id: true,
               nome_completo: true,
-              codigo_fnnn: true
-            }
+              codigo_fnnn: true,
+            },
           },
           processador: {
             select: {
               pessoa_id: true,
               nome: true,
-              email: true
-            }
-          }
+              email: true,
+            },
+          },
         },
         orderBy: {
-          data_solicitacao: 'desc'
-        }
+          data_solicitacao: 'desc',
+        },
       });
-    }
-    else if (tipoUsuario === 'Diretor') {
+    } else if (tipoUsuario === 'Diretor') {
       const usuarioUnidades = await this.prisma.pessoaUnidade.findMany({
-        where: { 
+        where: {
           pessoa_id: usuarioId,
-          ativo: true
+          ativo: true,
         },
         select: {
-          unidade_id: true
-        }
+          unidade_id: true,
+        },
       });
 
-      const unidadeIds = usuarioUnidades.map(pu => pu.unidade_id);
+      const unidadeIds = usuarioUnidades.map((pu) => pu.unidade_id);
 
       if (unidadeIds.length === 0) {
         return {
           pendingRequests: [],
-          processedRequests: []
+          processedRequests: [],
         };
       }
 
       solicitacoes = await this.prisma.solicitacaoAcesso.findMany({
         where: {
           unidade_id: {
-            in: unidadeIds
-          }
+            in: unidadeIds,
+          },
         },
         include: {
           unidade: {
             select: {
               unidade_id: true,
               nome_completo: true,
-              codigo_fnnn: true
-            }
+              codigo_fnnn: true,
+            },
           },
           processador: {
             select: {
               pessoa_id: true,
               nome: true,
-              email: true
-            }
-          }
+              email: true,
+            },
+          },
         },
         orderBy: {
-          data_solicitacao: 'desc'
-        }
+          data_solicitacao: 'desc',
+        },
       });
-    }
-    else {
-      throw new ForbiddenException('Você não tem permissão para visualizar solicitações de acesso');
+    } else {
+      throw new ForbiddenException(
+        'Você não tem permissão para visualizar solicitações de acesso',
+      );
     }
 
-    const pendingRequests = solicitacoes.filter(solicitacao => solicitacao.status === 'Pendente');
-    const processedRequests = solicitacoes.filter(solicitacao => 
-      solicitacao.status === 'Aprovada' || solicitacao.status === 'Rejeitada'
+    const pendingRequests = solicitacoes.filter(
+      (solicitacao) => solicitacao.status === 'Pendente',
+    );
+    const processedRequests = solicitacoes.filter(
+      (solicitacao) =>
+        solicitacao.status === 'Aprovada' || solicitacao.status === 'Rejeitada',
     );
 
     return {
       pendingRequests,
-      processedRequests
+      processedRequests,
     };
   }
 }

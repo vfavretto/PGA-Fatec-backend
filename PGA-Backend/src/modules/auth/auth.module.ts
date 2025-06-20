@@ -31,7 +31,13 @@ import { PrismaService } from '../../config/prisma.service';
     }),
   ],
   controllers: [AuthController],
-  providers: [LoginService, ValidateUserService, LocalStrategy, JwtStrategy, PrismaService],
+  providers: [
+    LoginService,
+    ValidateUserService,
+    LocalStrategy,
+    JwtStrategy,
+    PrismaService,
+  ],
   exports: [LoginService, ValidateUserService, JwtModule],
 })
 export class AuthModule {}

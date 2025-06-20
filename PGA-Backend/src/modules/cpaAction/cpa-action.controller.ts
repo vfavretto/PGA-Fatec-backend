@@ -1,4 +1,13 @@
-import { Controller, Post, Body, Get, Param, Put, Delete, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Param,
+  Put,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { CreateCpaActionDto } from './dto/create-cpa-action.dto';
 import { UpdateCpaActionDto } from './dto/update-cpa-action.dto';
 import { CreateCpaActionService } from './services/create-cpa-action.service';
@@ -33,7 +42,10 @@ export class CpaActionController {
   }
 
   @Put(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateCpaActionDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateCpaActionDto,
+  ) {
     return this.updateService.execute(id, dto);
   }
 

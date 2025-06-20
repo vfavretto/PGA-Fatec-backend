@@ -5,7 +5,13 @@ import { Injectable } from '@nestjs/common';
 export class SendAccessApproved {
   constructor(private mailerService: MailerService) {}
 
-  async execute(email: string, nome: string, senha: string, unidade: string, tipoUsuario: string) {
+  async execute(
+    email: string,
+    nome: string,
+    senha: string,
+    unidade: string,
+    tipoUsuario: string,
+  ) {
     const loginUrl = `${process.env.FRONTEND_URL}/login`;
 
     await this.mailerService.sendMail({

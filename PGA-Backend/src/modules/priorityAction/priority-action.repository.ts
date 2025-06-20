@@ -13,7 +13,7 @@ export class PriorityActionRepository extends BaseRepository<PrioridadeAcao> {
 
   async create(data: CreatePriorityActionDto) {
     return this.prisma.prioridadeAcao.create({
-      data
+      data,
     });
   }
 

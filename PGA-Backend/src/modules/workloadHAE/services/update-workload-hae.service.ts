@@ -7,9 +7,13 @@ import { TipoVinculoHAE } from '@prisma/client';
 export class UpdateWorkloadHaeService {
   constructor(private readonly repository: WorkloadHaeRepository) {}
 
-  async execute(id: number, dto: UpdateWorkloadHaeDto): Promise<TipoVinculoHAE> {
+  async execute(
+    id: number,
+    dto: UpdateWorkloadHaeDto,
+  ): Promise<TipoVinculoHAE> {
     const exists = await this.repository.findOne(id);
-    if (!exists) throw new NotFoundException('Tipo de vínculo HAE não encontrado');
+    if (!exists)
+      throw new NotFoundException('Tipo de vínculo HAE não encontrado');
     return this.repository.update(id, dto);
   }
 }

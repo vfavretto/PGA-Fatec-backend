@@ -13,7 +13,7 @@ export class RoutineOccurrenceRepository extends BaseRepository<RotinaOcorrencia
 
   async create(data: CreateRoutineOccurrenceDto) {
     return this.prisma.rotinaOcorrencia.create({
-      data
+      data,
     });
   }
 
@@ -21,11 +21,11 @@ export class RoutineOccurrenceRepository extends BaseRepository<RotinaOcorrencia
     return this.prisma.rotinaOcorrencia.findMany({
       where: this.whereActive(),
       include: {
-        rotina: true
+        rotina: true,
       },
       orderBy: {
-        data_realizacao: 'desc'
-      }
+        data_realizacao: 'desc',
+      },
     });
   }
 
@@ -33,22 +33,22 @@ export class RoutineOccurrenceRepository extends BaseRepository<RotinaOcorrencia
     return this.prisma.rotinaOcorrencia.findFirst({
       where: this.whereActive({ ocorrencia_id: id }),
       include: {
-        rotina: true
-      }
+        rotina: true,
+      },
     });
   }
 
   async update(id: number, data: UpdateRoutineOccurrenceDto) {
     return this.prisma.rotinaOcorrencia.update({
       where: { ocorrencia_id: id },
-      data
+      data,
     });
   }
 
   async softDelete(id: number) {
     return this.prisma.rotinaOcorrencia.update({
       where: { ocorrencia_id: id },
-      data: { ativo: false }
+      data: { ativo: false },
     });
   }
 
@@ -56,8 +56,8 @@ export class RoutineOccurrenceRepository extends BaseRepository<RotinaOcorrencia
     return this.prisma.rotinaOcorrencia.findMany({
       where: this.whereActive({ rotina_id: routineId }),
       orderBy: {
-        data_realizacao: 'desc'
-      }
+        data_realizacao: 'desc',
+      },
     });
   }
 }

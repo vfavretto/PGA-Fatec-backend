@@ -9,7 +9,7 @@ export abstract class BaseRepository<T> {
   protected whereActive(additionalWhere: any = {}): any {
     return {
       ...additionalWhere,
-      ativo: true
+      ativo: true,
     };
   }
 }

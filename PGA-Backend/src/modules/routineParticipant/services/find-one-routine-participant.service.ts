@@ -8,7 +8,8 @@ export class FindOneRoutineParticipantService {
 
   async execute(id: number): Promise<RoutineParticipant> {
     const participante = await this.repository.findOne(id);
-    if (!participante) throw new NotFoundException('RotinaParticipante não encontrada');
+    if (!participante)
+      throw new NotFoundException('RotinaParticipante não encontrada');
     return participante;
   }
 }

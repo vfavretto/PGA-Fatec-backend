@@ -1,4 +1,12 @@
-import { Controller, Post, Body, UseGuards, HttpCode, HttpStatus, Request } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
+  Request,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { LoginService } from './services/login.service';
 import { Public } from './decorators/is-public.decorator';
@@ -13,9 +21,10 @@ export class AuthController {
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Realizar login no sistema',
-    description: 'Autentica o usuário e retorna um token JWT para acesso às rotas protegidas'
+    description:
+      'Autentica o usuário e retorna um token JWT para acesso às rotas protegidas',
   })
   @ApiBody({
     type: LoginDto,
@@ -25,10 +34,10 @@ export class AuthController {
         summary: 'Login de exemplo',
         value: {
           email: 'usuario@fatec.sp.gov.br',
-          senha: 'senha123'
-        }
-      }
-    }
+          senha: 'senha123',
+        },
+      },
+    },
   })
   @ApiResponse({
     status: 200,
@@ -39,10 +48,10 @@ export class AuthController {
         access_token: {
           type: 'string',
           description: 'Token JWT para autenticação',
-          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
-        }
-      }
-    }
+          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+        },
+      },
+    },
   })
   @ApiResponse({
     status: 401,
@@ -52,9 +61,9 @@ export class AuthController {
       properties: {
         statusCode: { type: 'number', example: 401 },
         message: { type: 'string', example: 'Credenciais inválidas' },
-        error: { type: 'string', example: 'Unauthorized' }
-      }
-    }
+        error: { type: 'string', example: 'Unauthorized' },
+      },
+    },
   })
   @HttpCode(HttpStatus.OK)
   async login(@Request() req, @Body() loginDto: LoginDto) {

@@ -7,7 +7,10 @@ import { ProjectPerson } from '../entities/project-person.entity';
 export class UpdateProjectPersonService {
   constructor(private readonly repository: ProjectPersonRepository) {}
 
-  async execute(id: number, data: UpdateProjectPersonDto): Promise<ProjectPerson> {
+  async execute(
+    id: number,
+    data: UpdateProjectPersonDto,
+  ): Promise<ProjectPerson> {
     const projectPerson = await this.repository.findOne(id);
     if (!projectPerson) throw new NotFoundException('ProjectPerson not found');
     return this.repository.update(id, data);

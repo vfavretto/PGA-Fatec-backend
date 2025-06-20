@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { CourseRepository } from '../course.repository';
 import { PrismaService } from '../../../config/prisma.service';
 
@@ -6,7 +10,7 @@ import { PrismaService } from '../../../config/prisma.service';
 export class DeleteCourseService {
   constructor(
     private readonly repository: CourseRepository,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
   ) {}
 
   async execute(id: number, usuarioLogadoId?: number, motivo?: string) {
@@ -16,14 +20,16 @@ export class DeleteCourseService {
     const rotinasVinculadas = await this.prisma.rotinaInstitucional.count({
       where: {
         curso_id: id,
-        ativo: true
-      }
+        ativo: true,
+      },
     });
-    
+
     if (rotinasVinculadas > 0) {
-      throw new ConflictException('Este curso possui rotinas institucionais ativas e não pode ser excluído');
+      throw new ConflictException(
+        'Este curso possui rotinas institucionais ativas e não pode ser excluído',
+      );
     }
-    
+
     return this.repository.softDelete(id);
   }
 }

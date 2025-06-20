@@ -5,7 +5,7 @@ import { BaseRepository } from '@/common/repositories/base.repository';
 
 @Injectable()
 export class UserRepository extends BaseRepository<Pessoa> {
-  constructor(protected readonly prisma: PrismaService) { 
+  constructor(protected readonly prisma: PrismaService) {
     super(prisma);
   }
 
@@ -33,9 +33,9 @@ export class UserRepository extends BaseRepository<Pessoa> {
       include: {
         unidades: {
           where: { ativo: true },
-          include: { unidade: true }
-        }
-      }
+          include: { unidade: true },
+        },
+      },
     });
   }
 
@@ -65,7 +65,10 @@ export class UserRepository extends BaseRepository<Pessoa> {
     });
   }
 
-  async update(pessoa_id: number, data: Prisma.PessoaUpdateInput): Promise<Pessoa> {
+  async update(
+    pessoa_id: number,
+    data: Prisma.PessoaUpdateInput,
+  ): Promise<Pessoa> {
     return this.prisma.pessoa.update({
       where: { pessoa_id },
       data,
@@ -85,18 +88,18 @@ export class UserRepository extends BaseRepository<Pessoa> {
         unidades: {
           some: {
             unidade_id: unidadeId,
-            ativo: true
-          }
-        }
+            ativo: true,
+          },
+        },
       }),
       include: {
         unidades: {
           where: { ativo: true },
           include: {
-            unidade: true
-          }
-        }
-      }
+            unidade: true,
+          },
+        },
+      },
     });
   }
 }

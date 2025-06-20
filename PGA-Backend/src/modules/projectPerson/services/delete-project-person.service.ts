@@ -3,12 +3,15 @@ import { ProjectPersonRepository } from '../project-person.repository';
 
 @Injectable()
 export class DeleteProjectPersonService {
-  constructor(private readonly projectPersonRepository: ProjectPersonRepository) {}
+  constructor(
+    private readonly projectPersonRepository: ProjectPersonRepository,
+  ) {}
 
   async execute(id: number, usuarioLogadoId?: number, motivo?: string) {
     const projetoPessoa = await this.projectPersonRepository.findOne(id);
-    if (!projetoPessoa) throw new NotFoundException('Pessoa no projeto não encontrada');
-    
+    if (!projetoPessoa)
+      throw new NotFoundException('Pessoa no projeto não encontrada');
+
     return this.projectPersonRepository.delete(id);
   }
 }

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from '../../../config/prisma.service';
 import { RequestAccessDto } from '../dto/request-access.dto';
 
@@ -17,7 +21,9 @@ export class RequestAccessService {
     });
 
     if (!unidade) {
-      throw new NotFoundException('Unidade não encontrada com o código fornecido');
+      throw new NotFoundException(
+        'Unidade não encontrada com o código fornecido',
+      );
     }
 
     const existingSolicitation = await this.prisma.solicitacaoAcesso.findFirst({
@@ -28,7 +34,9 @@ export class RequestAccessService {
     });
 
     if (existingSolicitation) {
-      throw new ConflictException('Você já possui uma solicitação pendente com este email');
+      throw new ConflictException(
+        'Você já possui uma solicitação pendente com este email',
+      );
     }
 
     const solicitacao = await this.prisma.solicitacaoAcesso.create({
