@@ -1,28 +1,48 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@/config/prisma.service';
-import { Prisma, TipoVinculoHAE } from '@prisma/client';
+import { PrismaService } from '../../config/prisma.service';
+import { BaseRepository } from '../../common/repositories/base.repository';
+import { TipoVinculoHAE } from '@prisma/client';
+import { CreateWorkloadHaeDto } from './dto/create-workload-hae.dto';
+import { UpdateWorkloadHaeDto } from './dto/update-workload-hae.dto';
 
 @Injectable()
-export class WorkloadHaeRepository {
-  constructor(private readonly prisma: PrismaService) {}
-
-  async create(data: Prisma.TipoVinculoHAECreateInput): Promise<TipoVinculoHAE> {
-    return this.prisma.tipoVinculoHAE.create({ data });
+export class WorkloadHaeRepository extends BaseRepository<TipoVinculoHAE> {
+  constructor(protected readonly prisma: PrismaService) {
+    super(prisma);
   }
 
-  async findAll(): Promise<TipoVinculoHAE[]> {
-    return this.prisma.tipoVinculoHAE.findMany();
+  async create(data: CreateWorkloadHaeDto) {
+    return this.prisma.tipoVinculoHAE.create({
+      data
+    });
   }
 
-  async findOne(id: number): Promise<TipoVinculoHAE | null> {
-    return this.prisma.tipoVinculoHAE.findUnique({ where: { id } });
+  async findAll() {
+    return this.prisma.tipoVinculoHAE.findMany({
+      where: this.whereActive(),
+      orderBy: {
+        sigla: 'asc'
+      }
+    });
   }
 
-  async update(id: number, data: Prisma.TipoVinculoHAEUpdateInput): Promise<TipoVinculoHAE> {
-    return this.prisma.tipoVinculoHAE.update({ where: { id }, data });
+  async findOne(id: number) {
+    return this.prisma.tipoVinculoHAE.findFirst({
+      where: this.whereActive({ id })
+    });
   }
 
-  async delete(id: number): Promise<TipoVinculoHAE> {
-    return this.prisma.tipoVinculoHAE.delete({ where: { id } });
+  async update(id: number, data: UpdateWorkloadHaeDto) {
+    return this.prisma.tipoVinculoHAE.update({
+      where: { id },
+      data
+    });
+  }
+
+  async softDelete(id: number) {
+    return this.prisma.tipoVinculoHAE.update({
+      where: { id },
+      data: { ativo: false }
+    });
   }
 }

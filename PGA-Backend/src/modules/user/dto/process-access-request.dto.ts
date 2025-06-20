@@ -14,4 +14,8 @@ export class ProcessAccessRequestDto {
     message: 'Tipo de usuário inválido. Verifique os valores permitidos.'
   })
   tipo_usuario?: TipoUsuario;
+
+  @ValidateIf(o => o.tipo_usuario === 'Diretor')
+  @IsNotEmpty({ message: 'A unidade é obrigatória para diretores' })
+  unidade_id: number;
 }

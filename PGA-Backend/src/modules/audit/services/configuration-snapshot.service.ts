@@ -25,7 +25,6 @@ export class ConfigurationSnapshotService {
       timestampSnapshot: new Date(),
     };
 
-    // Salvar snapshot no PGA
     await this.prisma.pGA.update({
       where: { pga_id: pgaId },
       data: {
@@ -35,7 +34,6 @@ export class ConfigurationSnapshotService {
       },
     });
 
-    // Registrar na auditoria
     await this.auditRepository.createAuditLog({
       tabela: 'pga',
       registro_id: pgaId,
@@ -59,7 +57,6 @@ export class ConfigurationSnapshotService {
     
     for (const situacao of situacoesAtivas) {
       try {
-        // Verifica se já existe versão para este ano
         const versaoExistente = await this.prisma.situacaoProblemaVersao.findUnique({
           where: {
             situacao_base_id_ano: {
@@ -83,7 +80,6 @@ export class ConfigurationSnapshotService {
 
           versoes.push(novaVersao);
 
-          // Log de auditoria
           await this.auditRepository.createAuditLog({
             tabela: 'situacao_problema',
             registro_id: situacao.situacao_id,

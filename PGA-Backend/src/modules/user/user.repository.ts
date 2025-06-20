@@ -1,67 +1,67 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/config/prisma.service';
 import { Pessoa, Prisma } from '@prisma/client';
+import { BaseRepository } from '@/common/repositories/base.repository';
 
 @Injectable()
-export class UserRepository {
-  constructor(private readonly prisma: PrismaService) { }
+export class UserRepository extends BaseRepository<Pessoa> {
+  constructor(protected readonly prisma: PrismaService) { 
+    super(prisma);
+  }
 
   async create(data: Prisma.PessoaCreateInput): Promise<Pessoa> {
     return this.prisma.pessoa.create({ data });
   }
 
   async findAll(): Promise<Pessoa[]> {
-    // Incluir relacionamento com unidades
     return this.prisma.pessoa.findMany({
+      where: this.whereActive(), // 👈 Adicionado para filtrar apenas ativos
       include: {
         unidades: {
+          where: { ativo: true }, // 👈 Filtrar apenas unidades ativas
           include: {
-            unidade: true
-          }
-        }
-      }
+            unidade: true,
+          },
+        },
+      },
     });
   }
 
-  async findById(pessoa_id: number): Promise<Pessoa | null> {
-    // Incluir relacionamento com unidades
-    return this.prisma.pessoa.findUnique({
-      where: { pessoa_id },
+  async findById(id: number): Promise<Pessoa | null> {
+    return this.prisma.pessoa.findFirst({
+      where: this.whereActive({ pessoa_id: id }),
       include: {
         unidades: {
-          include: {
-            unidade: true
-          }
+          where: { ativo: true },
+          include: { unidade: true }
         }
       }
     });
   }
 
   async findByEmail(email: string): Promise<Pessoa | null> {
-    // Incluir relacionamento com unidades
     return this.prisma.pessoa.findUnique({
       where: { email },
       include: {
         unidades: {
           include: {
-            unidade: true
-          }
-        }
-      }
+            unidade: true,
+          },
+        },
+      },
     });
   }
 
   async findByUsername(nome_usuario: string): Promise<Pessoa | null> {
-    // Incluir relacionamento com unidades
     return this.prisma.pessoa.findUnique({
       where: { nome_usuario },
       include: {
         unidades: {
           include: {
-            unidade: true
-          }
-        }
-      }
+            unidade: true,
+          },
+        },
+      },
     });
   }
 
@@ -72,24 +72,26 @@ export class UserRepository {
     });
   }
 
-  async delete(pessoa_id: number): Promise<Pessoa> {
-    return this.prisma.pessoa.delete({
-      where: { pessoa_id },
+  async delete(id: number): Promise<Pessoa> {
+    return this.prisma.pessoa.update({
+      where: { pessoa_id: id },
+      data: { ativo: false },
     });
   }
 
   async findByUnidadeId(unidadeId: number): Promise<Pessoa[]> {
     return this.prisma.pessoa.findMany({
-      where: {
+      where: this.whereActive({
         unidades: {
           some: {
             unidade_id: unidadeId,
             ativo: true
           }
         }
-      },
+      }),
       include: {
         unidades: {
+          where: { ativo: true },
           include: {
             unidade: true
           }

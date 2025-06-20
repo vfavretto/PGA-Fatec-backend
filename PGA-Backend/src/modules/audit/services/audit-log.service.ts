@@ -117,7 +117,6 @@ export class AuditLogService {
     }
   }
 
-  // 🔥 MÉTODO PRINCIPAL - BUSCAR CONFIGURAÇÕES POR ANO
   async getConfigurationsByYear(ano: number) {
     try {
       console.log(`🔍 AuditLogService - Buscando configurações para o ano: ${ano}`);
@@ -160,12 +159,10 @@ export class AuditLogService {
     }
   }
 
-  // 🔥 FILTRAR SITUAÇÕES PROBLEMA POR ANO
   async getSituacoesProblemaByYear(ano: number) {
     try {
       console.log(`📋 Buscando situações problema para ${ano}...`);
 
-      // ESTRATÉGIA 1: Buscar via auditoria
       const situacoesAuditoria = await this.prisma.configuracaoAuditoria.findMany({
         where: {
           tabela: 'situacao_problema',
@@ -191,7 +188,6 @@ export class AuditLogService {
         return situacoes;
       }
 
-      // ESTRATÉGIA 2: Fallback por criado_em (campo que existe!)
       const endOfYear = new Date(`${ano}-12-31T23:59:59.999Z`);
       const situacoes = await this.prisma.situacaoProblema.findMany({
         where: {
@@ -211,12 +207,10 @@ export class AuditLogService {
     }
   }
 
-  // 🔥 FILTRAR EIXOS TEMÁTICOS POR ANO
   async getEixosTematicosByYear(ano: number) {
     try {
       console.log(`📊 Buscando eixos temáticos para ${ano}...`);
 
-      // Tentar auditoria primeiro
       const eixosAuditoria = await this.prisma.configuracaoAuditoria.findMany({
         where: {
           tabela: 'eixo_tematico',
@@ -242,7 +236,6 @@ export class AuditLogService {
         return eixos;
       }
 
-      // Fallback por criado_em
       const endOfYear = new Date(`${ano}-12-31T23:59:59.999Z`);
       const eixos = await this.prisma.eixoTematico.findMany({
         where: {
@@ -262,12 +255,10 @@ export class AuditLogService {
     }
   }
 
-  // 🔥 FILTRAR PRIORIDADES POR ANO
   async getPrioridadesByYear(ano: number) {
     try {
       console.log(`⭐ Buscando prioridades para ${ano}...`);
 
-      // Tentar auditoria primeiro
       const prioridadesAuditoria = await this.prisma.configuracaoAuditoria.findMany({
         where: {
           tabela: 'prioridade_acao',
@@ -293,7 +284,6 @@ export class AuditLogService {
         return prioridades;
       }
 
-      // Fallback por criado_em
       const endOfYear = new Date(`${ano}-12-31T23:59:59.999Z`);
       const prioridades = await this.prisma.prioridadeAcao.findMany({
         where: {
@@ -313,12 +303,10 @@ export class AuditLogService {
     }
   }
 
-  // 🔥 FILTRAR TEMAS POR ANO
   async getTemasByYear(ano: number) {
     try {
       console.log(`🎯 Buscando temas para ${ano}...`);
 
-      // Tentar auditoria primeiro
       const temasAuditoria = await this.prisma.configuracaoAuditoria.findMany({
         where: {
           tabela: 'tema',
@@ -349,7 +337,6 @@ export class AuditLogService {
         return temas;
       }
 
-      // Fallback por criado_em
       const endOfYear = new Date(`${ano}-12-31T23:59:59.999Z`);
       const temas = await this.prisma.tema.findMany({
         where: {
@@ -374,12 +361,10 @@ export class AuditLogService {
     }
   }
 
-  // 🔥 FILTRAR ENTREGÁVEIS POR ANO
   async getEntregaveisByYear(ano: number) {
     try {
       console.log(`📦 Buscando entregáveis para ${ano}...`);
 
-      // Tentar auditoria primeiro
       const entregaveisAuditoria = await this.prisma.configuracaoAuditoria.findMany({
         where: {
           tabela: 'entregavel_link_sei',
@@ -405,7 +390,6 @@ export class AuditLogService {
         return entregaveis;
       }
 
-      // Fallback por criado_em
       const endOfYear = new Date(`${ano}-12-31T23:59:59.999Z`);
       const entregaveis = await this.prisma.entregavelLinkSei.findMany({
         where: {
@@ -425,12 +409,10 @@ export class AuditLogService {
     }
   }
 
-  // 🔥 FILTRAR PESSOAS POR ANO - O MAIS IMPORTANTE!
   async getPessoasByYear(ano: number) {
     try {
       console.log(`👥 Buscando pessoas que existiam até ${ano}...`);
 
-      // ESTRATÉGIA 1: Buscar via logs de auditoria
       const pessoasAuditoria = await this.prisma.configuracaoAuditoria.findMany({
         where: {
           tabela: 'pessoa',
@@ -454,7 +436,7 @@ export class AuditLogService {
             nome: true,
             email: true,
             tipo_usuario: true,
-            criado_em: true // Para debug
+            criado_em: true
           },
           orderBy: { pessoa_id: 'asc' }
         });
@@ -467,7 +449,6 @@ export class AuditLogService {
         return pessoas;
       }
 
-      // ESTRATÉGIA 2: Fallback usando criado_em (campo que existe!)
       console.log(`⚠️ Nenhuma pessoa na auditoria, usando filtro por criado_em...`);
       const endOfYear = new Date(`${ano}-12-31T23:59:59.999Z`);
       
@@ -502,7 +483,6 @@ export class AuditLogService {
     }
   }
 
-  // MÉTODOS AUXILIARES EXISTENTES
   async getTableHistory(tableName: string, year?: number) {
     const whereCondition: any = { tabela: tableName };
     if (year) {

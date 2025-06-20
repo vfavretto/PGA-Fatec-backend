@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from "@nestjs/common";
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
 import { Prisma } from "@prisma/client";
+
 import { CreateProject1Service } from "./services/createProject1.service";
 import { DeleteProject1Service } from "./services/deleteProject1.service";
 import { FindAllProject1Service } from "./services/findAllProject1.service";
@@ -65,7 +66,7 @@ export class Project1Controller {
   @ApiResponse({ status: 404, description: 'Projeto não encontrado' })
   async update(
     @Param("id", ParseIntPipe) id: number,
-    @Body() data: Prisma.AcaoProjetoUncheckedUpdateInput,
+    @Body() data: UpdateProject1Dto,
   ) {
     return this.updateProject1Service.execute(id, data);
   }
