@@ -10,19 +10,23 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
+# Copiar arquivos de dependências
 COPY package*.json ./
 COPY prisma ./prisma/
 
+# Instalar dependências
 RUN npm install
 
 # Copiar resto do código
 COPY . .
 
+# Build da aplicação
 RUN npm run build
 
-# Gerar o Prisma Client APÓS o build para garantir compatibilidade
+# Gerar Prisma Client
 RUN npx prisma generate
 
 EXPOSE 3000
 
+# Executar migrações e iniciar aplicação
 CMD ["sh", "-c", "npx prisma migrate deploy && npm run start:prod"]
