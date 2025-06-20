@@ -1,11 +1,14 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, ParseIntPipe,} from "@nestjs/common";
-import { CreateProject1Service } from "../project1/services/createProject1.service";
-import { DeleteProject1Service } from "../project1/services/deleteProject1.service";
-import { FindAllProject1Service } from "../project1/services/findAllProject1.service";
-import { FindOneProject1Service } from "../project1/services/findOneProject1.service";
-import { UpdateProject1Service } from "../project1/services/updateProject1.service";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from "@nestjs/common";
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
 import { Prisma } from "@prisma/client";
+import { CreateProject1Service } from "./services/createProject1.service";
+import { DeleteProject1Service } from "./services/deleteProject1.service";
+import { FindAllProject1Service } from "./services/findAllProject1.service";
+import { FindOneProject1Service } from "./services/findOneProject1.service";
+import { UpdateProject1Service } from "./services/updateProject1.service";
 
+@ApiTags('Projects')
+@ApiBearerAuth('JWT-auth')
 @Controller("project1")
 export class Project1Controller {
   constructor(
@@ -17,21 +20,49 @@ export class Project1Controller {
   ) {}
 
   @Get()
+  @ApiOperation({ summary: 'Listar projetos', description: 'Retorna lista de todos os projetos' })
+  @ApiResponse({ status: 200, description: 'Lista de projetos retornada com sucesso' })
   async findAll() {
     return this.findAllProject1Service.execute();
   }
 
   @Get(":id")
+  @ApiOperation({ summary: 'Buscar projeto por ID', description: 'Retorna dados de um projeto específico' })
+  @ApiParam({ name: 'id', type: 'number', description: 'ID do projeto' })
+  @ApiResponse({ status: 200, description: 'Projeto encontrado com sucesso' })
+  @ApiResponse({ status: 404, description: 'Projeto não encontrado' })
   async findOne(@Param("id", ParseIntPipe) id: number) {
     return this.findOneProject1Service.execute(id);
   }
 
   @Post()
+  @ApiOperation({ summary: 'Criar novo projeto', description: 'Cria um novo projeto no sistema' })
+  @ApiBody({ 
+    description: 'Dados do novo projeto',
+    schema: {
+      type: 'object',
+      properties: {
+        pga_id: { type: 'number', description: 'ID do PGA' },
+        eixo_id: { type: 'number', description: 'ID do eixo temático' },
+        prioridade_id: { type: 'number', description: 'ID da prioridade' },
+        tema: { type: 'string', description: 'Tema do projeto' },
+        o_que_sera_feito: { type: 'string', description: 'Descrição do que será feito' },
+        por_que_sera_feito: { type: 'string', description: 'Justificativa do projeto' }
+      }
+    }
+  })
+  @ApiResponse({ status: 201, description: 'Projeto criado com sucesso' })
+  @ApiResponse({ status: 400, description: 'Dados inválidos' })
   async create(@Body() data: Prisma.AcaoProjetoUncheckedCreateInput) {
     return this.createProject1Service.execute(data);
   }
 
   @Put(":id")
+  @ApiOperation({ summary: 'Atualizar projeto', description: 'Atualiza dados de um projeto específico' })
+  @ApiParam({ name: 'id', type: 'number', description: 'ID do projeto' })
+  @ApiBody({ description: 'Dados a serem atualizados' })
+  @ApiResponse({ status: 200, description: 'Projeto atualizado com sucesso' })
+  @ApiResponse({ status: 404, description: 'Projeto não encontrado' })
   async update(
     @Param("id", ParseIntPipe) id: number,
     @Body() data: Prisma.AcaoProjetoUncheckedUpdateInput,
@@ -40,6 +71,10 @@ export class Project1Controller {
   }
 
   @Delete(":id")
+  @ApiOperation({ summary: 'Excluir projeto', description: 'Remove um projeto do sistema' })
+  @ApiParam({ name: 'id', type: 'number', description: 'ID do projeto' })
+  @ApiResponse({ status: 200, description: 'Projeto excluído com sucesso' })
+  @ApiResponse({ status: 404, description: 'Projeto não encontrado' })
   async delete(@Param("id", ParseIntPipe) id: number) {
     return this.deleteProject1Service.execute(id);
   }
