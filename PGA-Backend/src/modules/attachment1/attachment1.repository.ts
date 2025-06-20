@@ -1,77 +1,55 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../config/prisma.service';
-import { UpdateAttachment1Dto } from './dto/update-attachment1.dto';
+import { BaseRepository } from '../../common/repositories/base.repository';
+import { Attachment1 } from '@prisma/client';
 import { CreateAttachment1Dto } from './dto/create-attachment1.dto';
-import { Prisma, Attachment1 } from '@prisma/client';
+import { UpdateAttachment1Dto } from './dto/update-attachment1.dto';
 
 @Injectable()
-export class Attachment1Repository {
-  constructor(private readonly prisma: PrismaService) {}
+export class Attachment1Repository extends BaseRepository<Attachment1> {
+  constructor(protected readonly prisma: PrismaService) {
+    super(prisma);
+  }
 
-  async create(dto: CreateAttachment1Dto): Promise<Attachment1> {
-    const data: Prisma.Attachment1CreateInput = {
-      item: dto.item,
-      denominacaoOuEspecificacao: dto.denominacaoOuEspecificacao,
-      quantidade: dto.quantidade,
-      precoTotalEstimado: dto.precoTotalEstimado,
-      flag: dto.flag,
-      projeto: {
-        connect: dto.projetoId ? { acao_projeto_id: parseInt(dto.projetoId) } : undefined
-      }
-    };
-
-    return this.prisma.attachment1.create({ data });
+  async create(data: CreateAttachment1Dto) {
+    return this.prisma.attachment1.create({
+      data
+    });
   }
 
   async findAll() {
     return this.prisma.attachment1.findMany({
+      where: this.whereActive(),
       include: {
-        projeto: true // Incluir os projetos relacionados
+        projeto: {
+          where: this.whereActive()
+        }
       }
     });
   }
 
   async findOne(id: string) {
-    return this.prisma.attachment1.findUnique({ 
-      where: { id },
+    return this.prisma.attachment1.findFirst({
+      where: this.whereActive({ id }),
       include: {
-        projeto: true // Incluir os projetos relacionados
+        projeto: {
+          where: this.whereActive()
+        }
       }
     });
   }
 
-  async update(id: string, dto: UpdateAttachment1Dto) {
-    // Convertemos o DTO para o formato esperado pelo Prisma
-    const data: Prisma.Attachment1UpdateInput = {};
-    
-    if (dto.item !== undefined) data.item = dto.item;
-    if (dto.denominacaoOuEspecificacao !== undefined) data.denominacaoOuEspecificacao = dto.denominacaoOuEspecificacao;
-    if (dto.quantidade !== undefined) data.quantidade = dto.quantidade;
-    if (dto.precoTotalEstimado !== undefined) data.precoTotalEstimado = dto.precoTotalEstimado;
-    if (dto.flag !== undefined) data.flag = dto.flag;
-    
-    // Se temos um ID de projeto para conectar
-    if (dto.projetoId) {
-      data.projeto = {
-        connect: { acao_projeto_id: parseInt(dto.projetoId) }
-      };
-    }
-
+  async update(id: string, data: UpdateAttachment1Dto) {
     return this.prisma.attachment1.update({
       where: { id },
-      data,
-      include: {
-        projeto: true
-      }
+      data
     });
   }
 
-  async delete(id: string) {
-    return this.prisma.attachment1.delete({ 
+  async softDelete(id: string) {
+    return this.prisma.attachment1.update({
       where: { id },
-      include: {
-        projeto: true
-      }
+      data: { ativo: false }
     });
   }
 }

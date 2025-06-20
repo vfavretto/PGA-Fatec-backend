@@ -5,9 +5,10 @@ import { ThematicAxisRepository } from '../thematicAxis.repository';
 export class DeleteThematicAxisService {
   constructor(private readonly repo: ThematicAxisRepository) {}
 
-  async execute(id: number) {
+  async execute(id: number, usuario_id?: number) {
     const eixo = await this.repo.findOne(id);
     if (!eixo) throw new NotFoundException('Eixo Temático não encontrado');
-    return this.repo.remove(id);
+    
+    return this.repo.softDelete(id);
   }
 }

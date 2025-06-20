@@ -15,11 +15,13 @@ import { ListAccessRequestsService } from './services/list-access-requests.servi
 import { ProcessAccessRequestService } from './services/process-access-request.service';
 import { RequestAccessService } from './services/request-access.service';
 import { GetUsersByUnitService } from './services/get-users-by-unit.service';
+import { AuditModule } from '../audit/audit.module';
 
 @Module({
   imports: [
     PrismaModule,
     MailModule,
+    AuditModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '1h' },
