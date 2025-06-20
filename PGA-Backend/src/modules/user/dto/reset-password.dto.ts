@@ -9,7 +9,8 @@ export class ResetPasswordDto {
   @IsNotEmpty({ message: 'A senha é obrigatória' })
   @MinLength(6, { message: 'A senha deve ter pelo menos 6 caracteres' })
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-    message: 'A senha deve conter pelo menos uma letra maiúscula, uma letra minúscula e um número ou caractere especial',
+    message:
+      'A senha deve conter pelo menos uma letra maiúscula, uma letra minúscula e um número ou caractere especial',
   })
   password: string;
 }

@@ -13,7 +13,7 @@ export class UnitRepository extends BaseRepository<Unidade> {
 
   async create(data: CreateUnitDto) {
     return this.prisma.unidade.create({
-      data
+      data,
     });
   }
 
@@ -22,10 +22,10 @@ export class UnitRepository extends BaseRepository<Unidade> {
       where: this.whereActive(),
       include: {
         cursos: {
-          where: this.whereActive()
-        }
+          where: this.whereActive(),
+        },
       },
-      orderBy: { nome_completo: 'asc' }
+      orderBy: { nome_completo: 'asc' },
     });
   }
 
@@ -34,16 +34,16 @@ export class UnitRepository extends BaseRepository<Unidade> {
       where: this.whereActive({ unidade_id: id }),
       include: {
         cursos: {
-          where: this.whereActive()
-        }
-      }
+          where: this.whereActive(),
+        },
+      },
     });
   }
 
   async update(id: number, data: UpdateUnitDto) {
     return this.prisma.unidade.update({
       where: { unidade_id: id },
-      data
+      data,
     });
   }
 

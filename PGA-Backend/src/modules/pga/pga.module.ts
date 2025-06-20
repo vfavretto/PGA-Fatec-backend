@@ -6,7 +6,7 @@ import { CreatePgaService } from './services/create-pga.service';
 import { FindAllPgaService } from './services/find-all-pga.service';
 import { FindOnePgaService } from './services/find-one-pga.service';
 import { UpdatePgaService } from './services/update-pga.service';
-import { DeletePgaService} from './services/delete-pga.service';
+import { DeletePgaService } from './services/delete-pga.service';
 
 @Module({
   imports: [PrismaModule],

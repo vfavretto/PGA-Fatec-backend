@@ -5,14 +5,14 @@ export class CreateThematicAxisDto {
   @ApiProperty({
     description: 'Número do eixo temático',
     example: 1,
-    type: 'integer'
+    type: 'integer',
   })
   @IsInt()
   numero: number;
 
   @ApiProperty({
     description: 'Nome do eixo temático',
-    example: 'Gestão e Planejamento Institucional'
+    example: 'Gestão e Planejamento Institucional',
   })
   @IsString()
   @IsNotEmpty()
@@ -21,7 +21,7 @@ export class CreateThematicAxisDto {
   @ApiProperty({
     description: 'Descrição detalhada do eixo temático',
     example: 'Eixo focado no planejamento estratégico e gestão institucional',
-    required: false
+    required: false,
   })
   @IsString()
   @IsOptional()

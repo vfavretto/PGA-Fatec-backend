@@ -5,7 +5,7 @@ export class LoginDto {
   @ApiProperty({
     description: 'Email do usuário para login',
     example: 'usuario@fatec.sp.gov.br',
-    format: 'email'
+    format: 'email',
   })
   @IsEmail({}, { message: 'O email fornecido não é válido' })
   @IsNotEmpty({ message: 'O email é obrigatório' })
@@ -16,7 +16,7 @@ export class LoginDto {
     example: 'senha123',
     minLength: 6,
     type: 'string',
-    format: 'password'
+    format: 'password',
   })
   @IsString({ message: 'A senha deve ser uma string' })
   @IsNotEmpty({ message: 'A senha é obrigatória' })

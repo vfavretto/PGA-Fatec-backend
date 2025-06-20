@@ -13,7 +13,7 @@ export class RoutineParticipantRepository extends BaseRepository<RotinaParticipa
 
   async create(data: CreateRoutineParticipantDto) {
     return this.prisma.rotinaParticipante.create({
-      data
+      data,
     });
   }
 
@@ -22,8 +22,8 @@ export class RoutineParticipantRepository extends BaseRepository<RotinaParticipa
       where: this.whereActive(),
       include: {
         pessoa: true,
-        rotina: true
-      }
+        rotina: true,
+      },
     });
   }
 
@@ -32,22 +32,22 @@ export class RoutineParticipantRepository extends BaseRepository<RotinaParticipa
       where: this.whereActive({ rotina_participante_id: id }),
       include: {
         pessoa: true,
-        rotina: true
-      }
+        rotina: true,
+      },
     });
   }
 
   async update(id: number, data: UpdateRoutineParticipantDto) {
     return this.prisma.rotinaParticipante.update({
       where: { rotina_participante_id: id },
-      data
+      data,
     });
   }
 
   async softDelete(id: number) {
     return this.prisma.rotinaParticipante.update({
       where: { rotina_participante_id: id },
-      data: { ativo: false }
+      data: { ativo: false },
     });
   }
 
@@ -55,8 +55,8 @@ export class RoutineParticipantRepository extends BaseRepository<RotinaParticipa
     return this.prisma.rotinaParticipante.findMany({
       where: this.whereActive({ rotina_id: routineId }),
       include: {
-        pessoa: true
-      }
+        pessoa: true,
+      },
     });
   }
 }

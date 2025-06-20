@@ -13,7 +13,7 @@ export class CourseRepository extends BaseRepository<Curso> {
 
   async create(data: CreateCourseDto) {
     return this.prisma.curso.create({
-      data
+      data,
     });
   }
 
@@ -22,11 +22,11 @@ export class CourseRepository extends BaseRepository<Curso> {
       where: this.whereActive(),
       include: {
         coordenador: true,
-        unidade: true
+        unidade: true,
       },
       orderBy: {
-        nome: 'asc'
-      }
+        nome: 'asc',
+      },
     });
   }
 
@@ -35,22 +35,22 @@ export class CourseRepository extends BaseRepository<Curso> {
       where: this.whereActive({ curso_id: id }),
       include: {
         coordenador: true,
-        unidade: true
-      }
+        unidade: true,
+      },
     });
   }
 
   async update(id: number, data: UpdateCourseDto) {
     return this.prisma.curso.update({
       where: { curso_id: id },
-      data
+      data,
     });
   }
 
   async softDelete(id: number) {
     return this.prisma.curso.update({
       where: { curso_id: id },
-      data: { ativo: false }
+      data: { ativo: false },
     });
   }
 
@@ -58,11 +58,11 @@ export class CourseRepository extends BaseRepository<Curso> {
     return this.prisma.curso.findMany({
       where: this.whereActive({ unidade_id: unitId }),
       include: {
-        coordenador: true
+        coordenador: true,
       },
       orderBy: {
-        nome: 'asc'
-      }
+        nome: 'asc',
+      },
     });
   }
 }

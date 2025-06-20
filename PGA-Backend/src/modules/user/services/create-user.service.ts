@@ -15,4 +15,3 @@ export class CreateUserService {
     return this.userRepository.create(data);
   }
 }
-

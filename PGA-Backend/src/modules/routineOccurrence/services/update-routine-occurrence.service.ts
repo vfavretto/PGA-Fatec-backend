@@ -7,9 +7,13 @@ import { RoutineOccurrence } from '../entities/routine-occurrence.entity';
 export class UpdateRoutineOccurrenceService {
   constructor(private readonly repository: RoutineOccurrenceRepository) {}
 
-  async execute(id: number, data: UpdateRoutineOccurrenceDto): Promise<RoutineOccurrence> {
+  async execute(
+    id: number,
+    data: UpdateRoutineOccurrenceDto,
+  ): Promise<RoutineOccurrence> {
     const ocorrencia = await this.repository.findOne(id);
-    if (!ocorrencia) throw new NotFoundException('RotinaOcorrencia não encontrada');
+    if (!ocorrencia)
+      throw new NotFoundException('RotinaOcorrencia não encontrada');
     return this.repository.update(id, data);
   }
 }

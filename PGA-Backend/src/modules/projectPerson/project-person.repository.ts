@@ -13,7 +13,7 @@ export class ProjectPersonRepository extends BaseRepository<ProjetoPessoa> {
 
   async create(data: CreateProjectPersonDto) {
     return this.prisma.projetoPessoa.create({
-      data
+      data,
     });
   }
 
@@ -23,8 +23,8 @@ export class ProjectPersonRepository extends BaseRepository<ProjetoPessoa> {
       include: {
         pessoa: true,
         acaoProjeto: true,
-        tipo_vinculo_hae: true
-      }
+        tipo_vinculo_hae: true,
+      },
     });
   }
 
@@ -34,15 +34,15 @@ export class ProjectPersonRepository extends BaseRepository<ProjetoPessoa> {
       include: {
         pessoa: true,
         acaoProjeto: true,
-        tipo_vinculo_hae: true
-      }
+        tipo_vinculo_hae: true,
+      },
     });
   }
 
   async update(id: number, data: UpdateProjectPersonDto) {
     return this.prisma.projetoPessoa.update({
       where: { projeto_pessoa_id: id },
-      data
+      data,
     });
   }
 
@@ -58,8 +58,8 @@ export class ProjectPersonRepository extends BaseRepository<ProjetoPessoa> {
       where: this.whereActive({ acao_projeto_id: projetoId }),
       include: {
         pessoa: true,
-        tipo_vinculo_hae: true
-      }
+        tipo_vinculo_hae: true,
+      },
     });
   }
 }

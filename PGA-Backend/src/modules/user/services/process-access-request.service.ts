@@ -59,15 +59,18 @@ export class ProcessAccessRequestService {
 
     if (processador.tipo_usuario === 'Diretor') {
       const unidadeDiretor = await this.prisma.unidade.findFirst({
-        where: { 
+        where: {
           diretor_id: usuarioId,
           ativo: true
         } as any,
       });
 
-      if (!unidadeDiretor || unidadeDiretor.unidade_id !== solicitacao.unidade_id) {
+      if (
+        !unidadeDiretor ||
+        unidadeDiretor.unidade_id !== solicitacao.unidade_id
+      ) {
         throw new UnauthorizedException(
-          'Você não pode processar solicitações de outras unidades'
+          'Você não pode processar solicitações de outras unidades',
         );
       }
     }
@@ -82,7 +85,10 @@ export class ProcessAccessRequestService {
       const nivelProcessador = this.getNivelUsuario(processador.tipo_usuario);
       const nivelSolicitado = this.getNivelUsuario(tipoUsuario);
 
-      if (processador.tipo_usuario === 'Administrador' || processador.tipo_usuario === 'CPS') {
+      if (
+        processador.tipo_usuario === 'Administrador' ||
+        processador.tipo_usuario === 'CPS'
+      ) {
       } else {
         if (nivelSolicitado <= nivelProcessador) {
           throw new UnauthorizedException(
@@ -113,7 +119,9 @@ export class ProcessAccessRequestService {
         }) as any;
 
         if (unidadeAtual?.diretor_id) {
-          throw new ConflictException(`A unidade ${unidadeAtual.nome_completo} já possui um diretor atribuído. Remova o diretor atual antes de atribuir um novo.`);
+          throw new ConflictException(
+            `A unidade ${unidadeAtual.nome_completo} já possui um diretor atribuído. Remova o diretor atual antes de atribuir um novo.`,
+          );
         }
       }
 

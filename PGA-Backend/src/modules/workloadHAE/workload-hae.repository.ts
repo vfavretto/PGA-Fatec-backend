@@ -13,7 +13,7 @@ export class WorkloadHaeRepository extends BaseRepository<TipoVinculoHAE> {
 
   async create(data: CreateWorkloadHaeDto) {
     return this.prisma.tipoVinculoHAE.create({
-      data
+      data,
     });
   }
 
@@ -21,28 +21,28 @@ export class WorkloadHaeRepository extends BaseRepository<TipoVinculoHAE> {
     return this.prisma.tipoVinculoHAE.findMany({
       where: this.whereActive(),
       orderBy: {
-        sigla: 'asc'
-      }
+        sigla: 'asc',
+      },
     });
   }
 
   async findOne(id: number) {
     return this.prisma.tipoVinculoHAE.findFirst({
-      where: this.whereActive({ id })
+      where: this.whereActive({ id }),
     });
   }
 
   async update(id: number, data: UpdateWorkloadHaeDto) {
     return this.prisma.tipoVinculoHAE.update({
       where: { id },
-      data
+      data,
     });
   }
 
   async softDelete(id: number) {
     return this.prisma.tipoVinculoHAE.update({
       where: { id },
-      data: { ativo: false }
+      data: { ativo: false },
     });
   }
 }

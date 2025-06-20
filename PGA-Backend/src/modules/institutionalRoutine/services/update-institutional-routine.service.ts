@@ -7,9 +7,13 @@ import { InstitutionalRoutine } from '../entities/institutional-routine.entity';
 export class UpdateInstitutionalRoutineService {
   constructor(private readonly repository: InstitutionalRoutineRepository) {}
 
-  async execute(id: number, data: UpdateInstitutionalRoutineDto): Promise<InstitutionalRoutine> {
+  async execute(
+    id: number,
+    data: UpdateInstitutionalRoutineDto,
+  ): Promise<InstitutionalRoutine> {
     const rotina = await this.repository.findOne(id);
-    if (!rotina) throw new NotFoundException('RotinaInstitucional não encontrada');
+    if (!rotina)
+      throw new NotFoundException('RotinaInstitucional não encontrada');
     return this.repository.update(id, data);
   }
 }

@@ -25,7 +25,7 @@ export class CreateProject1Dto {
   })
   @IsOptional()
   @IsString()
-  nome_projeto?: string;
+  nome_projeto?: string | null;
 
   @ApiProperty({
     description: 'ID do PGA ao qual o projeto pertence',

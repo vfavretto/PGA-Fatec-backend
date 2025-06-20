@@ -13,14 +13,14 @@ export class DeliverableRepository extends BaseRepository<EntregavelLinkSei> {
 
   async create(data: CreateDeliverableDto) {
     return this.prisma.entregavelLinkSei.create({
-      data
+      data,
     });
   }
 
   async findAll() {
     return this.prisma.entregavelLinkSei.findMany({
       where: this.whereActive(),
-      orderBy: { entregavel_numero: 'asc' }
+      orderBy: { entregavel_numero: 'asc' },
     });
   }
 
@@ -33,7 +33,7 @@ export class DeliverableRepository extends BaseRepository<EntregavelLinkSei> {
   async update(id: number, data: UpdateDeliverableDto) {
     return this.prisma.entregavelLinkSei.update({
       where: { entregavel_id: id },
-      data
+      data,
     });
   }
 

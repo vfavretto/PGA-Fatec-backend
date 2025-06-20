@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../../config/prisma.service";
-import { BaseRepository } from "../../common/repositories/base.repository";
-import { AcaoProjeto } from "@prisma/client";
-import { CreateProject1Dto } from "./dto/create-project1.dto";
-import { UpdateProject1Dto } from "./dto/update-project1.dto";
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../../config/prisma.service';
+import { BaseRepository } from '../../common/repositories/base.repository';
+import { AcaoProjeto } from '@prisma/client';
+import { CreateProject1Dto } from './dto/create-project1.dto';
+import { UpdateProject1Dto } from './dto/update-project1.dto';
 
 @Injectable()
 export class Project1Repository extends BaseRepository<AcaoProjeto> {

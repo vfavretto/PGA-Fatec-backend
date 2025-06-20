@@ -15,14 +15,14 @@ export class VersionRepository {
     criado_por?: number | null;
     motivo_alteracao?: string | null;
   }) {
-    return this.prisma.situacaoProblemaVersao.create({ 
+    return this.prisma.situacaoProblemaVersao.create({
       data: {
         ...data,
         fonte: data.fonte ?? undefined,
         ordem: data.ordem ?? undefined,
         criado_por: data.criado_por ?? undefined,
         motivo_alteracao: data.motivo_alteracao ?? undefined,
-      }
+      },
     });
   }
 
@@ -33,7 +33,7 @@ export class VersionRepository {
     });
 
     if (versoes.length > 0) {
-      return versoes.map(v => ({
+      return versoes.map((v) => ({
         situacao_id: v.situacao_base_id,
         codigo_categoria: v.codigo_categoria,
         descricao: v.descricao,
@@ -60,13 +60,13 @@ export class VersionRepository {
     criado_por?: number | null;
     motivo_alteracao?: string | null;
   }) {
-    return this.prisma.eixoTematicoVersao.create({ 
+    return this.prisma.eixoTematicoVersao.create({
       data: {
         ...data,
         descricao: data.descricao ?? undefined,
         criado_por: data.criado_por ?? undefined,
         motivo_alteracao: data.motivo_alteracao ?? undefined,
-      }
+      },
     });
   }
 
@@ -77,7 +77,7 @@ export class VersionRepository {
     });
 
     if (versoes.length > 0) {
-      return versoes.map(v => ({
+      return versoes.map((v) => ({
         eixo_id: v.eixo_base_id,
         numero: v.numero,
         nome: v.nome,
@@ -104,13 +104,13 @@ export class VersionRepository {
     criado_por?: number | null;
     motivo_alteracao?: string | null;
   }) {
-    return this.prisma.prioridadeAcaoVersao.create({ 
+    return this.prisma.prioridadeAcaoVersao.create({
       data: {
         ...data,
         detalhes: data.detalhes ?? undefined,
         criado_por: data.criado_por ?? undefined,
         motivo_alteracao: data.motivo_alteracao ?? undefined,
-      }
+      },
     });
   }
 
@@ -121,7 +121,7 @@ export class VersionRepository {
     });
 
     if (versoes.length > 0) {
-      return versoes.map(v => ({
+      return versoes.map((v) => ({
         prioridade_id: v.prioridade_base_id,
         grau: v.grau,
         descricao: v.descricao,
@@ -148,26 +148,26 @@ export class VersionRepository {
     criado_por?: number | null;
     motivo_alteracao?: string | null;
   }) {
-    return this.prisma.temaVersao.create({ 
+    return this.prisma.temaVersao.create({
       data: {
         ...data,
         criado_por: data.criado_por ?? undefined,
         motivo_alteracao: data.motivo_alteracao ?? undefined,
-      }
+      },
     });
   }
 
   async getTemasByYear(ano: number) {
     const versoes = await this.prisma.temaVersao.findMany({
       where: { ano, ativo_no_ano: true },
-      include: { 
+      include: {
         temaBase: true,
-        eixo: true 
+        eixo: true,
       },
     });
 
     if (versoes.length > 0) {
-      return versoes.map(v => ({
+      return versoes.map((v) => ({
         tema_id: v.tema_base_id,
         tema_num: v.tema_num,
         eixo_id: v.eixo_id,
@@ -195,13 +195,13 @@ export class VersionRepository {
     criado_por?: number | null;
     motivo_alteracao?: string | null;
   }) {
-    return this.prisma.entregavelVersao.create({ 
+    return this.prisma.entregavelVersao.create({
       data: {
         ...data,
         detalhes: data.detalhes ?? undefined,
         criado_por: data.criado_por ?? undefined,
         motivo_alteracao: data.motivo_alteracao ?? undefined,
-      }
+      },
     });
   }
 
@@ -212,7 +212,7 @@ export class VersionRepository {
     });
 
     if (versoes.length > 0) {
-      return versoes.map(v => ({
+      return versoes.map((v) => ({
         entregavel_id: v.entregavel_base_id,
         entregavel_numero: v.entregavel_numero,
         descricao: v.descricao,
@@ -238,13 +238,13 @@ export class VersionRepository {
     criado_por?: number | null;
     motivo_alteracao?: string | null;
   }) {
-    return this.prisma.pessoaVersao.create({ 
+    return this.prisma.pessoaVersao.create({
       data: {
         ...data,
         email: data.email ?? undefined,
         criado_por: data.criado_por ?? undefined,
         motivo_alteracao: data.motivo_alteracao ?? undefined,
-      }
+      },
     });
   }
 
@@ -255,7 +255,7 @@ export class VersionRepository {
     });
 
     if (versoes.length > 0) {
-      return versoes.map(v => ({
+      return versoes.map((v) => ({
         pessoa_id: v.pessoa_base_id,
         nome: v.nome,
         email: v.email,

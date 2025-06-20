@@ -2,7 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/config/prisma.service';
 import { VersionRepository } from '../repositories/version.repository';
 import { AuditRepository } from '../repositories/audit.repository';
-import { TipoOperacaoAuditoria, SituacaoProblemaVersao, EixoTematicoVersao, PrioridadeAcaoVersao, TemaVersao, EntregavelVersao, PessoaVersao } from '@prisma/client';
+import {
+  TipoOperacaoAuditoria,
+  SituacaoProblemaVersao,
+  EixoTematicoVersao,
+  PrioridadeAcaoVersao,
+  TemaVersao,
+  EntregavelVersao,
+  PessoaVersao,
+} from '@prisma/client';
 
 @Injectable()
 export class ConfigurationSnapshotService {
@@ -16,7 +24,10 @@ export class ConfigurationSnapshotService {
     console.log(`Criando snapshot para PGA ${pgaId} do ano ${ano}`);
 
     const snapshot = {
-      situacoesProblema: await this.criarVersoesSituacoesProblema(ano, usuarioId),
+      situacoesProblema: await this.criarVersoesSituacoesProblema(
+        ano,
+        usuarioId,
+      ),
       eixosTematicos: await this.criarVersoesEixosTematicos(ano, usuarioId),
       prioridades: await this.criarVersoesPrioridades(ano, usuarioId),
       temas: await this.criarVersoesTemas(ano, usuarioId),
@@ -48,35 +59,40 @@ export class ConfigurationSnapshotService {
     return snapshot;
   }
 
-  private async criarVersoesSituacoesProblema(ano: number, usuarioId: number): Promise<SituacaoProblemaVersao[]> {
+  private async criarVersoesSituacoesProblema(
+    ano: number,
+    usuarioId: number,
+  ): Promise<SituacaoProblemaVersao[]> {
     const situacoesAtivas = await this.prisma.situacaoProblema.findMany({
       where: { ativo: true },
     });
 
     const versoes: SituacaoProblemaVersao[] = [];
-    
+
     for (const situacao of situacoesAtivas) {
       try {
-        const versaoExistente = await this.prisma.situacaoProblemaVersao.findUnique({
-          where: {
-            situacao_base_id_ano: {
-              situacao_base_id: situacao.situacao_id,
-              ano: ano,
+        const versaoExistente =
+          await this.prisma.situacaoProblemaVersao.findUnique({
+            where: {
+              situacao_base_id_ano: {
+                situacao_base_id: situacao.situacao_id,
+                ano: ano,
+              },
             },
-          },
-        });
+          });
 
         if (!versaoExistente) {
-          const novaVersao = await this.versionRepository.createSituacaoProblemaVersion({
-            situacao_base_id: situacao.situacao_id,
-            ano: ano,
-            codigo_categoria: situacao.codigo_categoria,
-            descricao: situacao.descricao,
-            fonte: situacao.fonte ?? undefined,
-            ordem: situacao.ordem ?? undefined,
-            criado_por: usuarioId,
-            motivo_alteracao: `Versão criada automaticamente para ano ${ano}`,
-          });
+          const novaVersao =
+            await this.versionRepository.createSituacaoProblemaVersion({
+              situacao_base_id: situacao.situacao_id,
+              ano: ano,
+              codigo_categoria: situacao.codigo_categoria,
+              descricao: situacao.descricao,
+              fonte: situacao.fonte ?? undefined,
+              ordem: situacao.ordem ?? undefined,
+              criado_por: usuarioId,
+              motivo_alteracao: `Versão criada automaticamente para ano ${ano}`,
+            });
 
           versoes.push(novaVersao);
 
@@ -91,41 +107,50 @@ export class ConfigurationSnapshotService {
           });
         }
       } catch (error) {
-        console.error(`Erro ao criar versão para situação ${situacao.situacao_id}:`, error);
+        console.error(
+          `Erro ao criar versão para situação ${situacao.situacao_id}:`,
+          error,
+        );
       }
     }
 
     return versoes;
   }
 
-  private async criarVersoesEixosTematicos(ano: number, usuarioId: number): Promise<EixoTematicoVersao[]> {
+  private async criarVersoesEixosTematicos(
+    ano: number,
+    usuarioId: number,
+  ): Promise<EixoTematicoVersao[]> {
     const eixosAtivos = await this.prisma.eixoTematico.findMany({
       where: { ativo: true },
     });
 
     const versoes: EixoTematicoVersao[] = [];
-    
+
     for (const eixo of eixosAtivos) {
       try {
-        const versaoExistente = await this.prisma.eixoTematicoVersao.findUnique({
-          where: {
-            eixo_base_id_ano: {
-              eixo_base_id: eixo.eixo_id,
-              ano: ano,
+        const versaoExistente = await this.prisma.eixoTematicoVersao.findUnique(
+          {
+            where: {
+              eixo_base_id_ano: {
+                eixo_base_id: eixo.eixo_id,
+                ano: ano,
+              },
             },
           },
-        });
+        );
 
         if (!versaoExistente) {
-          const novaVersao = await this.versionRepository.createEixoTematicoVersion({
-            eixo_base_id: eixo.eixo_id,
-            ano: ano,
-            numero: eixo.numero,
-            nome: eixo.nome,
-            descricao: eixo.descricao ?? undefined,
-            criado_por: usuarioId,
-            motivo_alteracao: `Versão criada automaticamente para ano ${ano}`,
-          });
+          const novaVersao =
+            await this.versionRepository.createEixoTematicoVersion({
+              eixo_base_id: eixo.eixo_id,
+              ano: ano,
+              numero: eixo.numero,
+              nome: eixo.nome,
+              descricao: eixo.descricao ?? undefined,
+              criado_por: usuarioId,
+              motivo_alteracao: `Versão criada automaticamente para ano ${ano}`,
+            });
 
           versoes.push(novaVersao);
 
@@ -147,35 +172,40 @@ export class ConfigurationSnapshotService {
     return versoes;
   }
 
-  private async criarVersoesPrioridades(ano: number, usuarioId: number): Promise<PrioridadeAcaoVersao[]> {
+  private async criarVersoesPrioridades(
+    ano: number,
+    usuarioId: number,
+  ): Promise<PrioridadeAcaoVersao[]> {
     const prioridadesAtivas = await this.prisma.prioridadeAcao.findMany({
       where: { ativo: true },
     });
 
     const versoes: PrioridadeAcaoVersao[] = [];
-    
+
     for (const prioridade of prioridadesAtivas) {
       try {
-        const versaoExistente = await this.prisma.prioridadeAcaoVersao.findUnique({
-          where: {
-            prioridade_base_id_ano: {
-              prioridade_base_id: prioridade.prioridade_id,
-              ano: ano,
+        const versaoExistente =
+          await this.prisma.prioridadeAcaoVersao.findUnique({
+            where: {
+              prioridade_base_id_ano: {
+                prioridade_base_id: prioridade.prioridade_id,
+                ano: ano,
+              },
             },
-          },
-        });
+          });
 
         if (!versaoExistente) {
-          const novaVersao = await this.versionRepository.createPrioridadeAcaoVersion({
-            prioridade_base_id: prioridade.prioridade_id,
-            ano: ano,
-            grau: prioridade.grau,
-            descricao: prioridade.descricao,
-            tipo_gestao: prioridade.tipo_gestao,
-            detalhes: prioridade.detalhes ?? undefined,
-            criado_por: usuarioId,
-            motivo_alteracao: `Versão criada automaticamente para ano ${ano}`,
-          });
+          const novaVersao =
+            await this.versionRepository.createPrioridadeAcaoVersion({
+              prioridade_base_id: prioridade.prioridade_id,
+              ano: ano,
+              grau: prioridade.grau,
+              descricao: prioridade.descricao,
+              tipo_gestao: prioridade.tipo_gestao,
+              detalhes: prioridade.detalhes ?? undefined,
+              criado_por: usuarioId,
+              motivo_alteracao: `Versão criada automaticamente para ano ${ano}`,
+            });
 
           versoes.push(novaVersao);
 
@@ -190,20 +220,26 @@ export class ConfigurationSnapshotService {
           });
         }
       } catch (error) {
-        console.error(`Erro ao criar versão para prioridade ${prioridade.prioridade_id}:`, error);
+        console.error(
+          `Erro ao criar versão para prioridade ${prioridade.prioridade_id}:`,
+          error,
+        );
       }
     }
 
     return versoes;
   }
 
-  private async criarVersoesTemas(ano: number, usuarioId: number): Promise<TemaVersao[]> {
+  private async criarVersoesTemas(
+    ano: number,
+    usuarioId: number,
+  ): Promise<TemaVersao[]> {
     const temasAtivos = await this.prisma.tema.findMany({
       where: { ativo: true },
     });
 
     const versoes: TemaVersao[] = [];
-    
+
     for (const tema of temasAtivos) {
       try {
         const versaoExistente = await this.prisma.temaVersao.findUnique({
@@ -246,13 +282,16 @@ export class ConfigurationSnapshotService {
     return versoes;
   }
 
-  private async criarVersoesEntregaveis(ano: number, usuarioId: number): Promise<EntregavelVersao[]> {
+  private async criarVersoesEntregaveis(
+    ano: number,
+    usuarioId: number,
+  ): Promise<EntregavelVersao[]> {
     const entregaveisAtivos = await this.prisma.entregavelLinkSei.findMany({
       where: { ativo: true },
     });
 
     const versoes: EntregavelVersao[] = [];
-    
+
     for (const entregavel of entregaveisAtivos) {
       try {
         const versaoExistente = await this.prisma.entregavelVersao.findUnique({
@@ -265,15 +304,16 @@ export class ConfigurationSnapshotService {
         });
 
         if (!versaoExistente) {
-          const novaVersao = await this.versionRepository.createEntregavelVersion({
-            entregavel_base_id: entregavel.entregavel_id,
-            ano: ano,
-            entregavel_numero: entregavel.entregavel_numero,
-            descricao: entregavel.descricao,
-            detalhes: entregavel.detalhes ?? undefined,
-            criado_por: usuarioId,
-            motivo_alteracao: `Versão criada automaticamente para ano ${ano}`,
-          });
+          const novaVersao =
+            await this.versionRepository.createEntregavelVersion({
+              entregavel_base_id: entregavel.entregavel_id,
+              ano: ano,
+              entregavel_numero: entregavel.entregavel_numero,
+              descricao: entregavel.descricao,
+              detalhes: entregavel.detalhes ?? undefined,
+              criado_por: usuarioId,
+              motivo_alteracao: `Versão criada automaticamente para ano ${ano}`,
+            });
 
           versoes.push(novaVersao);
 
@@ -288,20 +328,26 @@ export class ConfigurationSnapshotService {
           });
         }
       } catch (error) {
-        console.error(`Erro ao criar versão para entregável ${entregavel.entregavel_id}:`, error);
+        console.error(
+          `Erro ao criar versão para entregável ${entregavel.entregavel_id}:`,
+          error,
+        );
       }
     }
 
     return versoes;
   }
 
-  private async criarVersoesPessoas(ano: number, usuarioId: number): Promise<PessoaVersao[]> {
+  private async criarVersoesPessoas(
+    ano: number,
+    usuarioId: number,
+  ): Promise<PessoaVersao[]> {
     const pessoasAtivas = await this.prisma.pessoa.findMany({
       where: { ativo: true },
     });
 
     const versoes: PessoaVersao[] = [];
-    
+
     for (const pessoa of pessoasAtivas) {
       try {
         const versaoExistente = await this.prisma.pessoaVersao.findUnique({
@@ -337,7 +383,10 @@ export class ConfigurationSnapshotService {
           });
         }
       } catch (error) {
-        console.error(`Erro ao criar versão para pessoa ${pessoa.pessoa_id}:`, error);
+        console.error(
+          `Erro ao criar versão para pessoa ${pessoa.pessoa_id}:`,
+          error,
+        );
       }
     }
 

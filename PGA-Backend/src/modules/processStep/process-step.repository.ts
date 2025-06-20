@@ -13,7 +13,7 @@ export class ProcessStepRepository extends BaseRepository<EtapaProcesso> {
 
   async create(data: CreateProcessStepDto) {
     return this.prisma.etapaProcesso.create({
-      data
+      data,
     });
   }
 
@@ -22,8 +22,8 @@ export class ProcessStepRepository extends BaseRepository<EtapaProcesso> {
       where: this.whereActive(),
       include: {
         acaoProjeto: true,
-        entregavel_link_sei: true
-      }
+        entregavel_link_sei: true,
+      },
     });
   }
 
@@ -32,22 +32,22 @@ export class ProcessStepRepository extends BaseRepository<EtapaProcesso> {
       where: this.whereActive({ etapa_id: id }),
       include: {
         acaoProjeto: true,
-        entregavel_link_sei: true
-      }
+        entregavel_link_sei: true,
+      },
     });
   }
 
   async update(id: number, data: UpdateProcessStepDto) {
     return this.prisma.etapaProcesso.update({
       where: { etapa_id: id },
-      data
+      data,
     });
   }
 
   async softDelete(id: number) {
     return this.prisma.etapaProcesso.update({
       where: { etapa_id: id },
-      data: { ativo: false }
+      data: { ativo: false },
     });
   }
 
@@ -55,11 +55,11 @@ export class ProcessStepRepository extends BaseRepository<EtapaProcesso> {
     return this.prisma.etapaProcesso.findMany({
       where: this.whereActive({ acao_projeto_id: projectId }),
       include: {
-        entregavel_link_sei: true
+        entregavel_link_sei: true,
       },
       orderBy: {
-        data_verificacao_prevista: 'asc'
-      }
+        data_verificacao_prevista: 'asc',
+      },
     });
   }
 }

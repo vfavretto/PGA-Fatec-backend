@@ -1,4 +1,12 @@
-import { EixoTematico, EtapaProcesso, PGA, PrioridadeAcao, ProjetoPessoa, SituacaoProblema, Tema } from "@prisma/client";
+import {
+  EixoTematico,
+  EtapaProcesso,
+  PGA,
+  PrioridadeAcao,
+  ProjetoPessoa,
+  SituacaoProblema,
+  Tema,
+} from '@prisma/client';
 
 export class AcaoProjeto {
   acao_projeto_id: number;

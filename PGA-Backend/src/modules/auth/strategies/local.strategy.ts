@@ -5,22 +5,22 @@ import { ValidateUserService } from '../services/validate-user.service';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
-    constructor(private readonly validateUserService: ValidateUserService) {
-        super({ 
-            usernameField: 'email',
-            passwordField: 'senha',
-        });
-    }
+  constructor(private readonly validateUserService: ValidateUserService) {
+    super({
+      usernameField: 'email',
+      passwordField: 'senha',
+    });
+  }
 
-    async validate(email: string, password: string): Promise<any> {
-        try {
-            const user = await this.validateUserService.execute(email, password);
-            return user;
-        } catch (error) {
-            if (error instanceof UnauthorizedException) {
-                throw error;
-            }
-            throw new UnauthorizedException('Falha na autenticação');
-        }
+  async validate(email: string, password: string): Promise<any> {
+    try {
+      const user = await this.validateUserService.execute(email, password);
+      return user;
+    } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+      throw new UnauthorizedException('Falha na autenticação');
     }
+  }
 }
