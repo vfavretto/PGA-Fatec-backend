@@ -15,13 +15,13 @@ COPY prisma ./prisma/
 
 RUN npm install
 
-# Regenerar o Prisma Client no ambiente Docker
-RUN npx prisma generate
-
 # Copiar resto do código
 COPY . .
 
 RUN npm run build
+
+# Gerar o Prisma Client APÓS o build para garantir compatibilidade
+RUN npx prisma generate
 
 EXPOSE 3000
 
