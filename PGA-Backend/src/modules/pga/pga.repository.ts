@@ -23,10 +23,7 @@ export class PgaRepository extends BaseRepository<PGA> {
       include: {
         unidade: true,
       },
-      orderBy: [
-        { ano: 'desc' },
-        { unidade: { nome_completo: 'asc' } },
-      ],
+      orderBy: [{ ano: 'desc' }, { unidade: { nome_completo: 'asc' } }],
     });
   }
 

@@ -13,7 +13,7 @@ export class InstitutionalRoutineRepository extends BaseRepository<RotinaInstitu
 
   async create(data: CreateInstitutionalRoutineDto) {
     return this.prisma.rotinaInstitucional.create({
-      data
+      data,
     });
   }
 
@@ -25,15 +25,15 @@ export class InstitutionalRoutineRepository extends BaseRepository<RotinaInstitu
         pga: true,
         responsavel: true,
         ocorrencias: {
-          where: this.whereActive()
+          where: this.whereActive(),
         },
         participantes: {
           where: this.whereActive(),
           include: {
-            pessoa: true
-          }
-        }
-      }
+            pessoa: true,
+          },
+        },
+      },
     });
   }
 
@@ -45,29 +45,29 @@ export class InstitutionalRoutineRepository extends BaseRepository<RotinaInstitu
         pga: true,
         responsavel: true,
         ocorrencias: {
-          where: this.whereActive()
+          where: this.whereActive(),
         },
         participantes: {
           where: this.whereActive(),
           include: {
-            pessoa: true
-          }
-        }
-      }
+            pessoa: true,
+          },
+        },
+      },
     });
   }
 
   async update(id: number, data: UpdateInstitutionalRoutineDto) {
     return this.prisma.rotinaInstitucional.update({
       where: { rotina_id: id },
-      data
+      data,
     });
   }
 
   async softDelete(id: number) {
     return this.prisma.rotinaInstitucional.update({
       where: { rotina_id: id },
-      data: { ativo: false }
+      data: { ativo: false },
     });
   }
 
@@ -76,8 +76,8 @@ export class InstitutionalRoutineRepository extends BaseRepository<RotinaInstitu
       where: this.whereActive({ pga_id: pgaId }),
       include: {
         curso: true,
-        responsavel: true
-      }
+        responsavel: true,
+      },
     });
   }
 }

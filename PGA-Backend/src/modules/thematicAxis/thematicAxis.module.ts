@@ -21,4 +21,3 @@ import { ThematicAxisController } from './thematicAxis.controller';
   controllers: [ThematicAxisController],
 })
 export class ThematicAxisModule {}
-

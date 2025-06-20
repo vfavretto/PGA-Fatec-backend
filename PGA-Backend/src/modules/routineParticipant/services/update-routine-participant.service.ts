@@ -7,9 +7,13 @@ import { RoutineParticipant } from '../entities/routine-participant.entity';
 export class UpdateRoutineParticipantService {
   constructor(private readonly repository: RoutineParticipantRepository) {}
 
-  async execute(id: number, data: UpdateRoutineParticipantDto): Promise<RoutineParticipant> {
+  async execute(
+    id: number,
+    data: UpdateRoutineParticipantDto,
+  ): Promise<RoutineParticipant> {
     const participante = await this.repository.findOne(id);
-    if (!participante) throw new NotFoundException('RotinaParticipante não encontrada');
+    if (!participante)
+      throw new NotFoundException('RotinaParticipante não encontrada');
     return this.repository.update(id, data);
   }
 }

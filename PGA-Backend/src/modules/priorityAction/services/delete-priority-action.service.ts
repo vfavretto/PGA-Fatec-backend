@@ -7,8 +7,9 @@ export class DeletePriorityActionService {
 
   async execute(id: number, usuario_id?: number) {
     const priority = await this.repo.findOne(id);
-    if (!priority) throw new NotFoundException('Prioridade de ação não encontrada');
-    
+    if (!priority)
+      throw new NotFoundException('Prioridade de ação não encontrada');
+
     return this.repo.delete(id);
   }
 }

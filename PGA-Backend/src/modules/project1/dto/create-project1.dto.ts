@@ -15,7 +15,7 @@ export class CreateProject1Dto {
 
   @IsOptional()
   @IsString()
-  nome_projeto?: string;
+  nome_projeto?: string | null;
 
   @IsInt()
   pga_id: number;

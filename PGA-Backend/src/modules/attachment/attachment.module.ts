@@ -29,7 +29,7 @@ import { AttachmentRepository } from './attachment.repository';
     FindAllAttachmentService,
     FindOneAttachmentService,
     FindByProcessStepService,
-    FindByDeliverableService
-  ]
+    FindByDeliverableService,
+  ],
 })
 export class AttachmentModule {}

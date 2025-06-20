@@ -1,7 +1,7 @@
-import { Injectable } from "@nestjs/common";
-import { Prisma } from "@prisma/client";
-import { Project1Repository } from "../project1.repository";
-import { UpdateProject1Dto } from "../dto/update-project1.dto";
+import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { Project1Repository } from '../project1.repository';
+import { UpdateProject1Dto } from '../dto/update-project1.dto';
 
 @Injectable()
 export class UpdateProject1Service {

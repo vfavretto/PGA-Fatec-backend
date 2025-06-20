@@ -1,4 +1,13 @@
-import { Controller, Post, Body, Get, Param, Put, Delete, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Param,
+  Put,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { CreateInstitutionalRoutineDto } from './dto/create-institutional-routine.dto';
 import { UpdateInstitutionalRoutineDto } from './dto/update-institutional-routine.dto';
 import { CreateInstitutionalRoutineService } from './services/create-institutional-routine.service';
@@ -33,7 +42,10 @@ export class InstitutionalRoutineController {
   }
 
   @Put(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateInstitutionalRoutineDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateInstitutionalRoutineDto,
+  ) {
     return this.updateService.execute(id, dto);
   }
 

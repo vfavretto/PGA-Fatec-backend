@@ -1,4 +1,13 @@
-import { Controller, Post, Get, Put, Delete, Param, Body, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Put,
+  Delete,
+  Param,
+  Body,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { CreatePriorityActionService } from './services/create-priority-action.service';
 import { FindAllPriorityActionService } from './services/find-all-priority-action.service';
 import { FindOnePriorityActionService } from './services/find-one-priority-action.service';
@@ -33,7 +42,10 @@ export class PriorityActionController {
   }
 
   @Put(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdatePriorityActionDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdatePriorityActionDto,
+  ) {
     return this.updateService.execute(id, dto);
   }
 

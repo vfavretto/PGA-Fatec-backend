@@ -7,10 +7,14 @@ export class CreateProblemSituationService {
   constructor(private readonly repo: ProblemSituationRepository) {}
 
   async execute(data: CreateProblemSituationDto) {
-    const existeAtivo = await this.repo.findByCodigoCategoria(data.codigo_categoria);
-    
+    const existeAtivo = await this.repo.findByCodigoCategoria(
+      data.codigo_categoria,
+    );
+
     if (existeAtivo && existeAtivo.ativo) {
-      throw new ConflictException('Código já está em uso por uma situação ativa');
+      throw new ConflictException(
+        'Código já está em uso por uma situação ativa',
+      );
     }
 
     return this.repo.create(data);

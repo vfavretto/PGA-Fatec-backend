@@ -1,4 +1,13 @@
-import { Controller, Post, Body, Get, Param, Put, Delete, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Param,
+  Put,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { CreateRoutineOccurrenceDto } from './dto/create-routine-occurrence.dto';
 import { UpdateRoutineOccurrenceDto } from './dto/update-routine-occurrence.dto';
 import { CreateRoutineOccurrenceService } from './services/create-routine-occurrence.service';
@@ -33,7 +42,10 @@ export class RoutineOccurrenceController {
   }
 
   @Put(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateRoutineOccurrenceDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateRoutineOccurrenceDto,
+  ) {
     return this.updateService.execute(id, dto);
   }
 

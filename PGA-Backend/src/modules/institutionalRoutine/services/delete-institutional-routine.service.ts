@@ -6,28 +6,29 @@ import { PrismaService } from '../../../config/prisma.service';
 export class DeleteInstitutionalRoutineService {
   constructor(
     private readonly repository: InstitutionalRoutineRepository,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
   ) {}
 
   async execute(id: number, usuarioLogadoId?: number, motivo?: string) {
     const routine = await this.repository.findOne(id);
-    if (!routine) throw new NotFoundException('Rotina institucional não encontrada');
-    
+    if (!routine)
+      throw new NotFoundException('Rotina institucional não encontrada');
+
     return this.prisma.$transaction(async (tx) => {
       await tx.rotinaOcorrencia.updateMany({
         where: {
           rotina_id: id,
-          ativo: true
+          ativo: true,
         },
-        data: { ativo: false }
+        data: { ativo: false },
       });
 
       await tx.rotinaParticipante.updateMany({
         where: {
           rotina_id: id,
-          ativo: true
+          ativo: true,
         },
-        data: { ativo: false }
+        data: { ativo: false },
       });
 
       return this.repository.softDelete(id);

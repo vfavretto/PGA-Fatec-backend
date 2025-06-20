@@ -1,4 +1,12 @@
-import { IsInt, IsNotEmpty, IsOptional, IsString, IsEnum, IsDateString, MaxLength } from 'class-validator';
+import {
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsEnum,
+  IsDateString,
+  MaxLength,
+} from 'class-validator';
 import { TipoRotina, PeriodicidadeRotina, StatusRotina } from '@prisma/client';
 
 export class CreateInstitutionalRoutineDto {

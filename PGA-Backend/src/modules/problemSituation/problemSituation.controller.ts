@@ -1,4 +1,13 @@
-import { Controller, Post, Get, Put, Delete, Body, Param, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Put,
+  Delete,
+  Body,
+  Param,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { CreateProblemSituationService } from './services/create-problemSituation.service';
 import { FindAllProblemSituationService } from './services/find-all-problemSituation.service';
 import { FindOneProblemSituationService } from './services/find-one-problemSituation.service';
@@ -33,7 +42,10 @@ export class ProblemSituationController {
   }
 
   @Put(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateProblemSituationDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateProblemSituationDto,
+  ) {
     return this.updateService.execute(id, dto);
   }
 

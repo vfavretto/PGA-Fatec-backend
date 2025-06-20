@@ -1,4 +1,13 @@
-import { Controller, Post, Body, Get, Param, Put, Delete, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Param,
+  Put,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { CreateProcessStepDto } from './dto/create-process-step.dto';
 import { UpdateProcessStepDto } from './dto/update-process-step.dto';
 import { CreateProcessStepService } from './services/create-process-step.service';
@@ -33,7 +42,10 @@ export class ProcessStepController {
   }
 
   @Put(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateProcessStepDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateProcessStepDto,
+  ) {
     return this.updateService.execute(id, dto);
   }
 

@@ -7,8 +7,9 @@ export class DeleteProblemSituationService {
 
   async execute(id: number, usuario_id?: number) {
     const situation = await this.repo.findOne(id);
-    if (!situation) throw new NotFoundException('Situação Problema não encontrada');
-    
+    if (!situation)
+      throw new NotFoundException('Situação Problema não encontrada');
+
     return this.repo.softDelete(id);
   }
 }

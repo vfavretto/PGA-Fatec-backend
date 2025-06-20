@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { UserRepository } from '../user.repository';
 import { Pessoa } from '@prisma/client';
 import { PrismaService } from '../../../config/prisma.service';
@@ -10,12 +14,16 @@ export class DeleteUserService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly prisma: PrismaService,
-    private readonly auditRepository: AuditRepository
+    private readonly auditRepository: AuditRepository,
   ) {}
 
-  async execute(id: number, usuarioLogadoId?: number, motivo?: string): Promise<Pessoa> {
+  async execute(
+    id: number,
+    usuarioLogadoId?: number,
+    motivo?: string,
+  ): Promise<Pessoa> {
     const user = await this.userRepository.findById(id);
-    
+
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
     }
@@ -25,35 +33,35 @@ export class DeleteUserService {
       where: {
         pessoa_id: id,
         ativo: true,
-      }
+      },
     });
 
     if (projetosVinculados > 0) {
       throw new ConflictException(
-        'Este usuário não pode ser excluído pois está vinculado a projetos ativos'
+        'Este usuário não pode ser excluído pois está vinculado a projetos ativos',
       );
     }
 
     const coordenadorEmCursos = await this.prisma.curso.count({
       where: {
         coordenador_id: id,
-        ativo: true
-      }
+        ativo: true,
+      },
     });
 
     if (coordenadorEmCursos > 0) {
       throw new ConflictException(
-        'Este usuário não pode ser excluído pois é coordenador de cursos ativos'
+        'Este usuário não pode ser excluído pois é coordenador de cursos ativos',
       );
     }
 
     return this.prisma.$transaction(async (tx) => {
       await tx.pessoaUnidade.updateMany({
-        where: { 
+        where: {
           pessoa_id: id,
-          ativo: true
+          ativo: true,
         },
-        data: { ativo: false }
+        data: { ativo: false },
       });
 
       await this.auditRepository.createAuditLog({
@@ -64,16 +72,16 @@ export class DeleteUserService {
         dados_antes: { pessoa_id: id, ativo: true },
         dados_depois: { pessoa_id: id, ativo: false },
         usuario_id: usuarioLogadoId,
-        motivo
+        motivo,
       });
 
       const updatedUser = await tx.pessoa.update({
         where: { pessoa_id: id },
-        data: { 
+        data: {
           ativo: false,
           atualizado_por: usuarioLogadoId,
           atualizado_em: new Date(),
-        }
+        },
       });
 
       // Registrar na auditoria a alteração do usuário
@@ -85,7 +93,7 @@ export class DeleteUserService {
         dados_antes: { ...user, ativo: true },
         dados_depois: updatedUser,
         usuario_id: usuarioLogadoId,
-        motivo
+        motivo,
       });
 
       return updatedUser;

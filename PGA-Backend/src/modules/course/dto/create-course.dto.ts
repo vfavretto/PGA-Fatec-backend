@@ -1,4 +1,11 @@
-import { IsInt, IsNotEmpty, IsOptional, IsString, IsEnum, MaxLength } from 'class-validator';
+import {
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsEnum,
+  MaxLength,
+} from 'class-validator';
 import { TipoCurso, StatusCurso } from '@prisma/client';
 
 export class CreateCourseDto {

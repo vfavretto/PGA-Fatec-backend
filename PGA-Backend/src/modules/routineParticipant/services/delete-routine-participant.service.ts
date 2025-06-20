@@ -7,7 +7,8 @@ export class DeleteRoutineParticipantService {
 
   async execute(id: number, usuarioLogadoId?: number, motivo?: string) {
     const participante = await this.repository.findOne(id);
-    if (!participante) throw new NotFoundException('RotinaParticipante não encontrada');
+    if (!participante)
+      throw new NotFoundException('RotinaParticipante não encontrada');
 
     return this.repository.softDelete(id);
   }

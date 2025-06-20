@@ -1,4 +1,13 @@
-import { Controller, Post, Get, Put, Delete, Param, Body, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Put,
+  Delete,
+  Param,
+  Body,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { CreateWorkloadHaeService } from './services/create-workload-hae.service';
 import { FindAllWorkloadHaeService } from './services/find-all-workload-hae.service';
 import { FindOneWorkloadHaeService } from './services/find-one-workload-hae.service';
@@ -33,7 +42,10 @@ export class WorkloadHaeController {
   }
 
   @Put(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateWorkloadHaeDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateWorkloadHaeDto,
+  ) {
     return this.updateService.execute(id, dto);
   }
 

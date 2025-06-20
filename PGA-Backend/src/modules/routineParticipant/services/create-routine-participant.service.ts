@@ -7,7 +7,9 @@ import { RoutineParticipant } from '../entities/routine-participant.entity';
 export class CreateRoutineParticipantService {
   constructor(private readonly repository: RoutineParticipantRepository) {}
 
-  async execute(data: CreateRoutineParticipantDto): Promise<RoutineParticipant> {
+  async execute(
+    data: CreateRoutineParticipantDto,
+  ): Promise<RoutineParticipant> {
     return this.repository.create(data);
   }
 }

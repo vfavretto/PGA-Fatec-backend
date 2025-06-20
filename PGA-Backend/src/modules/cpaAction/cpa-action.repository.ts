@@ -13,7 +13,7 @@ export class CpaActionRepository extends BaseRepository<AcaoCPA> {
 
   async create(data: CreateCpaActionDto) {
     return this.prisma.acaoCPA.create({
-      data
+      data,
     });
   }
 
@@ -21,8 +21,8 @@ export class CpaActionRepository extends BaseRepository<AcaoCPA> {
     return this.prisma.acaoCPA.findMany({
       where: this.whereActive(),
       include: {
-        pga: true
-      }
+        pga: true,
+      },
     });
   }
 
@@ -30,28 +30,28 @@ export class CpaActionRepository extends BaseRepository<AcaoCPA> {
     return this.prisma.acaoCPA.findFirst({
       where: this.whereActive({ acao_cpa_id: id }),
       include: {
-        pga: true
-      }
+        pga: true,
+      },
     });
   }
 
   async update(id: number, data: UpdateCpaActionDto) {
     return this.prisma.acaoCPA.update({
       where: { acao_cpa_id: id },
-      data
+      data,
     });
   }
 
   async softDelete(id: number) {
     return this.prisma.acaoCPA.update({
       where: { acao_cpa_id: id },
-      data: { ativo: false }
+      data: { ativo: false },
     });
   }
 
   async findByPgaId(pgaId: number) {
     return this.prisma.acaoCPA.findMany({
-      where: this.whereActive({ pga_id: pgaId })
+      where: this.whereActive({ pga_id: pgaId }),
     });
   }
 }

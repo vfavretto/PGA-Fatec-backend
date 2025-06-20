@@ -1,4 +1,13 @@
-import { Controller, Post, Body, Get, Param, Put, Delete, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Param,
+  Put,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { CreateRoutineParticipantDto } from './dto/create-routine-participant.dto';
 import { UpdateRoutineParticipantDto } from './dto/update-routine-participant.dto';
 import { CreateRoutineParticipantService } from './services/create-routine-participant.service';
@@ -33,7 +42,10 @@ export class RoutineParticipantController {
   }
 
   @Put(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateRoutineParticipantDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateRoutineParticipantDto,
+  ) {
     return this.updateService.execute(id, dto);
   }
 

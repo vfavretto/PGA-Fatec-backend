@@ -1,4 +1,13 @@
-import { Controller, Post, Get, Put, Delete, Param, Body, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Put,
+  Delete,
+  Param,
+  Body,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { CreateDeliverableService } from './services/create-deliverable.service';
 import { FindAllDeliverableService } from './services/find-all-deliverable.service';
 import { FindOneDeliverableService } from './services/find-one-deliverable.service';
@@ -33,7 +42,10 @@ export class DeliverableController {
   }
 
   @Put(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateDeliverableDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateDeliverableDto,
+  ) {
     return this.updateService.execute(id, dto);
   }
 

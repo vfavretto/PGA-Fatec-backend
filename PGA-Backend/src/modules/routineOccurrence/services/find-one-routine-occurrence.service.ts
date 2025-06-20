@@ -8,7 +8,8 @@ export class FindOneRoutineOccurrenceService {
 
   async execute(id: number): Promise<RoutineOccurrence> {
     const ocorrencia = await this.repository.findOne(id);
-    if (!ocorrencia) throw new NotFoundException('RotinaOcorrencia não encontrada');
+    if (!ocorrencia)
+      throw new NotFoundException('RotinaOcorrencia não encontrada');
     return ocorrencia;
   }
 }

@@ -8,7 +8,7 @@ export class DeleteCpaActionService {
   async execute(id: number, usuarioLogadoId?: number, motivo?: string) {
     const action = await this.repository.findOne(id);
     if (!action) throw new NotFoundException('Ação CPA não encontrada');
-    
+
     return this.repository.softDelete(id);
   }
 }
