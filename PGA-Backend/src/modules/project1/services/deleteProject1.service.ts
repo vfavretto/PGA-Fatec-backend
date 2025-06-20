@@ -30,9 +30,12 @@ export class DeleteProject1Service {
         data: { ativo: false }
       });
       
-      await tx.aquisicao.updateMany({
+      // Corrigido: atualizar attachments em vez de aquisicao
+      await tx.anexo.updateMany({
         where: {
-          acao_projeto_id: id,
+          etapaProcesso: {
+            acao_projeto_id: id
+          },
           ativo: true
         },
         data: { ativo: false }

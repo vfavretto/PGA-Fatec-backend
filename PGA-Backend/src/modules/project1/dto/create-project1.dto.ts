@@ -1,7 +1,17 @@
-import { Type } from "class-transformer";
-import { IsBoolean, IsDate, IsInt, IsOptional, IsString, MaxLength } from "class-validator";
+import { Type } from 'class-transformer';
+import {
+  IsBoolean,
+  IsDate,
+  IsInt,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 
 export class CreateProject1Dto {
+  @IsString()
+  codigo_projeto: string;
+
   @IsInt()
   pga_id: number;
 

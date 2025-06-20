@@ -33,15 +33,6 @@ export class DeleteProject1Service {
         data: { ativo: false }
       });
       
-      // Inativar aquisições vinculadas
-      await tx.aquisicao.updateMany({
-        where: {
-          acao_projeto_id: id,
-          ativo: true
-        },
-        data: { ativo: false }
-      });
-      
       // Inativar situações problema vinculadas
       await tx.acaoProjetoSituacaoProblema.updateMany({
         where: {

@@ -5,7 +5,7 @@ import { PrismaService } from './config/prisma.service';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
-import { Attachment1Module } from './modules/attachment1/attachment1.module';
+import { AttachmentModule } from './modules/attachment/attachment.module';
 import { DeliverableModule } from './modules/delivers/deliverable.module';
 import { MailModule } from './modules/mail/mail.module';
 import { PriorityActionModule } from './modules/priorityAction/priority-action.module';
@@ -32,7 +32,7 @@ import { AuditModule } from './modules/audit/audit.module';
     }),
     UserModule,
     AuthModule,
-    Attachment1Module,
+    AttachmentModule,
     MailModule,
     DeliverableModule,
     PriorityActionModule,
