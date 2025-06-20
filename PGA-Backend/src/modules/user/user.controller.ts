@@ -16,6 +16,7 @@ import {
   ForbiddenException,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
 import { CreateUserService } from './services/create-user.service';
 import { ListUsersService } from './services/list-users.service';
 import { GetUserService } from './services/get-user.service';
@@ -38,6 +39,8 @@ import { ChangeUserRoleService } from './services/change-user-role.service';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
 
+@ApiTags('Users')
+@ApiBearerAuth('JWT-auth')
 @Controller('users')
 export class UserController {
   constructor(
@@ -57,16 +60,24 @@ export class UserController {
 
   @Public()
   @Post()
+  @ApiOperation({ summary: 'Criar novo usuário', description: 'Cria um novo usuário no sistema' })
+  @ApiBody({ type: RegisterDto })
+  @ApiResponse({ status: 201, description: 'Usuário criado com sucesso' })
+  @ApiResponse({ status: 400, description: 'Dados inválidos' })
   async create(@Body() data: RegisterDto) {
     return this.createUserService.execute(data);
   }
 
   @Get()
+  @ApiOperation({ summary: 'Listar usuários', description: 'Retorna lista de todos os usuários' })
+  @ApiResponse({ status: 200, description: 'Lista de usuários retornada com sucesso' })
   async findAll() {
     return this.listUsersService.execute();
   }
 
   @Get('access-requests')
+  @ApiOperation({ summary: 'Listar solicitações de acesso', description: 'Retorna solicitações de acesso pendentes' })
+  @ApiResponse({ status: 200, description: 'Lista de solicitações retornada com sucesso' })
   async getAccessRequests(@Request() req) {
     const usuarioId = Number(req.user.pessoa_id);
     const tipoUsuario = req.user.tipo_usuario;
@@ -79,11 +90,19 @@ export class UserController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Buscar usuário por ID', description: 'Retorna dados de um usuário específico' })
+  @ApiParam({ name: 'id', type: 'number', description: 'ID do usuário' })
+  @ApiResponse({ status: 200, description: 'Usuário encontrado com sucesso' })
+  @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
   async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.getUserService.execute(id);
   }
 
   @Put(':id')
+  @ApiOperation({ summary: 'Atualizar usuário', description: 'Atualiza dados de um usuário específico' })
+  @ApiParam({ name: 'id', type: 'number', description: 'ID do usuário' })
+  @ApiResponse({ status: 200, description: 'Usuário atualizado com sucesso' })
+  @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() data: Prisma.PessoaUpdateInput,
@@ -92,6 +111,10 @@ export class UserController {
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Excluir usuário', description: 'Remove um usuário do sistema' })
+  @ApiParam({ name: 'id', type: 'number', description: 'ID do usuário' })
+  @ApiResponse({ status: 204, description: 'Usuário excluído com sucesso' })
+  @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
   @HttpCode(HttpStatus.NO_CONTENT)
   async delete(@Param('id', ParseIntPipe) id: number) {
     await this.deleteUserService.execute(id);
@@ -99,12 +122,18 @@ export class UserController {
 
   @Public()
   @Post('reset-password')
+  @ApiOperation({ summary: 'Solicitar redefinição de senha', description: 'Envia email para redefinição de senha' })
+  @ApiBody({ schema: { type: 'object', properties: { email: { type: 'string', format: 'email' } } } })
+  @ApiResponse({ status: 200, description: 'Email de redefinição enviado' })
   async resetPassword(@Body('email') email: string) {
     return this.forgotPasswordService.execute(email);
   }
 
   @Public()
   @Post('reset-password/confirm')
+  @ApiOperation({ summary: 'Confirmar redefinição de senha', description: 'Redefine senha usando token' })
+  @ApiBody({ type: ResetPasswordDto })
+  @ApiResponse({ status: 200, description: 'Senha redefinida com sucesso' })
   async confirmResetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return this.resetPasswordService.execute(
       resetPasswordDto.token,
@@ -114,11 +143,18 @@ export class UserController {
 
   @Public()
   @Post('request-access')
+  @ApiOperation({ summary: 'Solicitar acesso', description: 'Cria solicitação de acesso ao sistema' })
+  @ApiBody({ type: RequestAccessDto })
+  @ApiResponse({ status: 201, description: 'Solicitação criada com sucesso' })
   async requestAccess(@Body() data: RequestAccessDto) {
     return this.requestAccessService.execute(data);
   }
 
   @Post('process-access-request/:id')
+  @ApiOperation({ summary: 'Processar solicitação de acesso', description: 'Aprova ou rejeita solicitação de acesso' })
+  @ApiParam({ name: 'id', type: 'number', description: 'ID da solicitação' })
+  @ApiBody({ type: ProcessAccessRequestDto })
+  @ApiResponse({ status: 200, description: 'Solicitação processada com sucesso' })
   async processAccessRequest(
     @Param('id', ParseIntPipe) id: number,
     @Request() req,
@@ -135,6 +171,9 @@ export class UserController {
   }
 
   @Get('by-unidade/:id')
+  @ApiOperation({ summary: 'Buscar usuários por unidade', description: 'Retorna usuários de uma unidade específica' })
+  @ApiParam({ name: 'id', type: 'number', description: 'ID da unidade' })
+  @ApiResponse({ status: 200, description: 'Usuários da unidade retornados com sucesso' })
   async findByUnidade(@Param('id', ParseIntPipe) id: number) {
     return this.getUsersByUnitService.execute(id);
   }
