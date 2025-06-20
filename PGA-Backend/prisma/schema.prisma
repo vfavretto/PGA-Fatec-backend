@@ -12,11 +12,29 @@ model Unidade {
   unidade_id    Int     @id @default(autoincrement())
   codigo_fnnn   String  @unique @db.VarChar(10)
   nome_completo String  @db.VarChar(255)
-  diretor_nome  String? @db.VarChar(255)
+  ativo         Boolean @default(true)
+  diretor_id    Int?    @unique
+  endereco      String?  @db.VarChar(255)
+  complemento   String?  @db.VarChar(255)
+  bairro        String?  @db.VarChar(100)
+  cidade        String?  @db.VarChar(100)
+  uf            String?  @db.VarChar(2)
+  cep           String?  @db.VarChar(10)
+  telefone      String?  @db.VarChar(20)
+  site          String?  @db.VarChar(255)
+  criado_em     DateTime @default(now())
+  atualizado_em DateTime @updatedAt
+  criado_por   Int?
+  atualizado_por Int?
+
   cursos        Curso[]
   pgas          PGA[]
   solicitacoesAcesso   SolicitacaoAcesso[]
   pessoas PessoaUnidade[]
+
+  diretor       Pessoa? @relation("DiretorUnidade", fields: [diretor_id], references: [pessoa_id])
+  criadoPor     Pessoa? @relation("UnidadeCriadaPor", fields: [criado_por], references: [pessoa_id])
+  atualizadoPor Pessoa? @relation("UnidadeAtualizadaPor", fields: [atualizado_por], references: [pessoa_id])
 }
 
 model PGA {
@@ -31,9 +49,9 @@ model PGA {
   configuracoes_snapshot    Json?
   data_snapshot_criado      DateTime              @default(now())
   usuario_criacao_id        Int?
+  ativo                     Boolean               @default(true)
   acoesCPA                  AcaoCPA[]
   acoesProjetos             AcaoProjeto[]
-  aquisicoes                Aquisicao[]
   unidade                   Unidade               @relation(fields: [unidade_id], references: [unidade_id])
   rotinas                   RotinaInstitucional[]
   situacoesProblemas        PGASituacaoProblema[]
@@ -75,7 +93,7 @@ model EixoTematico {
 
   criado_em           DateTime        @default(now())
   criado_por          Int?
-  atualizado_em       DateTime        @updatedAt
+  atualizado_em       DateTime        @default(now())
   atualizado_por      Int?
 
   acoesProjetos       AcaoProjeto[]
@@ -110,14 +128,14 @@ model PrioridadeAcao {
 
 model Tema {
   tema_id             Int             @id @default(autoincrement())
-  tema_num            Int             @unique
+  tema_num            Int
   eixo_id             Int           
   descricao           String          @db.VarChar(255)
   ativo               Boolean         @default(true)
 
   criado_em           DateTime        @default(now())
   criado_por          Int?
-  atualizado_em       DateTime        @updatedAt
+  atualizado_em       DateTime        @default(now())
   atualizado_por      Int?
   
   eixo                EixoTematico    @relation(fields: [eixo_id], references: [eixo_id])
@@ -126,10 +144,14 @@ model Tema {
   versoes             TemaVersao[]
   usuarioCriador      Pessoa?         @relation("TemaCriador", fields: [criado_por], references: [pessoa_id])
   usuarioAtualizador  Pessoa?         @relation("TemaAtualizador", fields: [atualizado_por], references: [pessoa_id])
+
+  @@unique([tema_num, eixo_id])
 }
 
 model AcaoProjeto {
   acao_projeto_id                        Int         @id @default(autoincrement())
+  codigo_projeto                         String      @db.VarChar(20)
+  nome_projeto                           String?      @db.VarChar(255)
   pga_id                                 Int
   eixo_id                                Int
   prioridade_id                          Int
@@ -141,16 +163,18 @@ model AcaoProjeto {
   objetivos_institucionais_referenciados String?
   obrigatorio_inclusao                   Boolean          @default(false)
   obrigatorio_sustentabilidade           Boolean          @default(false)
+  ativo                                  Boolean          @default(true)
+  custo_total_estimado                   Decimal?        @db.Decimal(10, 2)
+  fonte_recursos                         String?         @db.VarChar(255)
   eixo                                   EixoTematico     @relation(fields: [eixo_id], references: [eixo_id])
   tema                                   Tema             @relation(fields: [tema_id], references: [tema_id])
   pga                                    PGA              @relation(fields: [pga_id], references: [pga_id])
   prioridade                             PrioridadeAcao   @relation(fields: [prioridade_id], references: [prioridade_id])
   situacoesProblemas                     AcaoProjetoSituacaoProblema[]
-  aquisicoes                             Aquisicao[]
   etapas                                 EtapaProcesso[]
   pessoas                                ProjetoPessoa[]
-  attachment1Id                          String? 
-  attachment1                            Attachment1?     @relation("Attachment1ToAcaoProjeto", fields: [attachment1Id], references: [id])
+
+  @@index([codigo_projeto])
 }
 
 model Pessoa {
@@ -160,18 +184,32 @@ model Pessoa {
   nome_usuario         String?               @unique @db.VarChar(30)
   senha                String?               @db.VarChar(255)
   tipo_usuario         TipoUsuario
+  cpf                  String?               @unique @db.VarChar(11)
+  matricula           String?               @unique @db.VarChar(20)
+  telefone             String?               @db.VarChar(20)
   ativo                Boolean               @default(true)
   
   criado_em            DateTime              @default(now())
   atualizado_em        DateTime              @updatedAt
+  criado_por           Int?
+  atualizado_por       Int?
+
+  unidade_dirigida    Unidade?       @relation("DiretorUnidade")
 
   unidades PessoaUnidade[]
-  
   cursos_coordenados   Curso[]
   projetos             ProjetoPessoa[]
-  rotinas_responsaveis RotinaInstitucional[] @relation("ResponsavelRotina")
   rotinas_participante RotinaParticipante[]
 
+  pessoas_criadas     Pessoa[]        @relation("PessoaCriadaPor")
+  pessoas_atualizadas Pessoa[]        @relation("PessoaAtualizadaPor")
+  criados_por          Pessoa?        @relation("PessoaCriadaPor", fields: [criado_por], references: [pessoa_id])
+  atualizados_por      Pessoa?        @relation("PessoaAtualizadaPor", fields: [atualizado_por], references: [pessoa_id])
+
+  unidades_criadas         Unidade[]       @relation("UnidadeCriadaPor")
+  unidades_atualizadas     Unidade[]       @relation("UnidadeAtualizadaPor")
+
+  rotinas_responsaveis RotinaInstitucional[] @relation("ResponsavelRotina")
   pgasCriados                    PGA[]                        @relation("PGACriador")
   auditorias                     ConfiguracaoAuditoria[]
   situacoesProblemasCriadas      SituacaoProblema[]           @relation("SituacaoCriador")
@@ -204,6 +242,7 @@ model ProjetoPessoa {
   papel                 PapelProjeto
   carga_horaria_semanal Int?
   tipo_vinculo_hae_id   Int?            
+  ativo                 Boolean        @default(true)
   tipo_vinculo_hae      TipoVinculoHAE? @relation(fields: [tipo_vinculo_hae_id], references: [id])
   acaoProjeto           AcaoProjeto     @relation(fields: [acao_projeto_id], references: [acao_projeto_id])
   pessoa                Pessoa          @relation(fields: [pessoa_id], references: [pessoa_id])
@@ -213,13 +252,35 @@ model EtapaProcesso {
   etapa_id                   Int               @id @default(autoincrement())
   acao_projeto_id            Int
   descricao                  String
-  entregavel_id              Int
-  entregavel_link_sei        EntregavelLinkSei @relation(fields: [entregavel_id], references: [entregavel_id])
+  entregavel_id              Int?            
+  entregavel_link_sei        EntregavelLinkSei? @relation(fields: [entregavel_id], references: [entregavel_id])
   numero_ref                 String?           @db.VarChar(50)
   data_verificacao_prevista  DateTime?         @db.Date
   data_verificacao_realizada DateTime?         @db.Date
-  status_verificacao         StatusVerificacao @default(Pendente)
+  status_verificacao         StatusVerificacao? @default(Pendente)
+  ativo                      Boolean           @default(true)
   acaoProjeto                AcaoProjeto       @relation(fields: [acao_projeto_id], references: [acao_projeto_id])
+  anexos                     Anexo[]
+}
+
+model Anexo {
+  anexo_id                  Int             @id @default(autoincrement())
+  etapa_processo_id         Int?            
+  entregavel_id             Int
+  item                      String          @db.VarChar(100)
+  descricao                 String          @db.VarChar(255)
+  quantidade                Int
+  preco_unitario_estimado   Decimal         @db.Decimal(10, 2)
+  preco_total_estimado      Decimal         @db.Decimal(10, 2)
+  ativo                     Boolean         @default(true)
+  criado_em                 DateTime        @default(now())
+  atualizado_em             DateTime        @updatedAt
+  
+  etapaProcesso             EtapaProcesso?   @relation(fields: [etapa_processo_id], references: [etapa_id], onDelete: SetNull)
+  entregavel                EntregavelLinkSei @relation(fields: [entregavel_id], references: [entregavel_id])
+
+  @@index([etapa_processo_id])
+  @@index([entregavel_id])
 }
 
 model EntregavelLinkSei {
@@ -227,33 +288,20 @@ model EntregavelLinkSei {
   entregavel_numero   String            @unique @db.VarChar(50)
   descricao           String            @db.VarChar(255)
   detalhes            String?           @db.VarChar(500)
+  requer_anexo        Boolean           @default(false)
   ativo               Boolean           @default(true)
 
   criado_em           DateTime          @default(now())
   criado_por          Int?
-  atualizado_em       DateTime          @updatedAt
+  atualizado_em       DateTime          @default(now())
   atualizado_por      Int?
   
   etapas              EtapaProcesso[]
+  anexos              Anexo[]
 
   versoes             EntregavelVersao[]
   usuarioCriador      Pessoa?           @relation("EntregavelCriador", fields: [criado_por], references: [pessoa_id])
   usuarioAtualizador  Pessoa?           @relation("EntregavelAtualizador", fields: [atualizado_por], references: [pessoa_id])
-}
-
-model Aquisicao {
-  aquisicao_id            Int          @id @default(autoincrement())
-  acao_projeto_id         Int?
-  pga_id                  Int
-  tipo_anexo              TipoAnexo
-  descricao_item          String       @db.VarChar(255)
-  unidade_medida          String?      @db.VarChar(50)
-  quantidade              Int
-  justificativa           String?
-  valor_unitario_estimado Decimal?     @db.Decimal(10, 2)
-  valor_total_estimado    Decimal?     @db.Decimal(10, 2)
-  acaoProjeto             AcaoProjeto? @relation(fields: [acao_projeto_id], references: [acao_projeto_id])
-  pga                     PGA          @relation(fields: [pga_id], references: [pga_id])
 }
 
 model AcaoCPA {
@@ -261,6 +309,7 @@ model AcaoCPA {
   pga_id        Int
   descricao     String
   justificativa String?
+  ativo         Boolean @default(true)
   pga           PGA     @relation(fields: [pga_id], references: [pga_id])
 }
 
@@ -277,6 +326,7 @@ model RotinaInstitucional {
   responsavel_id      Int
   entregavel_esperado String?
   status              StatusRotina         @default(Planejada)
+  ativo               Boolean              @default(true)
   curso               Curso?               @relation(fields: [curso_id], references: [curso_id])
   pga                 PGA                  @relation(fields: [pga_id], references: [pga_id])
   responsavel         Pessoa               @relation("ResponsavelRotina", fields: [responsavel_id], references: [pessoa_id])
@@ -289,6 +339,7 @@ model RotinaParticipante {
   rotina_id              Int
   pessoa_id              Int
   papel                  String?             @db.VarChar(100)
+  ativo                  Boolean             @default(true)
   pessoa                 Pessoa              @relation(fields: [pessoa_id], references: [pessoa_id])
   rotina                 RotinaInstitucional @relation(fields: [rotina_id], references: [rotina_id])
 }
@@ -304,6 +355,7 @@ model RotinaOcorrencia {
   resultado       String?
   link_ata        String?             @db.VarChar(255)
   status          StatusOcorrencia    @default(Planejada)
+  ativo           Boolean             @default(true)
   rotina          RotinaInstitucional @relation(fields: [rotina_id], references: [rotina_id])
 }
 
@@ -314,21 +366,10 @@ model Curso {
   tipo           TipoCurso
   status         StatusCurso
   coordenador_id Int?
+  ativo          Boolean               @default(true)
   coordenador    Pessoa?               @relation(fields: [coordenador_id], references: [pessoa_id])
   unidade        Unidade               @relation(fields: [unidade_id], references: [unidade_id])
   rotinas        RotinaInstitucional[]
-}
-
-model Attachment1 {
-  id                         String        @id @default(uuid())
-  item                       String
-  projeto                    AcaoProjeto[] @relation("Attachment1ToAcaoProjeto")
-  denominacaoOuEspecificacao String
-  quantidade                 Int           @db.Integer
-  precoTotalEstimado         Decimal       @db.Decimal(10, 2)
-  createdAt                  DateTime      @default(now())
-  updatedAt                  DateTime      @updatedAt
-  flag                       AnexoProjetoUm
 }
 
 model TipoVinculoHAE {
@@ -336,12 +377,14 @@ model TipoVinculoHAE {
   sigla                 String          @unique @db.VarChar(10)
   descricao             String          @db.VarChar(255)
   detalhes              String?         @db.Text
+  ativo                 Boolean         @default(true)
   projetos_pessoas      ProjetoPessoa[]
 }
 
 model PGASituacaoProblema {
   pga_id              Int
   situacao_problema_id Int
+  ativo               Boolean         @default(true)
   pga                 PGA               @relation(fields: [pga_id], references: [pga_id])
   situacaoProblema    SituacaoProblema  @relation(fields: [situacao_problema_id], references: [situacao_id])
   
@@ -351,6 +394,7 @@ model PGASituacaoProblema {
 model AcaoProjetoSituacaoProblema {
   acao_projeto_id     Int
   situacao_problema_id Int
+  ativo               Boolean         @default(true)
   acaoProjeto         AcaoProjeto       @relation(fields: [acao_projeto_id], references: [acao_projeto_id])
   situacaoProblema    SituacaoProblema  @relation(fields: [situacao_problema_id], references: [situacao_id])
   
@@ -615,7 +659,6 @@ model PessoaUnidade {
   data_vinculo DateTime @default(now())
   ativo      Boolean @default(true)
   
-  // Relacionamentos
   pessoa  Pessoa  @relation(fields: [pessoa_id], references: [pessoa_id], onDelete: Cascade)
   unidade Unidade @relation(fields: [unidade_id], references: [unidade_id], onDelete: Cascade)
   
