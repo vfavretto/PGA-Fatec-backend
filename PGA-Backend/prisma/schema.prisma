@@ -151,6 +151,7 @@ model Tema {
 model AcaoProjeto {
   acao_projeto_id                        Int         @id @default(autoincrement())
   codigo_projeto                         String      @db.VarChar(20)
+  nome_projeto                           String?      @db.VarChar(255)
   pga_id                                 Int
   eixo_id                                Int
   prioridade_id                          Int

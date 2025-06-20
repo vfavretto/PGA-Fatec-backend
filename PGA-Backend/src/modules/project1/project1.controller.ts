@@ -5,6 +5,8 @@ import { FindAllProject1Service } from "../project1/services/findAllProject1.ser
 import { FindOneProject1Service } from "../project1/services/findOneProject1.service";
 import { UpdateProject1Service } from "../project1/services/updateProject1.service";
 import { Prisma } from "@prisma/client";
+import { CreateProject1Dto } from './dto/create-project1.dto';
+import { UpdateProject1Dto } from './dto/update-project1.dto';
 
 @Controller("project1")
 export class Project1Controller {
@@ -27,14 +29,14 @@ export class Project1Controller {
   }
 
   @Post()
-  async create(@Body() data: Prisma.AcaoProjetoUncheckedCreateInput) {
+  async create(@Body() data: CreateProject1Dto) {
     return this.createProject1Service.execute(data);
   }
 
   @Put(":id")
   async update(
     @Param("id", ParseIntPipe) id: number,
-    @Body() data: Prisma.AcaoProjetoUncheckedUpdateInput,
+    @Body() data: UpdateProject1Dto,
   ) {
     return this.updateProject1Service.execute(id, data);
   }

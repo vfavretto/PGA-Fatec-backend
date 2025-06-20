@@ -6,11 +6,16 @@ import {
   IsOptional,
   IsString,
   MaxLength,
+  IsNumber,
 } from 'class-validator';
 
 export class CreateProject1Dto {
   @IsString()
   codigo_projeto: string;
+
+  @IsOptional()
+  @IsString()
+  nome_projeto?: string;
 
   @IsInt()
   pga_id: number;
@@ -51,4 +56,12 @@ export class CreateProject1Dto {
   @IsOptional()
   @IsBoolean()
   obrigatorio_sustentabilidade?: boolean;
+
+  @IsOptional()
+  @IsNumber()
+  custo_total_estimado?: number | null;
+
+  @IsOptional()
+  @IsString()
+  fonte_recursos?: string | null;
 }
