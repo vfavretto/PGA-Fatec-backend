@@ -16,6 +16,7 @@ import { ProcessAccessRequestService } from './services/process-access-request.s
 import { RequestAccessService } from './services/request-access.service';
 import { GetUsersByUnitService } from './services/get-users-by-unit.service';
 import { AuditModule } from '../audit/audit.module';
+import { ChangeUserRoleService } from './services/change-user-role.service';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { AuditModule } from '../audit/audit.module';
     ProcessAccessRequestService,
     RequestAccessService,
     GetUsersByUnitService,
+    ChangeUserRoleService,
   ],
   controllers: [UserController],
 })

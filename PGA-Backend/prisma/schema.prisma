@@ -12,12 +12,29 @@ model Unidade {
   unidade_id    Int     @id @default(autoincrement())
   codigo_fnnn   String  @unique @db.VarChar(10)
   nome_completo String  @db.VarChar(255)
-  diretor_nome  String? @db.VarChar(255)
   ativo         Boolean @default(true)
+  diretor_id    Int?    @unique
+  endereco      String?  @db.VarChar(255)
+  complemento   String?  @db.VarChar(255)
+  bairro        String?  @db.VarChar(100)
+  cidade        String?  @db.VarChar(100)
+  uf            String?  @db.VarChar(2)
+  cep           String?  @db.VarChar(10)
+  telefone      String?  @db.VarChar(20)
+  site          String?  @db.VarChar(255)
+  criado_em     DateTime @default(now())
+  atualizado_em DateTime @updatedAt
+  criado_por   Int?
+  atualizado_por Int?
+
   cursos        Curso[]
   pgas          PGA[]
   solicitacoesAcesso   SolicitacaoAcesso[]
   pessoas PessoaUnidade[]
+
+  diretor       Pessoa? @relation("DiretorUnidade", fields: [diretor_id], references: [pessoa_id])
+  criadoPor     Pessoa? @relation("UnidadeCriadaPor", fields: [criado_por], references: [pessoa_id])
+  atualizadoPor Pessoa? @relation("UnidadeAtualizadaPor", fields: [atualizado_por], references: [pessoa_id])
 }
 
 model PGA {
@@ -112,7 +129,7 @@ model PrioridadeAcao {
 
 model Tema {
   tema_id             Int             @id @default(autoincrement())
-  tema_num            Int             @unique
+  tema_num            Int
   eixo_id             Int           
   descricao           String          @db.VarChar(255)
   ativo               Boolean         @default(true)
@@ -128,6 +145,8 @@ model Tema {
   versoes             TemaVersao[]
   usuarioCriador      Pessoa?         @relation("TemaCriador", fields: [criado_por], references: [pessoa_id])
   usuarioAtualizador  Pessoa?         @relation("TemaAtualizador", fields: [atualizado_por], references: [pessoa_id])
+
+  @@unique([tema_num, eixo_id])
 }
 
 model AcaoProjeto {
@@ -163,19 +182,32 @@ model Pessoa {
   nome_usuario         String?               @unique @db.VarChar(30)
   senha                String?               @db.VarChar(255)
   tipo_usuario         TipoUsuario
+  cpf                  String?               @unique @db.VarChar(11)
+  matricula           String?               @unique @db.VarChar(20)
+  telefone             String?               @db.VarChar(20)
   ativo                Boolean               @default(true)
   
   criado_em            DateTime              @default(now())
   atualizado_em        DateTime              @updatedAt
+  criado_por           Int?
   atualizado_por       Int?
 
+  unidade_dirigida    Unidade?       @relation("DiretorUnidade")
+
   unidades PessoaUnidade[]
-  
   cursos_coordenados   Curso[]
   projetos             ProjetoPessoa[]
-  rotinas_responsaveis RotinaInstitucional[] @relation("ResponsavelRotina")
   rotinas_participante RotinaParticipante[]
 
+  pessoas_criadas     Pessoa[]        @relation("PessoaCriadaPor")
+  pessoas_atualizadas Pessoa[]        @relation("PessoaAtualizadaPor")
+  criados_por          Pessoa?        @relation("PessoaCriadaPor", fields: [criado_por], references: [pessoa_id])
+  atualizados_por      Pessoa?        @relation("PessoaAtualizadaPor", fields: [atualizado_por], references: [pessoa_id])
+
+  unidades_criadas         Unidade[]       @relation("UnidadeCriadaPor")
+  unidades_atualizadas     Unidade[]       @relation("UnidadeAtualizadaPor")
+
+  rotinas_responsaveis RotinaInstitucional[] @relation("ResponsavelRotina")
   pgasCriados                    PGA[]                        @relation("PGACriador")
   auditorias                     ConfiguracaoAuditoria[]
   situacoesProblemasCriadas      SituacaoProblema[]           @relation("SituacaoCriador")
@@ -237,7 +269,7 @@ model EntregavelLinkSei {
 
   criado_em           DateTime          @default(now())
   criado_por          Int?
-  atualizado_em       DateTime          @updatedAt
+  atualizado_em       DateTime          @default(now())
   atualizado_por      Int?
   
   etapas              EtapaProcesso[]

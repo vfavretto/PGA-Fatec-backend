@@ -2,6 +2,7 @@ import {
   Injectable,
   BadRequestException,
   UnauthorizedException,
+  ConflictException,
 } from '@nestjs/common';
 import { PrismaService } from '../../../config/prisma.service';
 import { SendAccessApproved } from '../../mail/services/sendAccessApproved.service';
@@ -21,7 +22,6 @@ export class ProcessAccessRequestService {
     status: string,
     tipoUsuario?: TipoUsuario,
   ) {
-    // Buscar solicitação
     const solicitacao = await this.prisma.solicitacaoAcesso.findUnique({
       where: { solicitacao_id: solicitacaoId },
       include: { unidade: true },
@@ -35,18 +35,15 @@ export class ProcessAccessRequestService {
       throw new BadRequestException('Esta solicitação já foi processada');
     }
 
-    // Buscar usuário processador
     const processador = await this.prisma.pessoa.findUnique({
       where: { pessoa_id: usuarioId },
       select: { pessoa_id: true, tipo_usuario: true },
     });
 
-    // Verificar se o processador existe
     if (!processador) {
       throw new UnauthorizedException('Usuário não encontrado');
     }
 
-    // Verificar se tem permissão para processar
     const permissaoProcessar = [
       'Administrador',
       'CPS',
@@ -60,24 +57,21 @@ export class ProcessAccessRequestService {
       );
     }
 
-    // Se for Diretor, verificar se a unidade é dele
     if (processador.tipo_usuario === 'Diretor') {
-      // Correção 1: usar diretor_nome em vez de diretor_id
       const unidadeDiretor = await this.prisma.unidade.findFirst({
-        where: { diretor_nome: { contains: usuarioId.toString() } },
+        where: { 
+          diretor_id: usuarioId,
+          ativo: true
+        },
       });
 
-      if (
-        !unidadeDiretor ||
-        unidadeDiretor.unidade_id !== solicitacao.unidade_id
-      ) {
+      if (!unidadeDiretor || unidadeDiretor.unidade_id !== solicitacao.unidade_id) {
         throw new UnauthorizedException(
-          'Você não pode processar solicitações de outras unidades',
+          'Você não pode processar solicitações de outras unidades'
         );
       }
     }
 
-    // Verificar se o tipo de usuario é compatível com quem está aprovando
     if (status === 'Aprovada') {
       if (!tipoUsuario) {
         throw new BadRequestException(
@@ -85,18 +79,19 @@ export class ProcessAccessRequestService {
         );
       }
 
-      // Verificar hierarquia
       const nivelProcessador = this.getNivelUsuario(processador.tipo_usuario);
       const nivelSolicitado = this.getNivelUsuario(tipoUsuario);
 
-      if (nivelSolicitado >= nivelProcessador) {
-        throw new UnauthorizedException(
-          'Você não pode criar usuários do mesmo nível ou superior ao seu',
-        );
+      if (processador.tipo_usuario === 'Administrador' || processador.tipo_usuario === 'CPS') {
+      } else {
+        if (nivelSolicitado <= nivelProcessador) {
+          throw new UnauthorizedException(
+            'Você não pode criar usuários do mesmo nível ou superior ao seu',
+          );
+        }
       }
     }
 
-    // Atualizar o status da solicitação
     await this.prisma.solicitacaoAcesso.update({
       where: { solicitacao_id: solicitacaoId },
       data: {
@@ -107,13 +102,21 @@ export class ProcessAccessRequestService {
       },
     });
 
-    // Se foi aprovada, criar o usuário e enviar email
     if (status === 'Aprovada' && tipoUsuario) {
-      // Gerar senha temporária
       const tempPassword = crypto.randomBytes(8).toString('hex');
       const hashedPassword = await this.hashPassword(tempPassword);
 
-      // 1. Criar o usuário
+      if (tipoUsuario === 'Diretor') {
+        const unidadeAtual = await this.prisma.unidade.findUnique({
+          where: { unidade_id: solicitacao.unidade_id },
+          select: { diretor_id: true, nome_completo: true }
+        });
+
+        if (unidadeAtual?.diretor_id) {
+          throw new ConflictException(`A unidade ${unidadeAtual.nome_completo} já possui um diretor atribuído. Remova o diretor atual antes de atribuir um novo.`);
+        }
+      }
+
       const novoUsuario = await this.prisma.pessoa.create({
         data: {
           nome: solicitacao.nome,
@@ -123,7 +126,6 @@ export class ProcessAccessRequestService {
         },
       });
 
-      // 2. Criar o vínculo com a unidade na tabela PessoaUnidade
       await this.prisma.pessoaUnidade.create({
         data: {
           pessoa_id: novoUsuario.pessoa_id,
@@ -131,6 +133,13 @@ export class ProcessAccessRequestService {
           data_vinculo: new Date(),
         },
       });
+
+      if (tipoUsuario === 'Diretor') {
+        await this.prisma.unidade.update({
+          where: { unidade_id: solicitacao.unidade_id },
+          data: { diretor_id: novoUsuario.pessoa_id },
+        });
+      }
 
       await this.sendAccessApproved.execute(
         solicitacao.email,
@@ -145,7 +154,6 @@ export class ProcessAccessRequestService {
         message: `Solicitação aprovada e usuário criado. Email enviado para ${solicitacao.email}`,
       };
     } else {
-      // Se foi rejeitada
       return {
         success: true,
         message: `Solicitação rejeitada com sucesso`,
@@ -153,14 +161,12 @@ export class ProcessAccessRequestService {
     }
   }
 
-  // Helper para hash de senha
   private async hashPassword(password: string): Promise<string> {
     const bcrypt = require('bcrypt');
     const salt = await bcrypt.genSalt(10);
     return bcrypt.hash(password, salt);
   }
 
-  // Helper para obter nível numérico do tipo de usuário
   private getNivelUsuario(tipoUsuario: string): number {
     const niveis = {
       Administrador: 0,

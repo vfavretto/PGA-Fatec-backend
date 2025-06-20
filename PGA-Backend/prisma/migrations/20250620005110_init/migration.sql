@@ -45,7 +45,20 @@ CREATE TABLE "Unidade" (
     "unidade_id" SERIAL NOT NULL,
     "codigo_fnnn" VARCHAR(10) NOT NULL,
     "nome_completo" VARCHAR(255) NOT NULL,
-    "diretor_nome" VARCHAR(255),
+    "ativo" BOOLEAN NOT NULL DEFAULT true,
+    "diretor_id" INTEGER,
+    "endereco" VARCHAR(255),
+    "complemento" VARCHAR(255),
+    "bairro" VARCHAR(100),
+    "cidade" VARCHAR(100),
+    "uf" VARCHAR(2),
+    "cep" VARCHAR(10),
+    "telefone" VARCHAR(20),
+    "site" VARCHAR(255),
+    "criado_em" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "atualizado_em" TIMESTAMP(3) NOT NULL,
+    "criado_por" INTEGER,
+    "atualizado_por" INTEGER,
 
     CONSTRAINT "Unidade_pkey" PRIMARY KEY ("unidade_id")
 );
@@ -63,6 +76,7 @@ CREATE TABLE "PGA" (
     "configuracoes_snapshot" JSONB,
     "data_snapshot_criado" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "usuario_criacao_id" INTEGER,
+    "ativo" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "PGA_pkey" PRIMARY KEY ("pga_id")
 );
@@ -143,6 +157,7 @@ CREATE TABLE "AcaoProjeto" (
     "objetivos_institucionais_referenciados" TEXT,
     "obrigatorio_inclusao" BOOLEAN NOT NULL DEFAULT false,
     "obrigatorio_sustentabilidade" BOOLEAN NOT NULL DEFAULT false,
+    "ativo" BOOLEAN NOT NULL DEFAULT true,
     "attachment1Id" TEXT,
 
     CONSTRAINT "AcaoProjeto_pkey" PRIMARY KEY ("acao_projeto_id")
@@ -156,9 +171,14 @@ CREATE TABLE "Pessoa" (
     "nome_usuario" VARCHAR(30),
     "senha" VARCHAR(255),
     "tipo_usuario" "TipoUsuario" NOT NULL,
+    "cpf" VARCHAR(11),
+    "matricula" VARCHAR(20),
+    "telefone" VARCHAR(20),
     "ativo" BOOLEAN NOT NULL DEFAULT true,
     "criado_em" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "atualizado_em" TIMESTAMP(3) NOT NULL,
+    "criado_por" INTEGER,
+    "atualizado_por" INTEGER,
 
     CONSTRAINT "Pessoa_pkey" PRIMARY KEY ("pessoa_id")
 );
@@ -171,6 +191,7 @@ CREATE TABLE "ProjetoPessoa" (
     "papel" "PapelProjeto" NOT NULL,
     "carga_horaria_semanal" INTEGER,
     "tipo_vinculo_hae_id" INTEGER,
+    "ativo" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "ProjetoPessoa_pkey" PRIMARY KEY ("projeto_pessoa_id")
 );
@@ -185,6 +206,7 @@ CREATE TABLE "EtapaProcesso" (
     "data_verificacao_prevista" DATE,
     "data_verificacao_realizada" DATE,
     "status_verificacao" "StatusVerificacao" NOT NULL DEFAULT 'Pendente',
+    "ativo" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "EtapaProcesso_pkey" PRIMARY KEY ("etapa_id")
 );
@@ -216,6 +238,7 @@ CREATE TABLE "Aquisicao" (
     "justificativa" TEXT,
     "valor_unitario_estimado" DECIMAL(10,2),
     "valor_total_estimado" DECIMAL(10,2),
+    "ativo" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "Aquisicao_pkey" PRIMARY KEY ("aquisicao_id")
 );
@@ -226,6 +249,7 @@ CREATE TABLE "AcaoCPA" (
     "pga_id" INTEGER NOT NULL,
     "descricao" TEXT NOT NULL,
     "justificativa" TEXT,
+    "ativo" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "AcaoCPA_pkey" PRIMARY KEY ("acao_cpa_id")
 );
@@ -244,6 +268,7 @@ CREATE TABLE "RotinaInstitucional" (
     "responsavel_id" INTEGER NOT NULL,
     "entregavel_esperado" TEXT,
     "status" "StatusRotina" NOT NULL DEFAULT 'Planejada',
+    "ativo" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "RotinaInstitucional_pkey" PRIMARY KEY ("rotina_id")
 );
@@ -254,6 +279,7 @@ CREATE TABLE "RotinaParticipante" (
     "rotina_id" INTEGER NOT NULL,
     "pessoa_id" INTEGER NOT NULL,
     "papel" VARCHAR(100),
+    "ativo" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "RotinaParticipante_pkey" PRIMARY KEY ("rotina_participante_id")
 );
@@ -270,6 +296,7 @@ CREATE TABLE "RotinaOcorrencia" (
     "resultado" TEXT,
     "link_ata" VARCHAR(255),
     "status" "StatusOcorrencia" NOT NULL DEFAULT 'Planejada',
+    "ativo" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "RotinaOcorrencia_pkey" PRIMARY KEY ("ocorrencia_id")
 );
@@ -282,6 +309,7 @@ CREATE TABLE "Curso" (
     "tipo" "TipoCurso" NOT NULL,
     "status" "StatusCurso" NOT NULL,
     "coordenador_id" INTEGER,
+    "ativo" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "Curso_pkey" PRIMARY KEY ("curso_id")
 );
@@ -295,6 +323,7 @@ CREATE TABLE "Attachment1" (
     "precoTotalEstimado" DECIMAL(10,2) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "ativo" BOOLEAN NOT NULL DEFAULT true,
     "flag" "AnexoProjetoUm" NOT NULL,
 
     CONSTRAINT "Attachment1_pkey" PRIMARY KEY ("id")
@@ -306,6 +335,7 @@ CREATE TABLE "TipoVinculoHAE" (
     "sigla" VARCHAR(10) NOT NULL,
     "descricao" VARCHAR(255) NOT NULL,
     "detalhes" TEXT,
+    "ativo" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "TipoVinculoHAE_pkey" PRIMARY KEY ("id")
 );
@@ -314,6 +344,7 @@ CREATE TABLE "TipoVinculoHAE" (
 CREATE TABLE "PGASituacaoProblema" (
     "pga_id" INTEGER NOT NULL,
     "situacao_problema_id" INTEGER NOT NULL,
+    "ativo" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "PGASituacaoProblema_pkey" PRIMARY KEY ("pga_id","situacao_problema_id")
 );
@@ -322,6 +353,7 @@ CREATE TABLE "PGASituacaoProblema" (
 CREATE TABLE "AcaoProjetoSituacaoProblema" (
     "acao_projeto_id" INTEGER NOT NULL,
     "situacao_problema_id" INTEGER NOT NULL,
+    "ativo" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "AcaoProjetoSituacaoProblema_pkey" PRIMARY KEY ("acao_projeto_id","situacao_problema_id")
 );
@@ -455,8 +487,21 @@ CREATE TABLE "SolicitacaoAcesso" (
     CONSTRAINT "SolicitacaoAcesso_pkey" PRIMARY KEY ("solicitacao_id")
 );
 
+-- CreateTable
+CREATE TABLE "PessoaUnidade" (
+    "pessoa_id" INTEGER NOT NULL,
+    "unidade_id" INTEGER NOT NULL,
+    "data_vinculo" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "ativo" BOOLEAN NOT NULL DEFAULT true,
+
+    CONSTRAINT "PessoaUnidade_pkey" PRIMARY KEY ("pessoa_id","unidade_id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Unidade_codigo_fnnn_key" ON "Unidade"("codigo_fnnn");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Unidade_diretor_id_key" ON "Unidade"("diretor_id");
 
 -- CreateIndex
 CREATE INDEX "SituacaoProblema_codigo_categoria_idx" ON "SituacaoProblema"("codigo_categoria");
@@ -481,6 +526,12 @@ CREATE UNIQUE INDEX "Pessoa_email_key" ON "Pessoa"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Pessoa_nome_usuario_key" ON "Pessoa"("nome_usuario");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Pessoa_cpf_key" ON "Pessoa"("cpf");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Pessoa_matricula_key" ON "Pessoa"("matricula");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "EntregavelLinkSei_entregavel_numero_key" ON "EntregavelLinkSei"("entregavel_numero");
@@ -517,6 +568,15 @@ CREATE UNIQUE INDEX "EntregavelVersao_entregavel_base_id_ano_key" ON "Entregavel
 
 -- CreateIndex
 CREATE UNIQUE INDEX "PessoaVersao_pessoa_base_id_ano_key" ON "PessoaVersao"("pessoa_base_id", "ano");
+
+-- AddForeignKey
+ALTER TABLE "Unidade" ADD CONSTRAINT "Unidade_diretor_id_fkey" FOREIGN KEY ("diretor_id") REFERENCES "Pessoa"("pessoa_id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Unidade" ADD CONSTRAINT "Unidade_criado_por_fkey" FOREIGN KEY ("criado_por") REFERENCES "Pessoa"("pessoa_id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Unidade" ADD CONSTRAINT "Unidade_atualizado_por_fkey" FOREIGN KEY ("atualizado_por") REFERENCES "Pessoa"("pessoa_id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "PGA" ADD CONSTRAINT "PGA_unidade_id_fkey" FOREIGN KEY ("unidade_id") REFERENCES "Unidade"("unidade_id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -565,6 +625,12 @@ ALTER TABLE "AcaoProjeto" ADD CONSTRAINT "AcaoProjeto_prioridade_id_fkey" FOREIG
 
 -- AddForeignKey
 ALTER TABLE "AcaoProjeto" ADD CONSTRAINT "AcaoProjeto_attachment1Id_fkey" FOREIGN KEY ("attachment1Id") REFERENCES "Attachment1"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Pessoa" ADD CONSTRAINT "Pessoa_criado_por_fkey" FOREIGN KEY ("criado_por") REFERENCES "Pessoa"("pessoa_id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Pessoa" ADD CONSTRAINT "Pessoa_atualizado_por_fkey" FOREIGN KEY ("atualizado_por") REFERENCES "Pessoa"("pessoa_id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ProjetoPessoa" ADD CONSTRAINT "ProjetoPessoa_tipo_vinculo_hae_id_fkey" FOREIGN KEY ("tipo_vinculo_hae_id") REFERENCES "TipoVinculoHAE"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -679,3 +745,9 @@ ALTER TABLE "SolicitacaoAcesso" ADD CONSTRAINT "SolicitacaoAcesso_unidade_id_fke
 
 -- AddForeignKey
 ALTER TABLE "SolicitacaoAcesso" ADD CONSTRAINT "SolicitacaoAcesso_processado_por_fkey" FOREIGN KEY ("processado_por") REFERENCES "Pessoa"("pessoa_id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PessoaUnidade" ADD CONSTRAINT "PessoaUnidade_pessoa_id_fkey" FOREIGN KEY ("pessoa_id") REFERENCES "Pessoa"("pessoa_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PessoaUnidade" ADD CONSTRAINT "PessoaUnidade_unidade_id_fkey" FOREIGN KEY ("unidade_id") REFERENCES "Unidade"("unidade_id") ON DELETE CASCADE ON UPDATE CASCADE;
