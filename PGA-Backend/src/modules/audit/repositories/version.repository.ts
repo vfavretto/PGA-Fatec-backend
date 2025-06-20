@@ -5,7 +5,6 @@ import { PrismaService } from '@/config/prisma.service';
 export class VersionRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  // Situações Problema
   async createSituacaoProblemaVersion(data: {
     situacao_base_id: number;
     ano: number;
@@ -52,7 +51,6 @@ export class VersionRepository {
     });
   }
 
-  // Eixos Temáticos
   async createEixoTematicoVersion(data: {
     eixo_base_id: number;
     ano: number;
@@ -96,7 +94,6 @@ export class VersionRepository {
     });
   }
 
-  // Prioridades de Ação
   async createPrioridadeAcaoVersion(data: {
     prioridade_base_id: number;
     ano: number;
@@ -142,7 +139,6 @@ export class VersionRepository {
     });
   }
 
-  // Temas
   async createTemaVersion(data: {
     tema_base_id: number;
     ano: number;
@@ -190,7 +186,6 @@ export class VersionRepository {
     });
   }
 
-  // Entregáveis
   async createEntregavelVersion(data: {
     entregavel_base_id: number;
     ano: number;
@@ -234,7 +229,6 @@ export class VersionRepository {
     });
   }
 
-  // Pessoas
   async createPessoaVersion(data: {
     pessoa_base_id: number;
     ano: number;

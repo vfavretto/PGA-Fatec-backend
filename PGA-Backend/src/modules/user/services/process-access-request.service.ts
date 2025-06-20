@@ -2,6 +2,7 @@ import {
   Injectable,
   BadRequestException,
   UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../../../config/prisma.service';
 import { SendAccessApproved } from '../../mail/services/sendAccessApproved.service';

@@ -12,7 +12,7 @@ export class PgaRepository {
     return this.prisma.pGA.create({
       data: {
         ...data,
-        status: data.status ?? StatusPGA.EmElaboracao, // valor padrão do enum
+        status: data.status ?? StatusPGA.EmElaboracao,
       },
     });
   }

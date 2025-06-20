@@ -7,20 +7,19 @@ export class RequestAccessService {
   constructor(private prisma: PrismaService) {}
 
   async execute(data: RequestAccessDto) {
-    // 1. Buscar a unidade pelo campo codigo_fnnn (não pelo ID)
     const unidade = await this.prisma.unidade.findFirst({
       where: {
-        codigo_fnnn: data.codigo_unidade.toUpperCase(),
+        codigo_fnnn: {
+          equals: data.codigo_unidade,
+          mode: 'insensitive',
+        },
       },
     });
 
     if (!unidade) {
-      throw new NotFoundException(
-        `Unidade com código ${data.codigo_unidade} não encontrada ou inativa`,
-      );
+      throw new NotFoundException('Unidade não encontrada com o código fornecido');
     }
 
-    // 2. Verificar se já existe solicitação pendente com este email
     const existingSolicitation = await this.prisma.solicitacaoAcesso.findFirst({
       where: {
         email: data.email,
@@ -29,15 +28,14 @@ export class RequestAccessService {
     });
 
     if (existingSolicitation) {
-      throw new ConflictException('Já existe uma solicitação pendente para este email');
+      throw new ConflictException('Você já possui uma solicitação pendente com este email');
     }
 
-    // 3. Criar nova solicitação usando o unidade_id encontrado
     const solicitacao = await this.prisma.solicitacaoAcesso.create({
       data: {
         nome: data.nome,
         email: data.email,
-        unidade_id: unidade.unidade_id, // Usar o ID da unidade encontrada
+        unidade_id: unidade.unidade_id,
         status: 'Pendente',
         data_solicitacao: new Date(),
       },
