@@ -61,8 +61,8 @@ export class ProcessAccessRequestService {
       const unidadeDiretor = await this.prisma.unidade.findFirst({
         where: {
           diretor_id: usuarioId,
-          ativo: true,
-        },
+          ativo: true
+        } as any,
       });
 
       if (
@@ -115,8 +115,8 @@ export class ProcessAccessRequestService {
       if (tipoUsuario === 'Diretor') {
         const unidadeAtual = await this.prisma.unidade.findUnique({
           where: { unidade_id: solicitacao.unidade_id },
-          select: { diretor_id: true, nome_completo: true },
-        });
+          select: { diretor_id: true, nome_completo: true } as any,
+        }) as any;
 
         if (unidadeAtual?.diretor_id) {
           throw new ConflictException(
@@ -145,7 +145,7 @@ export class ProcessAccessRequestService {
       if (tipoUsuario === 'Diretor') {
         await this.prisma.unidade.update({
           where: { unidade_id: solicitacao.unidade_id },
-          data: { diretor_id: novoUsuario.pessoa_id },
+          data: { diretor_id: novoUsuario.pessoa_id } as any,
         });
       }
 
