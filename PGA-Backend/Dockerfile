@@ -17,14 +17,14 @@ COPY prisma ./prisma/
 # Instalar dependências
 RUN npm install
 
+# Gerar Prisma Client
+RUN npx prisma generate
+
 # Copiar resto do código
 COPY . .
 
 # Build da aplicação
 RUN npm run build
-
-# Gerar Prisma Client
-RUN npx prisma generate
 
 EXPOSE 3000
 
