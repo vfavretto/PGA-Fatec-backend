@@ -52,7 +52,7 @@ export class PgaRepository extends BaseRepository<PGA> {
   async delete(id: number) {
     return this.prisma.pGA.update({
       where: { pga_id: id },
-      data: { ativo: false },
+      data: { ativo: false } as any,
     });
   }
 
