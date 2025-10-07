@@ -15,10 +15,10 @@ export class UserRepository extends BaseRepository<Pessoa> {
 
   async findAll(): Promise<Pessoa[]> {
     return this.prisma.pessoa.findMany({
-      where: this.whereActive(), // 👈 Adicionado para filtrar apenas ativos
+      where: this.whereActive(),
       include: {
         unidades: {
-          where: { ativo: true }, // 👈 Filtrar apenas unidades ativas
+          where: { ativo: true },
           include: {
             unidade: true,
           },
@@ -101,5 +101,9 @@ export class UserRepository extends BaseRepository<Pessoa> {
         },
       },
     });
+  }
+
+  async countActiveUsers(): Promise<number> {
+    return this.prisma.pessoa.count({ where: this.whereActive() });
   }
 }

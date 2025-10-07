@@ -1,0 +1,644 @@
+@baseURL = http://192.168.0.248:3000/
+@userID = 1
+@pgaId = 1
+@unitId = 1
+@projectId = 1
+@deliverableId = 1
+@attachmentId = 1
+@themeId = 1
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im11cmlsb0BleGFtcGxlLmNvbSIsInBlc3NvYV9pZCI6MSwibm9tZSI6Ik11cmlsbyIsInRpcG9fdXN1YXJpbyI6IkFkbWluaXN0cmFkb3IiLCJpYXQiOjE3NTk3MTg4NjEsImV4cCI6MTc1OTgwNTI2MX0.gRFi0rDyu_rpgInTThuic01qKvV5IbjROZhBXhE6oIA
+
+### --------------------------
+### AUTH
+### --------------------------
+
+### Login (obter token)
+POST {{baseURL}}auth/login
+Content-Type: application/json
+
+{
+  "email": "adm@example.com",
+  "senha": "Senh@123"
+}
+
+
+### --------------------------
+### USERS
+### --------------------------
+
+### Criar usuário (rota pública — primeiro usuário vira Administrador)
+POST {{baseURL}}users
+Content-Type: application/json
+
+// O DTO `RegisterDto` exige `nome`, `email`, `senha` e `tipo_usuario`.
+// Observação: se for o primeiro usuário no sistema, o backend força `tipo_usuario = 'Administrador'`.
+{
+  "nome": "Admin",
+  "email": "adm@example.com",
+  "senha": "Senh@123",
+  "tipo_usuario": "Docente" // O primeiro usuário sempre será convertido para Administrador
+}
+
+
+### Listar usuários
+GET {{baseURL}}users
+Authorization: Bearer {{token}}
+
+
+### Listar solicitações de acesso (usuário autenticado)
+GET {{baseURL}}users/access-requests
+Authorization: Bearer {{token}}
+
+
+### Buscar usuário por ID
+GET {{baseURL}}users/{{userID}}
+Authorization: Bearer {{token}}
+
+
+### Atualizar usuário por ID
+PUT {{baseURL}}users/{{userID}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nome": "Murilo"
+}
+
+
+### Remover usuário por ID
+DELETE {{baseURL}}users/{{userID}}
+Authorization: Bearer {{token}}
+
+
+### Solicitar redefinição de senha
+POST {{baseURL}}users/reset-password
+Content-Type: application/json
+
+{
+  "email": "murilo@example.com"
+}
+
+
+### Confirmar redefinição de senha
+POST {{baseURL}}users/reset-password/confirm
+Content-Type: application/json
+
+{
+  "token": "token-temporario",
+  "password": "novaSenha123"
+}
+
+
+### Solicitar acesso (público)
+### Use o campo `codigo_unidade` no formato FNNN (ex: F301). O endpoint retorna `data.solicitacao_id`.
+POST {{baseURL}}users/request-access
+Content-Type: application/json
+
+{
+  "nome": "João Silva Santos",
+  "email": "joao.silva@fatec.sp.gov.br",
+  "codigo_unidade": "F301"
+}
+
+
+### Processar solicitação de acesso (aprovador autenticado)
+### Substitua :id pelo solicitacao_id retornado ao criar a solicitação.
+POST {{baseURL}}users/process-access-request/<<SOLICITACAO_ID>>
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+// Exemplo de aprovação (não-diretor)
+{
+  "status": "Aprovada",
+  "tipo_usuario": "Docente"
+}
+
+// Exemplo de aprovação como Diretor (necessário enviar unidade_id)
+{
+  "status": "Aprovada",
+  "tipo_usuario": "Diretor",
+  "unidade_id": {{unitId}}
+}
+
+// Exemplo de rejeição
+{
+  "status": "Rejeitada"
+}
+
+
+### Buscar usuários por unidade
+GET {{baseURL}}users/by-unidade/{{unitId}}
+Authorization: Bearer {{token}}
+
+
+### Trocar papel/role (exemplo)
+PATCH {{baseURL}}users/1/change-role
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "novoTipo": "CPS",
+  "unidadeId": {{unitId}}
+}
+
+
+### --------------------------
+### UNITS
+### --------------------------
+
+### Criar unidade
+POST {{baseURL}}unit
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nome_completo": "Fatec Votorantim",
+  "codigo_fnnn": "F301"
+}
+
+
+### Listar unidades
+GET {{baseURL}}unit
+Authorization: Bearer {{token}}
+
+
+### Buscar unidade por ID
+GET {{baseURL}}unit/{{unitId}}
+Authorization: Bearer {{token}}
+
+
+### Atualizar unidade
+PUT {{baseURL}}unit/{{unitId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nome_completo": "Unidade Atualizada"
+}
+
+
+### Excluir unidade
+DELETE {{baseURL}}unit/{{unitId}}
+Authorization: Bearer {{token}}
+
+
+### --------------------------
+### COURSES
+### --------------------------
+
+POST {{baseURL}}course
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nome": "Desenvolvimento de Software Multiplataforma",
+  "codigo": "DSM"
+}
+
+GET {{baseURL}}course
+Authorization: Bearer {{token}}
+
+GET {{baseURL}}course/1
+Authorization: Bearer {{token}}
+
+PUT {{baseURL}}course/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nome": "Curso Atualizado"
+}
+
+DELETE {{baseURL}}course/1
+Authorization: Bearer {{token}}
+
+
+### --------------------------
+### DELIVERABLES
+### --------------------------
+
+POST {{baseURL}}deliverable
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "titulo": "Entregável Exemplo",
+  "descricao": "Descrição"
+}
+
+GET {{baseURL}}deliverable
+Authorization: Bearer {{token}}
+
+GET {{baseURL}}deliverable/{{deliverableId}}
+Authorization: Bearer {{token}}
+
+PUT {{baseURL}}deliverable/{{deliverableId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "titulo": "Atualizado"
+}
+
+DELETE {{baseURL}}deliverable/{{deliverableId}}
+Authorization: Bearer {{token}}
+
+
+### --------------------------
+### ATTACHMENTS
+### --------------------------
+
+POST {{baseURL}}attachments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nome": "Arquivo.pdf",
+  "url": "http://exemplo/arquivo.pdf",
+  "entregavel_id": {{deliverableId}}
+}
+
+GET {{baseURL}}attachments
+Authorization: Bearer {{token}}
+
+GET {{baseURL}}attachments/etapa-processo/{{processStepId}}
+Authorization: Bearer {{token}}
+
+GET {{baseURL}}attachments/entregavel/{{deliverableId}}
+Authorization: Bearer {{token}}
+
+GET {{baseURL}}attachments/{{attachmentId}}
+Authorization: Bearer {{token}}
+
+PUT {{baseURL}}attachments/{{attachmentId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nome": "Arquivo Atualizado.pdf"
+}
+
+DELETE {{baseURL}}attachments/{{attachmentId}}
+Authorization: Bearer {{token}}
+
+
+### --------------------------
+### PGA
+### --------------------------
+
+POST {{baseURL}}pga
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "ano": 2025,
+  "unidade_id": {{unitId}}
+}
+### Exibe PGA
+GET {{baseURL}}pga
+Authorization: Bearer {{token}}
+
+### Exibe PGA pelo ID
+GET {{baseURL}}pga/{{pgaId}}
+Authorization: Bearer {{token}}
+
+
+### Atualiza um PGA pelo ID
+PUT {{baseURL}}pga/{{pgaId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "titulo": "PGA Atualizado"
+}
+
+
+### Deleta um PGA pelo ID
+DELETE {{baseURL}}pga/{{pgaId}}
+Authorization: Bearer {{token}}
+
+
+### --------------------------
+### PROJECT1
+### --------------------------
+
+GET {{baseURL}}project1
+Authorization: Bearer {{token}}
+
+GET {{baseURL}}project1/{{projectId}}
+Authorization: Bearer {{token}}
+
+POST {{baseURL}}project1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "codigo_projeto": "P-001",
+  "nome_projeto": "Projeto Exemplo",
+  "pga_id": {{pgaId}}
+}
+
+PUT {{baseURL}}project1/{{projectId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nome_projeto": "Projeto Atualizado"
+}
+
+DELETE {{baseURL}}project1/{{projectId}}
+Authorization: Bearer {{token}}
+
+
+### --------------------------
+### CONFIGURATION (priority-action, problem-situation, thematic-axis, themes)
+### --------------------------
+
+POST {{baseURL}}priority-action
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "titulo": "Alta Prioridade"
+}
+
+GET {{baseURL}}priority-action
+Authorization: Bearer {{token}}
+
+GET {{baseURL}}priority-action/1
+Authorization: Bearer {{token}}
+
+PUT {{baseURL}}priority-action/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "titulo": "Atualizado"
+}
+
+DELETE {{baseURL}}priority-action/1
+Authorization: Bearer {{token}}
+
+
+POST {{baseURL}}problem-situation
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "titulo": "Problema Exemplo"
+}
+
+GET {{baseURL}}problem-situation
+Authorization: Bearer {{token}}
+
+GET {{baseURL}}problem-situation/1
+Authorization: Bearer {{token}}
+
+PUT {{baseURL}}problem-situation/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "titulo": "Atualizado"
+}
+
+DELETE {{baseURL}}problem-situation/1
+Authorization: Bearer {{token}}
+
+
+POST {{baseURL}}thematic-axis
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "titulo": "Eixo Exemplo"
+}
+
+GET {{baseURL}}thematic-axis
+Authorization: Bearer {{token}}
+
+GET {{baseURL}}thematic-axis/1
+Authorization: Bearer {{token}}
+
+PUT {{baseURL}}thematic-axis/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "titulo": "Atualizado"
+}
+
+DELETE {{baseURL}}thematic-axis/1
+Authorization: Bearer {{token}}
+
+
+POST {{baseURL}}themes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "titulo": "Tema Exemplo",
+  "eixo_id": 1
+}
+
+GET {{baseURL}}themes
+Authorization: Bearer {{token}}
+
+GET {{baseURL}}themes/1
+Authorization: Bearer {{token}}
+
+PUT {{baseURL}}themes/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "titulo": "Atualizado"
+}
+
+DELETE {{baseURL}}themes/1
+Authorization: Bearer {{token}}
+
+
+### --------------------------
+### PROCESS-STEP / ROUTINE / PROJECT-PERSON / WORKLOAD
+### --------------------------
+
+POST {{baseURL}}process-step
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "titulo": "Etapa X"
+}
+
+GET {{baseURL}}process-step
+Authorization: Bearer {{token}}
+
+GET {{baseURL}}process-step/1
+Authorization: Bearer {{token}}
+
+PUT {{baseURL}}process-step/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "titulo": "Atualizado"
+}
+
+DELETE {{baseURL}}process-step/1
+Authorization: Bearer {{token}}
+
+
+POST {{baseURL}}routine-occurrence
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "descricao": "Ocorrência X"
+}
+
+GET {{baseURL}}routine-occurrence
+Authorization: Bearer {{token}}
+
+GET {{baseURL}}routine-occurrence/1
+Authorization: Bearer {{token}}
+
+PUT {{baseURL}}routine-occurrence/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "descricao": "Atualizado"
+}
+
+DELETE {{baseURL}}routine-occurrence/1
+Authorization: Bearer {{token}}
+
+
+POST {{baseURL}}routine-participant
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "pessoa_id": {{userID}},
+  "rotina_id": 1
+}
+
+GET {{baseURL}}routine-participant
+Authorization: Bearer {{token}}
+
+GET {{baseURL}}routine-participant/1
+Authorization: Bearer {{token}}
+
+PUT {{baseURL}}routine-participant/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "pessoa_id": {{userID}}
+}
+
+DELETE {{baseURL}}routine-participant/1
+Authorization: Bearer {{token}}
+
+
+POST {{baseURL}}project-person
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "pessoa_id": {{userID}},
+  "project_id": {{projectId}}
+}
+
+GET {{baseURL}}project-person
+Authorization: Bearer {{token}}
+
+GET {{baseURL}}project-person/1
+Authorization: Bearer {{token}}
+
+PUT {{baseURL}}project-person/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "pessoa_id": {{userID}}
+}
+
+DELETE {{baseURL}}project-person/1
+Authorization: Bearer {{token}}
+
+
+POST {{baseURL}}workload-hae
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "descricao": "HAE X",
+  "horas": 10
+}
+
+GET {{baseURL}}workload-hae
+Authorization: Bearer {{token}}
+
+GET {{baseURL}}workload-hae/1
+Authorization: Bearer {{token}}
+
+PUT {{baseURL}}workload-hae/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "horas": 12
+}
+
+DELETE {{baseURL}}workload-hae/1
+Authorization: Bearer {{token}}
+
+
+### --------------------------
+### AUDIT
+### --------------------------
+
+POST {{baseURL}}audit/snapshot/pga/{{pgaId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "ano": 2025,
+  "usuarioId": {{userID}}
+}
+
+GET {{baseURL}}audit/configurations/year/2025
+Authorization: Bearer {{token}}
+
+GET {{baseURL}}audit/configurations/pessoas/year/2025
+Authorization: Bearer {{token}}
+
+POST {{baseURL}}audit/log
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "tabela": "pessoa",
+  "registroId": 1,
+  "operacao": "UPDATE",
+  "dados_antes": {},
+  "dados_depois": {}
+}
+
+GET {{baseURL}}audit/history/pessoa/1
+Authorization: Bearer {{token}}
+
+GET {{baseURL}}audit/year/2025
+Authorization: Bearer {{token}}
+
+GET {{baseURL}}audit/table/pessoa
+Authorization: Bearer {{token}}
+
+GET {{baseURL}}audit/report/changes/year/2025
+Authorization: Bearer {{token}}
+
+GET {{baseURL}}audit/report/summary
+Authorization: Bearer {{token}}
+
