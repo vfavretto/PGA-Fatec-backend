@@ -1,4 +1,4 @@
-@baseURL = http://192.168.0.248:3000/
+@baseURL = http://192.168.50.54:3000/
 @userID = 1
 @pgaId = 1
 @unitId = 1
@@ -17,8 +17,8 @@ POST {{baseURL}}auth/login
 Content-Type: application/json
 
 {
-  "email": "adm@example.com",
-  "senha": "Senh@123"
+  "email": "admin@exemplo.com",
+  "senha": "SenhaSegura123!"
 }
 
 
