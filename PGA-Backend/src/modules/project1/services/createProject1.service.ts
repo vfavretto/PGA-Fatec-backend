@@ -24,10 +24,28 @@ export class CreateProject1Service {
 
     const codigo_projeto = `${eixo.numero}${sequencial}`;
 
+    const { situacao_problema_ids, ...projectData } = dto;
+
     return this.prisma.acaoProjeto.create({
       data: {
-        ...dto,
+        ...projectData,
         codigo_projeto,
+        ...(situacao_problema_ids &&
+          situacao_problema_ids.length > 0 && {
+            situacoesProblemas: {
+              create: situacao_problema_ids.map((situacao_id) => ({
+                situacao_problema_id: situacao_id,
+                ativo: true,
+              })),
+            },
+          }),
+      },
+      include: {
+        situacoesProblemas: {
+          include: {
+            situacaoProblema: true,
+          },
+        },
       },
     });
   }

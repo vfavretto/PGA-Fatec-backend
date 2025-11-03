@@ -6,7 +6,7 @@
 @deliverableId = 1
 @attachmentId = 1
 @themeId = 1
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im11cmlsb0BleGFtcGxlLmNvbSIsInBlc3NvYV9pZCI6MSwibm9tZSI6Ik11cmlsbyIsInRpcG9fdXN1YXJpbyI6IkFkbWluaXN0cmFkb3IiLCJpYXQiOjE3NTk3MTg4NjEsImV4cCI6MTc1OTgwNTI2MX0.gRFi0rDyu_rpgInTThuic01qKvV5IbjROZhBXhE6oIA
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbUBleGFtcGxlLmNvbSIsInBlc3NvYV9pZCI6MSwibm9tZSI6IkFkbWluIiwidGlwb191c3VhcmlvIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc2MjEwMTAxNywiZXhwIjoxNzYyMTg3NDE3fQ.UVrSKkWvwWB5AOo5aPUoQdS5QMbSQ7TnAYDzkw8XK34
 
 ### --------------------------
 ### AUTH
@@ -17,8 +17,8 @@ POST {{baseURL}}auth/login
 Content-Type: application/json
 
 {
-  "email": "admin@exemplo.com",
-  "senha": "SenhaSegura123!"
+  "email": "adm@example.com",
+  "senha": "Senh@123"
 }
 
 
@@ -36,7 +36,7 @@ Content-Type: application/json
   "nome": "Admin",
   "email": "adm@example.com",
   "senha": "Senh@123",
-  "tipo_usuario": "Docente" // O primeiro usuário sempre será convertido para Administrador
+  "tipo_usuario": "Docente"
 }
 
 
@@ -73,19 +73,19 @@ Authorization: Bearer {{token}}
 ### Solicitar redefinição de senha
 POST {{baseURL}}users/reset-password
 Content-Type: application/json
-
+// Nesse caso é somente exemplo. Use um email válido para receber o token temporário.
 {
-  "email": "murilo@example.com"
+  "email": "adm@example.com"
 }
 
 
 ### Confirmar redefinição de senha
 POST {{baseURL}}users/reset-password/confirm
 Content-Type: application/json
-
+// Use o token temporário recebido por email.
 {
   "token": "token-temporario",
-  "password": "novaSenha123"
+  "password": "novaSenh@123"
 }
 
 
@@ -95,8 +95,8 @@ POST {{baseURL}}users/request-access
 Content-Type: application/json
 
 {
-  "nome": "João Silva Santos",
-  "email": "joao.silva@fatec.sp.gov.br",
+  "nome": "Murilo R Santos",
+  "email": "murilo.santos58@fatec.sp.gov.br",
   "codigo_unidade": "F301"
 }
 
