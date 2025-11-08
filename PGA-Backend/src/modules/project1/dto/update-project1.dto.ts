@@ -1,5 +1,5 @@
-import { IsOptional, IsNumber, IsNumberString } from 'class-validator';
-import { Prisma } from '@prisma/client';
+import { IsOptional } from 'class-validator';
+import { Prisma, StatusProjetoRegional } from '@prisma/client';
 
 export class UpdateProject1Dto {
   @IsOptional()
@@ -72,4 +72,28 @@ export class UpdateProject1Dto {
 
   @IsOptional()
   ativo?: boolean | Prisma.BoolFieldUpdateOperationsInput;
+
+  @IsOptional()
+  status_regional?:
+    | StatusProjetoRegional
+    | Prisma.EnumStatusProjetoRegionalFieldUpdateOperationsInput;
+
+  @IsOptional()
+  parecer_regional?:
+    | string
+    | Prisma.NullableStringFieldUpdateOperationsInput
+    | null;
+
+  @IsOptional()
+  data_parecer_regional?:
+    | Date
+    | string
+    | Prisma.NullableDateTimeFieldUpdateOperationsInput
+    | null;
+
+  @IsOptional()
+  regional_responsavel_id?:
+    | number
+    | Prisma.NullableIntFieldUpdateOperationsInput
+    | null;
 }

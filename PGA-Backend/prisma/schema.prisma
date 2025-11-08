@@ -49,6 +49,9 @@ model PGA {
   configuracoes_snapshot    Json?
   data_snapshot_criado      DateTime              @default(now())
   usuario_criacao_id        Int?
+  regional_responsavel_id   Int?
+  parecer_regional          String?               @db.Text
+  data_parecer_regional     DateTime?
   ativo                     Boolean               @default(true)
   acoesCPA                  AcaoCPA[]
   acoesProjetos             AcaoProjeto[]
@@ -56,6 +59,7 @@ model PGA {
   rotinas                   RotinaInstitucional[]
   situacoesProblemas        PGASituacaoProblema[]
   usuarioCriacao            Pessoa?               @relation("PGACriador", fields: [usuario_criacao_id], references: [pessoa_id])
+  regionalResponsavel       Pessoa?               @relation("PGARegionalResponsavel", fields: [regional_responsavel_id], references: [pessoa_id], onDelete: SetNull)
 }
 
 model SituacaoProblema {
@@ -166,6 +170,10 @@ model AcaoProjeto {
   ativo                                  Boolean          @default(true)
   custo_total_estimado                   Decimal?        @db.Decimal(10, 2)
   fonte_recursos                         String?         @db.VarChar(255)
+  status_regional                        StatusProjetoRegional @default(EmAnalise)
+  parecer_regional                       String?         @db.Text
+  data_parecer_regional                  DateTime?
+  regional_responsavel_id                Int?
   eixo                                   EixoTematico     @relation(fields: [eixo_id], references: [eixo_id])
   tema                                   Tema             @relation(fields: [tema_id], references: [tema_id])
   pga                                    PGA              @relation(fields: [pga_id], references: [pga_id])
@@ -173,8 +181,10 @@ model AcaoProjeto {
   situacoesProblemas                     AcaoProjetoSituacaoProblema[]
   etapas                                 EtapaProcesso[]
   pessoas                                ProjetoPessoa[]
+  regionalResponsavel                    Pessoa?          @relation("ProjetoRegionalResponsavel", fields: [regional_responsavel_id], references: [pessoa_id], onDelete: SetNull)
 
   @@index([codigo_projeto])
+  @@index([status_regional])
 }
 
 model Pessoa {
@@ -233,6 +243,8 @@ model Pessoa {
   entregaveisAtualizados         EntregavelLinkSei[]          @relation("EntregavelAtualizador")
 
   solicitacoesProcessadas  SolicitacaoAcesso[] @relation("ProcessadorSolicitacao")
+  pgasAvaliadosRegional    PGA[]               @relation("PGARegionalResponsavel")
+  projetosAvaliadosRegional AcaoProjeto[]      @relation("ProjetoRegionalResponsavel")
 }
 
 model ProjetoPessoa {
@@ -483,6 +495,12 @@ enum StatusCurso {
   EmImplantacao
   Ativo
   Inativo
+}
+
+enum StatusProjetoRegional {
+  EmAnalise
+  Aprovado
+  Reprovado
 }
 
 enum AnexoProjetoUm {

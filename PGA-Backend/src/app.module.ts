@@ -24,7 +24,7 @@ import { RoutineOccurrenceModule } from './modules/routineOccurrence/routine-occ
 import { RoutineParticipantModule } from './modules/routineParticipant/routine-participant.module';
 import { UnitModule } from './modules/unit/unit.module';
 import { AuditModule } from './modules/audit/audit.module';
-import { RegionalController } from './modules/regional/regional.controller';
+import { RegionalModule } from './modules/regional/regional.module';
 
 @Module({
   imports: [
@@ -52,6 +52,7 @@ import { RegionalController } from './modules/regional/regional.controller';
     RoutineParticipantModule,
     UnitModule,
     AuditModule,
+    RegionalModule,
   ],
   providers: [
     PrismaService,
@@ -60,7 +61,6 @@ import { RegionalController } from './modules/regional/regional.controller';
       useClass: JwtAuthGuard,
     },
   ],
-  controllers: [RegionalController],
   exports: [PrismaService],
 })
 export class AppModule {}
