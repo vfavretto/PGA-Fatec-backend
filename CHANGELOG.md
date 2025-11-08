@@ -7,6 +7,83 @@
 
 ---
 
+## [1.4.0] - 2025-01-05
+
+### ✨ New Features
+
+#### Enhanced Audit System
+- **Audit Interceptor**: Implementação de interceptor global para auditoria automática de todas as operações CRUD
+- **Configuration Snapshot Service**: Serviço para capturar snapshots de configurações por ano
+- **Version Manager Service**: Sistema de gerenciamento de versões com filtros por ano
+- **Enhanced Audit Reporting**: Relatórios detalhados de auditoria com suporte a filtros temporais
+
+#### Performance Improvements
+- **Global Audit Interceptor**: Interceptação automática e transparente de todas as operações
+- **Optimized Database Queries**: Consultas otimizadas para relatórios de auditoria
+- **Enhanced Error Handling**: Melhor tratamento de erros em operações de auditoria
+
+### 🔧 Technical Improvements
+
+#### API Enhancements
+```
+GET /audit/snapshot/:year - Capturar snapshot de configurações por ano
+GET /audit/versions/:year - Obter versões por ano
+POST /audit/log - Registrar logs de auditoria
+GET /audit/summary - Relatório resumido de auditoria
+GET /audit/changes - Relatório de mudanças
+```
+
+#### Service Architecture
+- **Audit Log Service**: Serviço centralizado para logs de auditoria
+- **Configuration Snapshot Service**: Captura automática de snapshots
+- **Version Manager Service**: Gerenciamento avançado de versões
+
+### 🔄 Infrastructure Changes
+- **Global Interceptor Registration**: Interceptor de auditoria registrado globalmente no main.ts
+- **Enhanced CORS Configuration**: Configuração aprimorada de CORS para frontend
+- **Improved Swagger Documentation**: Documentação Swagger com tags organizadas e melhor UX
+
+---
+
+## [1.3.0] - 2024-12-22
+
+### ✨ New Features
+
+#### Enhanced Swagger Documentation
+- **Improved Swagger UI**: Interface aprimorada com customizações visuais
+- **Better API Organization**: Tags organizadas por funcionalidade (Auth, Users, Audit, PGA, Projects, Configuration, Academic)
+- **Enhanced Documentation**: Descrições detalhadas para todos os endpoints
+- **Custom Styling**: Interface personalizada com ícone da Fatec e melhor UX
+
+#### Global Validation & Security
+- **Enhanced Validation Pipes**: Validação global aprimorada com whitelist e transform
+- **Improved CORS Configuration**: Configuração de CORS mais robusta para produção
+- **Security Enhancements**: Melhor configuração de segurança para APIs
+
+#### Module Integration Improvements
+- **Complete Module Registry**: Todos os módulos devidamente registrados no AppModule
+- **Consistent Service Architecture**: Arquitetura consistente entre todos os módulos
+- **Enhanced Error Handling**: Tratamento de erros padronizado em toda a aplicação
+
+### 🔧 Technical Improvements
+
+#### Application Bootstrap
+- **Enhanced Main Configuration**: Configuração principal aprimorada com interceptors globais
+- **JWT Guard Integration**: Guard JWT configurado globalmente para proteção de rotas
+- **Swagger Customization**: Personalização completa da documentação Swagger
+
+#### Database & Migrations
+- **Schema Consistency**: Consistência aprimorada no schema do Prisma
+- **Migration Stability**: Migrações mais estáveis e confiáveis
+- **Enhanced Relationships**: Relacionamentos entre entidades aprimorados
+
+### 📋 API Documentation
+- **Swagger UI Available**: Documentação interativa disponível em `/api`
+- **Bearer Authentication**: Autenticação JWT configurada na documentação
+- **Complete Endpoint Coverage**: Todos os endpoints documentados com exemplos
+
+---
+
 ## [1.2.0] - 2024-12-18
 
 ### ✨ New Features

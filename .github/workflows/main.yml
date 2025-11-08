@@ -16,260 +16,257 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-        token: ${{ secrets.GH_TOKEN }}
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_TOKEN }}
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '22'
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "22"
 
-    - name: Install dependencies
-      run: npm install
-      working-directory: ./PGA-Backend
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./PGA-Backend
 
-    - name: Run linter
-      run: npm run lint || true
-      working-directory: ./PGA-Backend
+      - name: Run linter
+        run: npm run lint || true
+        working-directory: ./PGA-Backend
 
-    - name: Run tests
-      run: npm run test:e2e
-      working-directory: ./PGA-Backend
+      - name: Run tests
+        run: npm run test:e2e
+        working-directory: ./PGA-Backend
 
-    # Versionamento Semântico
-    - name: Install semver
-      if: github.ref == 'refs/heads/main'
-      run: npm install -g semver
-      working-directory: ./PGA-Backend # Can be kept or removed
+      # Versionamento Semântico
+      - name: Install semver
+        if: github.ref == 'refs/heads/main'
+        run: npm install -g semver
+        working-directory: ./PGA-Backend # Can be kept or removed
 
-    - name: Create initial tag if not exists
-      if: github.ref == 'refs/heads/main'
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      run: |
-        # These git commands operate on the repository root
-        git config --global user.name 'github-actions'
-        git config --global user.email 'github-actions@github.com'
-        if [ -z "$(git tag)" ]; then
-          git tag -a v0.0.0 -m "Initial release"
-          git push origin v0.0.0
-        fi
-
-    - name: Calculate and generate new version
-      if: github.ref == 'refs/heads/main'
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      run: |
-        # Fetch tags from the repository root
-        git fetch --tags
-
-        # Get last tag from the repository root
-        LAST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
-        if [ -z "$LAST_TAG" ]; then
-          LAST_TAG="v0.0.0"
-        fi
-
-        echo "Última tag: $LAST_TAG"
-
-        # Get commits since last tag (from repository root)
-        COMMITS=$(git log ${LAST_TAG}..HEAD --pretty=format:"%s")
-
-        # Initialize version increment flags
-        MAJOR=0
-        MINOR=0
-        PATCH=0
-
-        # Analyze commit messages
-        for COMMIT in "$COMMITS"; do
-          if [[ "$COMMIT" == *"BREAKING CHANGE"* ]]; then
-            MAJOR=1
-          elif [[ "$COMMIT" == *"feat"* ]]; then
-            MINOR=1
-          elif [[ "$COMMIT" == *"fix"* ]]; then
-            PATCH=1
+      - name: Create initial tag if not exists
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          # These git commands operate on the repository root
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          if [ -z "$(git tag)" ]; then
+            git tag -a v0.0.0 -m "Initial release"
+            git push origin v0.0.0
           fi
-        done
 
-        # Calculate new version using semver (which is globally available)
-        CURRENT_VERSION=${LAST_TAG#v}
-        NEW_VERSION=$CURRENT_VERSION
+      - name: Calculate and generate new version
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          # Fetch tags from the repository root
+          git fetch --tags
 
-        if [[ $MAJOR -eq 1 ]]; then
-          NEW_VERSION=$(semver -i major $CURRENT_VERSION)
-        elif [[ $MINOR -eq 1 ]]; then
-          NEW_VERSION=$(semver -i minor $CURRENT_VERSION)
-        elif [[ $PATCH -eq 1 ]]; then
-          NEW_VERSION=$(semver -i patch $CURRENT_VERSION)
-        fi
+          # Get last tag from the repository root
+          LAST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          if [ -z "$LAST_TAG" ]; then
+            LAST_TAG="v0.0.0"
+          fi
 
-        echo "Nova versão: $NEW_VERSION"
-        echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
+          echo "Última tag: $LAST_TAG"
 
-    - name: Update package.json version
-      if: github.ref == 'refs/heads/main' && env.new_version != ''
-      run: |
-        CURRENT_VERSION=$(node -p "require('./package.json').version")
-        if [ "$CURRENT_VERSION" != "${{ env.new_version }}" ]; then
-          npm version ${{ env.new_version }} --no-git-tag-version
-        else
-          echo "Versão já está em $CURRENT_VERSION, não é necessário atualizar."
-        fi
-      working-directory: ./PGA-Backend
+          # Get commits since last tag (from repository root)
+          COMMITS=$(git log ${LAST_TAG}..HEAD --pretty=format:"%s")
 
-    # Docker Build, Migrate and Push Steps (Only for main branch and if new version is set)
-    - name: Set up Docker Buildx
-      if: github.ref == 'refs/heads/main' && env.new_version != ''
-      uses: docker/setup-buildx-action@v3
+          # Initialize version increment flags
+          MAJOR=0
+          MINOR=0
+          PATCH=0
 
-    - name: Login to Docker Hub
-      if: github.ref == 'refs/heads/main' && env.new_version != ''
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+          # Analyze commit messages
+          for COMMIT in "$COMMITS"; do
+            if [[ "$COMMIT" == *"BREAKING CHANGE"* ]]; then
+              MAJOR=1
+            elif [[ "$COMMIT" == *"feat"* ]]; then
+              MINOR=1
+            elif [[ "$COMMIT" == *"fix"* ]]; then
+              PATCH=1
+            fi
+          done
 
-    - name: Create .env file for Docker Compose in CI
-      if: github.ref == 'refs/heads/main' && env.new_version != ''
-      run: |
-        echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" > .env
-        echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
-        echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
-        echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-      working-directory: ./PGA-Backend
+          # Calculate new version using semver (which is globally available)
+          CURRENT_VERSION=${LAST_TAG#v}
+          NEW_VERSION=$CURRENT_VERSION
 
-    - name: Build Docker image via docker-compose
-      if: github.ref == 'refs/heads/main' && env.new_version != ''
-      run: |
-        docker compose build --no-cache
-        # Verifica se a imagem foi construída
-        docker images | grep pga-backend
-      working-directory: ./PGA-Backend
+          if [[ $MAJOR -eq 1 ]]; then
+            NEW_VERSION=$(semver -i major $CURRENT_VERSION)
+          elif [[ $MINOR -eq 1 ]]; then
+            NEW_VERSION=$(semver -i minor $CURRENT_VERSION)
+          elif [[ $PATCH -eq 1 ]]; then
+            NEW_VERSION=$(semver -i patch $CURRENT_VERSION)
+          fi
 
-    - name: Start containers for migration
-      if: github.ref == 'refs/heads/main' && env.new_version != ''
-      run: docker compose up -d
-      working-directory: ./PGA-Backend
-      
-    - name: Wait for PostgreSQL to be ready
-      if: github.ref == 'refs/heads/main' && env.new_version != ''
-      run: |
-        echo "Waiting for PostgreSQL to start..."
-        timeout 30s bash -c 'until docker compose exec -T postgres pg_isready; do echo "Waiting for PostgreSQL..." && sleep 2; done'
-      working-directory: ./PGA-Backend
+          echo "Nova versão: $NEW_VERSION"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
 
-    - name: Run Prisma migrations
-      if: github.ref == 'refs/heads/main' && env.new_version != ''
-      run: |
-        # Limpa recursos Docker não utilizados
-        docker system prune -f
-        
-        # Remove containers antigos se existirem
-        docker compose down -v
-        
-        # Reinicia os containers com configurações atualizadas
-        docker compose up -d
-        
-        # Aguarda postgres estar pronto
-        echo "Aguardando PostgreSQL..."
-        timeout 30s bash -c 'until docker compose exec -T postgres pg_isready; do echo "Aguardando PostgreSQL..." && sleep 2; done'
-        
-        # Executa migrações com retry e mais memória
-        for i in {1..3}; do
-          if docker compose exec -T \
-            -e NODE_OPTIONS="--max-old-space-size=4096" \
-            api sh -c "npm cache clean --force && \
-                      rm -rf node_modules/.prisma && \
-                      npx prisma generate && \
-                      npx prisma migrate deploy"; then
-            echo "Migração concluída com sucesso"
-            exit 0
+      - name: Update package.json version
+        if: github.ref == 'refs/heads/main' && env.new_version != ''
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          if [ "$CURRENT_VERSION" != "${{ env.new_version }}" ]; then
+            npm version ${{ env.new_version }} --no-git-tag-version
           else
-            echo "Tentativa $i falhou, tentando novamente em 15s..."
-            sleep 15
+            echo "Versão já está em $CURRENT_VERSION, não é necessário atualizar."
           fi
-        done
-        
-        # Se chegou aqui, todas as tentativas falharam
-        docker compose logs api
-        echo "Todas as tentativas falharam"
-        exit 1
-      working-directory: ./PGA-Backend
-      
-    - name: Tag Docker image
-      if: github.ref == 'refs/heads/main' && env.new_version != ''
-      run: |
-        # Lista todas as imagens para debug
-        echo "Listando imagens disponíveis:"
-        docker images
-        
-        # Obtém o ID da imagem do container api
-        IMAGE_ID=$(docker compose images -q api)
-        if [ -z "$IMAGE_ID" ]; then
-          echo "Erro: Não foi possível encontrar a imagem do container api"
+        working-directory: ./PGA-Backend
+
+      # Docker Build, Migrate and Push Steps (Only for main branch and if new version is set)
+      - name: Set up Docker Buildx
+        if: github.ref == 'refs/heads/main' && env.new_version != ''
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        if: github.ref == 'refs/heads/main' && env.new_version != ''
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Create .env file for Docker Compose in CI
+        if: github.ref == 'refs/heads/main' && env.new_version != ''
+        run: |
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" > .env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+        working-directory: ./PGA-Backend
+
+      - name: Build Docker image via docker-compose
+        if: github.ref == 'refs/heads/main' && env.new_version != ''
+        run: |
+          docker compose build --no-cache
+          # Verifica se a imagem foi construída
+          docker images | grep pga-backend
+        working-directory: ./PGA-Backend
+
+      - name: Start containers for migration
+        if: github.ref == 'refs/heads/main' && env.new_version != ''
+        run: docker compose up -d
+        working-directory: ./PGA-Backend
+
+      - name: Wait for PostgreSQL to be ready
+        if: github.ref == 'refs/heads/main' && env.new_version != ''
+        run: |
+          echo "Waiting for PostgreSQL to start..."
+          timeout 30s bash -c 'until docker compose exec -T postgres pg_isready; do echo "Waiting for PostgreSQL..." && sleep 2; done'
+        working-directory: ./PGA-Backend
+
+      - name: Run Prisma migrations
+        if: github.ref == 'refs/heads/main' && env.new_version != ''
+        run: |
+          # Limpa recursos Docker não utilizados
+          docker system prune -f
+
+          # Remove containers antigos se existirem
+          docker compose down -v
+
+          # Reinicia os containers com configurações atualizadas
+          docker compose up -d
+
+          # Aguarda postgres estar pronto
+          echo "Aguardando PostgreSQL..."
+          timeout 30s bash -c 'until docker compose exec -T postgres pg_isready; do echo "Aguardando PostgreSQL..." && sleep 2; done'
+
+          # Executa migrações com retry e mais memória
+          for i in {1..3}; do
+            if docker compose exec -T \
+              -e NODE_OPTIONS="--max-old-space-size=4096" \
+              api npx prisma migrate deploy; then # Apenas o comando de deploy
+              echo "Migração concluída com sucesso"
+              exit 0
+            else
+              echo "Tentativa $i falhou, tentando novamente em 15s..."
+              sleep 15
+            fi
+          done
+
+          # Se chegou aqui, todas as tentativas falharam
+          docker compose logs api
+          echo "Todas as tentativas falharam"
           exit 1
-        fi
-        
-        # Faz o tag da imagem
-        docker tag $IMAGE_ID ${{ secrets.DOCKERHUB_USERNAME }}/pga-backend:${{ env.new_version }}
-        docker tag $IMAGE_ID ${{ secrets.DOCKERHUB_USERNAME }}/pga-backend:latest
-        
-        # Verifica se o tag foi feito corretamente
-        docker images | grep pga-backend
-      working-directory: ./PGA-Backend
+        working-directory: ./PGA-Backend
 
-    - name: Push Docker image to Docker Hub
-      if: github.ref == 'refs/heads/main' && env.new_version != ''
-      run: |
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/pga-backend:${{ env.new_version }}
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/pga-backend:latest
-      working-directory: ./PGA-Backend
+      - name: Tag Docker image
+        if: github.ref == 'refs/heads/main' && env.new_version != ''
+        run: |
+          # Lista todas as imagens para debug
+          echo "Listando imagens disponíveis:"
+          docker images
 
-    - name: Clean up Docker containers and volumes
-      # Roda sempre que os passos de Docker foram iniciados, mesmo se algum deles falhar, para limpar o runner
-      if: always() && github.ref == 'refs/heads/main' && env.new_version != ''
-      run: docker compose down -v --remove-orphans # -v remove os volumes anônimos
-      working-directory: ./PGA-Backend
-    # End of Docker Build, Migrate and Push Steps
+          # Obtém o ID da imagem do container api
+          IMAGE_ID=$(docker compose images -q api)
+          if [ -z "$IMAGE_ID" ]; then
+            echo "Erro: Não foi possível encontrar a imagem do container api"
+            exit 1
+          fi
 
-    - name: Commit and push new version
-      if: github.ref == 'refs/heads/main' && env.new_version != ''
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      run: |
-        # These git commands operate on the repository root
-        git config --global user.name 'github-actions'
-        git config --global user.email 'github-actions@github.com'
-        git add PGA-Backend/package.json
-        git commit -m "chore(release): version ${{ env.new_version }}" || echo "No changes to commit"
-        # Checa se a tag já existe antes de criar
-        if git rev-parse "v${{ env.new_version }}" >/dev/null 2>&1; then
-          echo "Tag v${{ env.new_version }} já existe, pulando criação."
-        else
-          git tag v${{ env.new_version }}
-          git push origin v${{ env.new_version }}
-        fi
-        git push origin main
-    
-    # Email Notification
-    - name: Send email on failure
-      if: failure()
-      uses: dawidd6/action-send-mail@v3
-      with:
-        server_address: smtp.gmail.com
-        server_port: 587
-        username: ${{secrets.EMAIL_ORIGEM}}
-        password: ${{secrets.SENHA_EMAIL}}
-        subject: Workflow Failure in GitHub Actions
-        body: |
-          The GitHub Actions workflow for ${{ github.repository }} has failed.
+          # Faz o tag da imagem
+          docker tag $IMAGE_ID ${{ secrets.DOCKERHUB_USERNAME }}/pga-backend:${{ env.new_version }}
+          docker tag $IMAGE_ID ${{ secrets.DOCKERHUB_USERNAME }}/pga-backend:latest
 
-          Workflow: ${{ github.workflow }}
-          Action: ${{ github.action }}
-          Repository: ${{ github.repository }}
+          # Verifica se o tag foi feito corretamente
+          docker images | grep pga-backend
+        working-directory: ./PGA-Backend
 
-          Check the Actions tab for more details.
-        to: ${{secrets.EMAIL_DESTINO}}
-        from: ${{secrets.EMAIL_ORIGEM}}
+      - name: Push Docker image to Docker Hub
+        if: github.ref == 'refs/heads/main' && env.new_version != ''
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/pga-backend:${{ env.new_version }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/pga-backend:latest
+        working-directory: ./PGA-Backend
+
+      - name: Clean up Docker containers and volumes
+        # Roda sempre que os passos de Docker foram iniciados, mesmo se algum deles falhar, para limpar o runner
+        if: always() && github.ref == 'refs/heads/main' && env.new_version != ''
+        run: docker compose down -v --remove-orphans # -v remove os volumes anônimos
+        working-directory: ./PGA-Backend
+      # End of Docker Build, Migrate and Push Steps
+
+      - name: Commit and push new version
+        if: github.ref == 'refs/heads/main' && env.new_version != ''
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          # These git commands operate on the repository root
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git add PGA-Backend/package.json
+          git commit -m "chore(release): version ${{ env.new_version }}" || echo "No changes to commit"
+          # Checa se a tag já existe antes de criar
+          if git rev-parse "v${{ env.new_version }}" >/dev/null 2>&1; then
+            echo "Tag v${{ env.new_version }} já existe, pulando criação."
+          else
+            git tag v${{ env.new_version }}
+            git push origin v${{ env.new_version }}
+          fi
+          git push origin main
+
+      # Email Notification
+      - name: Send email on failure
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{secrets.EMAIL_ORIGEM}}
+          password: ${{secrets.SENHA_EMAIL}}
+          subject: Workflow Failure in GitHub Actions
+          body: |
+            The GitHub Actions workflow for ${{ github.repository }} has failed.
+
+            Workflow: ${{ github.workflow }}
+            Action: ${{ github.action }}
+            Repository: ${{ github.repository }}
+
+            Check the Actions tab for more details.
+          to: ${{secrets.EMAIL_DESTINO}}
+          from: ${{secrets.EMAIL_ORIGEM}}

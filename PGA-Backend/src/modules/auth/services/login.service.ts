@@ -7,7 +7,7 @@ import { LoginPayload } from '../interfaces/loginPayload.interface';
 export class LoginService {
   constructor(private jwtService: JwtService) {}
 
-  async execute(user: LoginPayload): Promise<TokenDto> {
+  execute(user: LoginPayload): Promise<TokenDto> {
     if (!user || !user.email || !user.pessoa_id) {
       throw new UnauthorizedException('Credenciais inválidas');
     }
@@ -19,8 +19,14 @@ export class LoginService {
       tipo_usuario: user.tipo_usuario,
     };
 
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
+    // create an access token (shorter lived)
+    const access = this.jwtService.sign(payload, { expiresIn: '24h' });
+    // create a refresh token (longer lived) - same payload signed again
+    const refresh = this.jwtService.sign(payload, { expiresIn: '30d' });
+
+    return Promise.resolve({
+      access_token: access,
+      refresh_token: refresh,
+    });
   }
 }
