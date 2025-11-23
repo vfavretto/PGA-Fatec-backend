@@ -250,23 +250,39 @@ jobs:
           fi
           git push origin main
 
-      # Email Notification
-      - name: Send email on failure
-        if: failure()
-        uses: dawidd6/action-send-mail@v3
+
+  deploy-ec2:
+    runs-on: ubuntu-latest
+    needs: [build-and-test]
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
         with:
-          server_address: smtp.gmail.com
-          server_port: 587
-          username: ${{secrets.EMAIL_ORIGEM}}
-          password: ${{secrets.SENHA_EMAIL}}
-          subject: Workflow Failure in GitHub Actions
-          body: |
-            The GitHub Actions workflow for ${{ github.repository }} has failed.
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # Para e remove o container antigo se existir
+            docker stop pga-api || true
+            docker rm pga-api || true
 
-            Workflow: ${{ github.workflow }}
-            Action: ${{ github.action }}
-            Repository: ${{ github.repository }}
+            # Faz o pull da imagem mais recente do Docker Hub
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pga-backend:latest
 
-            Check the Actions tab for more details.
-          to: ${{secrets.EMAIL_DESTINO}}
-          from: ${{secrets.EMAIL_ORIGEM}}
+            # Remove imagens antigas não utilizadas (opcional, para economizar espaço)
+            docker image prune -f
+
+            # Executa o novo container com as variáveis de ambiente
+            docker run -d \
+              --name pga-api \
+              -p 3000:3000 \
+              -e DATABASE_URL="${{ secrets.RDS_DATABASE_URL }}" \
+              -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
+              -e FRONTEND_URL="${{ secrets.FRONTEND_URL }}" \
+              --restart unless-stopped \
+              ${{ secrets.DOCKERHUB_USERNAME }}/pga-backend:latest
+
+            # Verifica se o container está rodando
+            docker ps | grep pga-api

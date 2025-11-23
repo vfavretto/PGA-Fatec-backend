@@ -16,6 +16,7 @@ import {
   ForbiddenException,
   UseGuards,
 } from '@nestjs/common';
+import { Request as ExpressRequest } from 'express';
 import {
   ApiTags,
   ApiOperation,
@@ -74,8 +75,10 @@ export class UserController {
   @ApiBody({ type: RegisterDto })
   @ApiResponse({ status: 201, description: 'Usuário criado com sucesso' })
   @ApiResponse({ status: 400, description: 'Dados inválidos' })
-  async create(@Body() data: RegisterDto) {
-    return this.createUserService.execute(data);
+  async create(@Body() data: RegisterDto, @Request() req?: ExpressRequest & { user?: any }) {
+    // req.user pode ser undefined para chamadas públicas
+    const reqUser = req?.user ?? null;
+    return this.createUserService.execute(data as any, reqUser);
   }
 
   @Get()

@@ -6,17 +6,24 @@ import {
   HttpCode,
   HttpStatus,
   Request,
+  Get,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { LoginService } from './services/login.service';
+import { JwtService } from '@nestjs/jwt';
 import { Public } from './decorators/is-public.decorator';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { CurrentUser } from './decorators/current-user.decorator';
 import { LoginDto } from './dto/login.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly loginService: LoginService) {}
+  constructor(
+    private readonly loginService: LoginService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   @Public()
   @UseGuards(LocalAuthGuard)
@@ -66,7 +73,39 @@ export class AuthController {
     },
   })
   @HttpCode(HttpStatus.OK)
-  async login(@Request() req, @Body() loginDto: LoginDto) {
+  async login(@Request() req: any) {
     return this.loginService.execute(req.user);
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Validar token e retornar usuário autenticado',
+    description: 'Retorna os dados básicos do usuário associado ao token JWT enviado',
+  })
+  @ApiResponse({ status: 200, description: 'Token válido - retorna usuário' })
+  @ApiResponse({ status: 401, description: 'Token inválido ou ausente' })
+  me(@CurrentUser() user: any) {
+    // apenas retorna o objeto user que já foi populado pela estratégia JWT
+    return user;
+  }
+
+  @Public()
+  @Post('refresh')
+  @ApiOperation({ summary: 'Trocar refresh token por novo access token' })
+  @ApiResponse({ status: 200, description: 'Novo access token emitido' })
+  @ApiResponse({ status: 400, description: 'Refresh token inválido' })
+  refresh(@Body('refresh_token') refreshToken: string) {
+    if (!refreshToken) {
+      return { error: 'refresh_token é obrigatório' };
+    }
+    try {
+      const payload: any = this.jwtService.verify(refreshToken);
+      // re-emit access token with standard expiry
+      const access = this.jwtService.sign(payload, { expiresIn: '24h' });
+      return { access_token: access };
+    } catch (e) {
+      return { error: 'refresh_token inválido' };
+    }
   }
 }

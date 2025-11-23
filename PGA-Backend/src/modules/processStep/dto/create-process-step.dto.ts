@@ -1,4 +1,12 @@
-import { IsInt, IsNotEmpty, IsOptional, IsString, IsDateString, IsEnum, MaxLength } from 'class-validator';
+import {
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsDateString,
+  IsEnum,
+  MaxLength,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { StatusVerificacao } from '@prisma/client';
 
@@ -6,7 +14,7 @@ export class CreateProcessStepDto {
   @ApiProperty({
     description: 'ID da ação de projeto relacionada',
     example: 1,
-    type: 'integer'
+    type: 'integer',
   })
   @IsNotEmpty()
   @IsInt()
@@ -14,7 +22,7 @@ export class CreateProcessStepDto {
 
   @ApiProperty({
     description: 'Descrição da etapa do processo',
-    example: 'Análise de requisitos do sistema'
+    example: 'Análise de requisitos do sistema',
   })
   @IsNotEmpty()
   @IsString()
@@ -23,7 +31,7 @@ export class CreateProcessStepDto {
   @ApiPropertyOptional({
     description: 'ID do entregável relacionado',
     example: 2,
-    type: 'integer'
+    type: 'integer',
   })
   @IsOptional()
   @IsInt()
@@ -32,7 +40,7 @@ export class CreateProcessStepDto {
   @ApiPropertyOptional({
     description: 'Número de referência da etapa',
     example: 'ET-001',
-    maxLength: 50
+    maxLength: 50,
   })
   @IsOptional()
   @IsString()
@@ -43,7 +51,7 @@ export class CreateProcessStepDto {
     description: 'Data prevista para verificação',
     example: '2024-06-15',
     type: 'string',
-    format: 'date'
+    format: 'date',
   })
   @IsOptional()
   @IsDateString()
@@ -53,7 +61,7 @@ export class CreateProcessStepDto {
     description: 'Data em que a verificação foi realizada',
     example: '2024-06-10',
     type: 'string',
-    format: 'date'
+    format: 'date',
   })
   @IsOptional()
   @IsDateString()
@@ -62,7 +70,7 @@ export class CreateProcessStepDto {
   @ApiPropertyOptional({
     description: 'Status da verificação da etapa',
     enum: StatusVerificacao,
-    example: 'Pendente'
+    example: 'Pendente',
   })
   @IsOptional()
   @IsEnum(StatusVerificacao)
