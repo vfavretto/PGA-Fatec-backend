@@ -25,6 +25,7 @@ export class Project1Repository extends BaseRepository<AcaoProjeto> {
         pga: true,
         prioridade: true,
         tema: true,
+        regionalResponsavel: true,
         etapas: {
           where: this.whereActive(),
         },
@@ -52,6 +53,7 @@ export class Project1Repository extends BaseRepository<AcaoProjeto> {
         pga: true,
         prioridade: true,
         tema: true,
+        regionalResponsavel: true,
         etapas: {
           where: this.whereActive(),
         },
@@ -92,6 +94,7 @@ export class Project1Repository extends BaseRepository<AcaoProjeto> {
         eixo: true,
         prioridade: true,
         tema: true,
+        regionalResponsavel: true,
       },
     });
   }

@@ -22,6 +22,7 @@ export class PgaRepository extends BaseRepository<PGA> {
       where: this.whereActive(),
       include: {
         unidade: true,
+        regionalResponsavel: true,
       },
       orderBy: [{ ano: 'desc' }, { unidade: { nome_completo: 'asc' } }],
     });
@@ -32,6 +33,7 @@ export class PgaRepository extends BaseRepository<PGA> {
       where: this.whereActive({ pga_id: id }),
       include: {
         unidade: true,
+        regionalResponsavel: true,
         situacoesProblemas: {
           where: this.whereActive(),
           include: {
