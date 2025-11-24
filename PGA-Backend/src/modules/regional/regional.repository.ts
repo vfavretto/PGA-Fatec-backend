@@ -133,23 +133,22 @@ export class RegionalRepository {
       return [];
     }
 
-    const where: Prisma.AcaoProjetoWhereInput = {
-      ativo: true,
-      pga: {
-        unidade_id: { in: unidadeIds },
-      },
-    };
+    let unidadeFilter: number | { in: number[] } = { in: unidadeIds };
 
     if (filters.unidadeId) {
       if (!unidadeIds.includes(filters.unidadeId)) {
         return [];
       }
 
-      where.pga = {
-        ...(where.pga ?? {}),
-        unidade_id: filters.unidadeId,
-      };
+      unidadeFilter = filters.unidadeId;
     }
+
+    const where: Prisma.AcaoProjetoWhereInput = {
+      ativo: true,
+      pga: {
+        unidade_id: unidadeFilter,
+      },
+    };
 
     if (filters.pgaId) {
       where.pga_id = filters.pgaId;
