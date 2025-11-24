@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LoginService } from './services/login.service';
 import { ValidateUserService } from './services/validate-user.service';
 import { AuthController } from './auth.controller';
+import { ContextService } from './services/context.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { UserModule } from '../user/user.module';
@@ -37,6 +38,7 @@ import { PrismaService } from '../../config/prisma.service';
     LocalStrategy,
     JwtStrategy,
     PrismaService,
+    ContextService,
   ],
   exports: [LoginService, ValidateUserService, JwtModule],
 })

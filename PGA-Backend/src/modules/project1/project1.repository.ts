@@ -45,6 +45,69 @@ export class Project1Repository extends BaseRepository<AcaoProjeto> {
     });
   }
 
+  async findAllByUnit(unidadeId: number) {
+    return this.prisma.acaoProjeto.findMany({
+      where: this.whereActive({ pga: { unidade_id: unidadeId } }),
+      include: {
+        eixo: true,
+        pga: { include: { unidade: true } },
+        prioridade: true,
+        tema: true,
+        regionalResponsavel: true,
+        etapas: { where: this.whereActive() },
+        pessoas: { where: this.whereActive(), include: { pessoa: true } },
+        situacoesProblemas: { where: this.whereActive(), include: { situacaoProblema: true } },
+      },
+      orderBy: [{ pga: { ano: 'desc' } }, { codigo_projeto: 'asc' }],
+    });
+  }
+
+  async findAllByRegional(regionalId: number) {
+    const vinculos = await this.prisma.pessoaUnidade.findMany({
+      where: { pessoa_id: regionalId, ativo: true },
+      select: { unidade_id: true },
+    });
+    const unidadeIds = vinculos.map((v) => v.unidade_id);
+    if (!unidadeIds.length) return [];
+
+    return this.prisma.acaoProjeto.findMany({
+      where: this.whereActive({ pga: { unidade_id: { in: unidadeIds } } }),
+      include: {
+        eixo: true,
+        pga: { include: { unidade: true } },
+        prioridade: true,
+        tema: true,
+        regionalResponsavel: true,
+        etapas: { where: this.whereActive() },
+        pessoas: { where: this.whereActive(), include: { pessoa: true } },
+        situacoesProblemas: { where: this.whereActive(), include: { situacaoProblema: true } },
+      },
+      orderBy: [{ pga: { ano: 'desc' } }, { codigo_projeto: 'asc' }],
+    });
+  }
+
+  async findOneWithContext(id: number, active_context?: { tipo: string; id?: number } | null) {
+    const projeto = await this.findOne(id);
+    if (!projeto) return null;
+
+    if (active_context) {
+      if (active_context.tipo === 'unidade') {
+        if (projeto.pga.unidade_id !== Number(active_context.id)) return null;
+      }
+
+      if (active_context.tipo === 'regional') {
+        const vinculos = await this.prisma.pessoaUnidade.findMany({
+          where: { pessoa_id: Number(active_context.id), ativo: true },
+          select: { unidade_id: true },
+        });
+        const ids = vinculos.map((v) => v.unidade_id);
+        if (!ids.includes(projeto.pga.unidade_id)) return null;
+      }
+    }
+
+    return projeto;
+  }
+
   async findOne(id: number) {
     return this.prisma.acaoProjeto.findFirst({
       where: this.whereActive({ acao_projeto_id: id }),

@@ -6,8 +6,8 @@ import { CpaAction } from '../entities/cpa-action.entity';
 export class FindOneCpaActionService {
   constructor(private readonly repository: CpaActionRepository) {}
 
-  async execute(id: number): Promise<CpaAction> {
-    const action = await this.repository.findOne(id);
+  async execute(id: number, user?: any): Promise<CpaAction> {
+    const action = await this.repository.findOneWithContext(id, user?.active_context);
     if (!action) throw new NotFoundException('AcaoCPA não encontrada');
     return action;
   }

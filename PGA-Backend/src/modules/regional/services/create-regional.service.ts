@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { RegionalRepository } from '../regional.repository';
+import { CreateRegionalDto } from '../dto/create-regional.dto';
 
 @Injectable()
-export class ListRegionalUnitsService {
+export class CreateRegionalService {
   constructor(private readonly repository: RegionalRepository) {}
 
-  async execute(regionalId: number) {
-    return this.repository.findUnitsByRegional(regionalId);
+  async execute(data: CreateRegionalDto) {
+    return this.repository.create(data);
   }
 }

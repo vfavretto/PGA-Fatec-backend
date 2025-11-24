@@ -6,8 +6,8 @@ import { Unit } from '../entities/unit.entity';
 export class FindOneUnitService {
   constructor(private readonly repository: UnitRepository) {}
 
-  async execute(id: number): Promise<Unit> {
-    const unidade = await this.repository.findOne(id);
+  async execute(id: number, user?: any): Promise<Unit> {
+    const unidade = await this.repository.findOneWithContext(id, user?.active_context);
     if (!unidade) throw new NotFoundException('Unidade não encontrada');
     return unidade;
   }

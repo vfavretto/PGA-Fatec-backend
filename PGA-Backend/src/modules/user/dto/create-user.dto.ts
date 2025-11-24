@@ -29,18 +29,20 @@ export class CreateUserDto {
   email: string;
 
   @ApiProperty({
-    description: 'Senha do usuário',
+    description:
+      'Senha do usuário (opcional). Se omitida, será enviado link para definir senha',
     example: 'MinhaSenh@123',
     minLength: 6,
+    required: false,
   })
+  @IsOptional()
   @IsString({ message: 'A senha deve ser uma string' })
-  @IsNotEmpty({ message: 'A senha é obrigatória' })
   @MinLength(6, { message: 'A senha deve ter pelo menos 6 caracteres' })
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
     message:
       'A senha deve conter pelo menos uma letra maiúscula, uma letra minúscula e um número ou caractere especial',
   })
-  senha: string;
+  senha?: string;
 
   @ApiProperty({
     description: 'Tipo de usuário no sistema',
@@ -61,4 +63,13 @@ export class CreateUserDto {
   })
   @IsOptional()
   unidade_id?: number;
+
+  @ApiProperty({
+    description:
+      'ID da regional (opcional). Obrigatório para tipo_usuario = Regional',
+    example: 1,
+    required: false,
+  })
+  @IsOptional()
+  regional_id?: number;
 }

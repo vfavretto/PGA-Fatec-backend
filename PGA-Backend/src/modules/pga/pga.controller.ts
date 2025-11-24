@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Get,
-  Param,
-  Put,
-  Delete,
-  ParseIntPipe,
-} from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Put, Delete, ParseIntPipe, Request, UseGuards } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -23,10 +14,12 @@ import { FindAllPgaService } from './services/find-all-pga.service';
 import { FindOnePgaService } from './services/find-one-pga.service';
 import { UpdatePgaService } from './services/update-pga.service';
 import { DeletePgaService } from './services/delete-pga.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('PGA')
 @ApiBearerAuth('JWT-auth')
 @Controller('pga')
+@UseGuards(JwtAuthGuard)
 export class PgaController {
   constructor(
     private readonly createPgaService: CreatePgaService,
@@ -57,8 +50,8 @@ export class PgaController {
     status: 200,
     description: 'Lista de PGAs retornada com sucesso',
   })
-  findAll() {
-    return this.findAllPgaService.execute();
+  findAll(@Request() req: any) {
+    return this.findAllPgaService.execute(req.user);
   }
 
   @Get(':id')
@@ -69,8 +62,8 @@ export class PgaController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID do PGA' })
   @ApiResponse({ status: 200, description: 'PGA encontrado com sucesso' })
   @ApiResponse({ status: 404, description: 'PGA não encontrado' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.findOnePgaService.execute(id);
+  findOne(@Request() req: any, @Param('id', ParseIntPipe) id: number) {
+    return this.findOnePgaService.execute(id, req.user);
   }
 
   @Put(':id')

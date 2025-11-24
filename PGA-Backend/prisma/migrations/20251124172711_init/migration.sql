@@ -32,6 +32,9 @@ CREATE TYPE "TipoCurso" AS ENUM ('Tecnologico', 'AMS', 'Outro');
 CREATE TYPE "StatusCurso" AS ENUM ('EmPlanejamento', 'EmImplantacao', 'Ativo', 'Inativo');
 
 -- CreateEnum
+CREATE TYPE "StatusProjetoRegional" AS ENUM ('EmAnalise', 'Aprovado', 'Reprovado');
+
+-- CreateEnum
 CREATE TYPE "AnexoProjetoUm" AS ENUM ('1', '2', '3', '4');
 
 -- CreateEnum
@@ -44,7 +47,8 @@ CREATE TYPE "StatusSolicitacao" AS ENUM ('Pendente', 'Aprovada', 'Rejeitada');
 CREATE TABLE "Unidade" (
     "unidade_id" SERIAL NOT NULL,
     "codigo_fnnn" VARCHAR(10) NOT NULL,
-    "nome_completo" VARCHAR(255) NOT NULL,
+    "nome_unidade" VARCHAR(255) NOT NULL,
+    "regional_id" INTEGER NOT NULL,
     "ativo" BOOLEAN NOT NULL DEFAULT true,
     "diretor_id" INTEGER,
     "endereco" VARCHAR(255),
@@ -76,6 +80,9 @@ CREATE TABLE "PGA" (
     "configuracoes_snapshot" JSONB,
     "data_snapshot_criado" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "usuario_criacao_id" INTEGER,
+    "regional_responsavel_id" INTEGER,
+    "parecer_regional" TEXT,
+    "data_parecer_regional" TIMESTAMP(3),
     "ativo" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "PGA_pkey" PRIMARY KEY ("pga_id")
@@ -101,7 +108,7 @@ CREATE TABLE "SituacaoProblema" (
 CREATE TABLE "EixoTematico" (
     "eixo_id" SERIAL NOT NULL,
     "numero" INTEGER NOT NULL,
-    "nome" VARCHAR(255) NOT NULL,
+    "nome_eixo" VARCHAR(255) NOT NULL,
     "descricao" TEXT,
     "ativo" BOOLEAN NOT NULL DEFAULT true,
     "criado_em" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -146,6 +153,8 @@ CREATE TABLE "Tema" (
 -- CreateTable
 CREATE TABLE "AcaoProjeto" (
     "acao_projeto_id" SERIAL NOT NULL,
+    "codigo_projeto" VARCHAR(20) NOT NULL,
+    "nome_projeto" VARCHAR(255),
     "pga_id" INTEGER NOT NULL,
     "eixo_id" INTEGER NOT NULL,
     "prioridade_id" INTEGER NOT NULL,
@@ -160,6 +169,10 @@ CREATE TABLE "AcaoProjeto" (
     "ativo" BOOLEAN NOT NULL DEFAULT true,
     "custo_total_estimado" DECIMAL(10,2),
     "fonte_recursos" VARCHAR(255),
+    "status_regional" "StatusProjetoRegional" NOT NULL DEFAULT 'EmAnalise',
+    "parecer_regional" TEXT,
+    "data_parecer_regional" TIMESTAMP(3),
+    "regional_responsavel_id" INTEGER,
 
     CONSTRAINT "AcaoProjeto_pkey" PRIMARY KEY ("acao_projeto_id")
 );
@@ -484,11 +497,39 @@ CREATE TABLE "PessoaUnidade" (
     CONSTRAINT "PessoaUnidade_pkey" PRIMARY KEY ("pessoa_id","unidade_id")
 );
 
+-- CreateTable
+CREATE TABLE "PessoaRegional" (
+    "pessoa_id" INTEGER NOT NULL,
+    "regional_id" INTEGER NOT NULL,
+    "data_vinculo" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "ativo" BOOLEAN NOT NULL DEFAULT true,
+
+    CONSTRAINT "PessoaRegional_pkey" PRIMARY KEY ("pessoa_id","regional_id")
+);
+
+-- CreateTable
+CREATE TABLE "Regional" (
+    "regional_id" SERIAL NOT NULL,
+    "nome_regional" VARCHAR(255) NOT NULL,
+    "codigo_regional" VARCHAR(10),
+    "responsavel_id" INTEGER,
+    "ativo" BOOLEAN NOT NULL DEFAULT true,
+    "criado_em" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "atualizado_em" TIMESTAMP(3) NOT NULL,
+    "criado_por" INTEGER,
+    "atualizado_por" INTEGER,
+
+    CONSTRAINT "Regional_pkey" PRIMARY KEY ("regional_id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Unidade_codigo_fnnn_key" ON "Unidade"("codigo_fnnn");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Unidade_diretor_id_key" ON "Unidade"("diretor_id");
+
+-- CreateIndex
+CREATE INDEX "Unidade_regional_id_idx" ON "Unidade"("regional_id");
 
 -- CreateIndex
 CREATE INDEX "SituacaoProblema_codigo_categoria_idx" ON "SituacaoProblema"("codigo_categoria");
@@ -507,6 +548,15 @@ CREATE UNIQUE INDEX "PrioridadeAcao_grau_key" ON "PrioridadeAcao"("grau");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Tema_tema_num_eixo_id_key" ON "Tema"("tema_num", "eixo_id");
+
+-- CreateIndex
+CREATE INDEX "AcaoProjeto_codigo_projeto_idx" ON "AcaoProjeto"("codigo_projeto");
+
+-- CreateIndex
+CREATE INDEX "AcaoProjeto_status_regional_idx" ON "AcaoProjeto"("status_regional");
+
+-- CreateIndex
+CREATE INDEX "AcaoProjeto_pga_id_idx" ON "AcaoProjeto"("pga_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Pessoa_email_key" ON "Pessoa"("email");
@@ -562,6 +612,9 @@ CREATE UNIQUE INDEX "EntregavelVersao_entregavel_base_id_ano_key" ON "Entregavel
 -- CreateIndex
 CREATE UNIQUE INDEX "PessoaVersao_pessoa_base_id_ano_key" ON "PessoaVersao"("pessoa_base_id", "ano");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "Regional_codigo_regional_key" ON "Regional"("codigo_regional");
+
 -- AddForeignKey
 ALTER TABLE "Unidade" ADD CONSTRAINT "Unidade_diretor_id_fkey" FOREIGN KEY ("diretor_id") REFERENCES "Pessoa"("pessoa_id") ON DELETE SET NULL ON UPDATE CASCADE;
 
@@ -572,10 +625,16 @@ ALTER TABLE "Unidade" ADD CONSTRAINT "Unidade_criado_por_fkey" FOREIGN KEY ("cri
 ALTER TABLE "Unidade" ADD CONSTRAINT "Unidade_atualizado_por_fkey" FOREIGN KEY ("atualizado_por") REFERENCES "Pessoa"("pessoa_id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Unidade" ADD CONSTRAINT "Unidade_regional_id_fkey" FOREIGN KEY ("regional_id") REFERENCES "Regional"("regional_id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "PGA" ADD CONSTRAINT "PGA_unidade_id_fkey" FOREIGN KEY ("unidade_id") REFERENCES "Unidade"("unidade_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "PGA" ADD CONSTRAINT "PGA_usuario_criacao_id_fkey" FOREIGN KEY ("usuario_criacao_id") REFERENCES "Pessoa"("pessoa_id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PGA" ADD CONSTRAINT "PGA_regional_responsavel_id_fkey" FOREIGN KEY ("regional_responsavel_id") REFERENCES "Pessoa"("pessoa_id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "SituacaoProblema" ADD CONSTRAINT "SituacaoProblema_criado_por_fkey" FOREIGN KEY ("criado_por") REFERENCES "Pessoa"("pessoa_id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -615,6 +674,9 @@ ALTER TABLE "AcaoProjeto" ADD CONSTRAINT "AcaoProjeto_pga_id_fkey" FOREIGN KEY (
 
 -- AddForeignKey
 ALTER TABLE "AcaoProjeto" ADD CONSTRAINT "AcaoProjeto_prioridade_id_fkey" FOREIGN KEY ("prioridade_id") REFERENCES "PrioridadeAcao"("prioridade_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "AcaoProjeto" ADD CONSTRAINT "AcaoProjeto_regional_responsavel_id_fkey" FOREIGN KEY ("regional_responsavel_id") REFERENCES "Pessoa"("pessoa_id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Pessoa" ADD CONSTRAINT "Pessoa_criado_por_fkey" FOREIGN KEY ("criado_por") REFERENCES "Pessoa"("pessoa_id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -741,3 +803,18 @@ ALTER TABLE "PessoaUnidade" ADD CONSTRAINT "PessoaUnidade_pessoa_id_fkey" FOREIG
 
 -- AddForeignKey
 ALTER TABLE "PessoaUnidade" ADD CONSTRAINT "PessoaUnidade_unidade_id_fkey" FOREIGN KEY ("unidade_id") REFERENCES "Unidade"("unidade_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PessoaRegional" ADD CONSTRAINT "PessoaRegional_pessoa_id_fkey" FOREIGN KEY ("pessoa_id") REFERENCES "Pessoa"("pessoa_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PessoaRegional" ADD CONSTRAINT "PessoaRegional_regional_id_fkey" FOREIGN KEY ("regional_id") REFERENCES "Regional"("regional_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Regional" ADD CONSTRAINT "Regional_responsavel_id_fkey" FOREIGN KEY ("responsavel_id") REFERENCES "Pessoa"("pessoa_id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Regional" ADD CONSTRAINT "Regional_criado_por_fkey" FOREIGN KEY ("criado_por") REFERENCES "Pessoa"("pessoa_id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Regional" ADD CONSTRAINT "Regional_atualizado_por_fkey" FOREIGN KEY ("atualizado_por") REFERENCES "Pessoa"("pessoa_id") ON DELETE SET NULL ON UPDATE CASCADE;

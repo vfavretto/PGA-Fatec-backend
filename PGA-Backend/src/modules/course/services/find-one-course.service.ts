@@ -6,8 +6,8 @@ import { Course } from '../entities/course.entity';
 export class FindOneCourseService {
   constructor(private readonly repository: CourseRepository) {}
 
-  async execute(id: number): Promise<Course> {
-    const course = await this.repository.findOne(id);
+  async execute(id: number, user?: any): Promise<Course> {
+    const course = await this.repository.findOneWithContext(id, user?.active_context);
     if (!course) throw new NotFoundException('Curso não encontrado');
     return course;
   }

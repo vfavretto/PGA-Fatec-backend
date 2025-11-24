@@ -140,7 +140,7 @@ export class AuditLogService {
     }
   }
 
-  async getConfigurationsByYear(ano: number) {
+  async getConfigurationsByYear(ano: number, active_context?: any) {
     try {
       console.log(
         `🔍 AuditLogService - Buscando configurações para o ano: ${ano}`,
@@ -158,7 +158,7 @@ export class AuditLogService {
         this.getEixosTematicosByYear(ano),
         this.getPrioridadesByYear(ano),
         this.getTemasByYear(ano),
-        this.getEntregaveisByYear(ano),
+        this.getEntregaveisByYear(ano, active_context),
         this.getPessoasByYear(ano),
       ]);
 
@@ -372,7 +372,7 @@ export class AuditLogService {
           },
           include: {
             eixo: {
-              select: { nome: true },
+              select: { nome_eixo: true },
             },
           },
           orderBy: { tema_num: 'asc' },
@@ -393,7 +393,7 @@ export class AuditLogService {
         },
         include: {
           eixo: {
-            select: { nome: true },
+            select: { nome_eixo: true },
           },
         },
         orderBy: { tema_num: 'asc' },
@@ -409,7 +409,7 @@ export class AuditLogService {
     }
   }
 
-  async getEntregaveisByYear(ano: number) {
+  async getEntregaveisByYear(ano: number, active_context?: any) {
     try {
       console.log(`📦 Buscando entregáveis para ${ano}...`);
 
@@ -430,10 +430,12 @@ export class AuditLogService {
       console.log(`📦 IDs na auditoria: [${entregavelIds.join(', ')}]`);
 
       if (entregavelIds.length > 0) {
+        const where: any = { entregavel_id: { in: entregavelIds } };
+        if (active_context?.tipo === 'unidade') where.unidade_id = active_context.id;
+        if (active_context?.tipo === 'regional') where.regional_id = active_context.id;
+
         const entregaveis = await this.prisma.entregavelLinkSei.findMany({
-          where: {
-            entregavel_id: { in: entregavelIds },
-          },
+          where,
           orderBy: { entregavel_id: 'asc' },
         });
 
@@ -444,12 +446,12 @@ export class AuditLogService {
       }
 
       const endOfYear = new Date(`${ano}-12-31T23:59:59.999Z`);
+      const where: any = { criado_em: { lte: endOfYear } };
+      if (active_context?.tipo === 'unidade') where.unidade_id = active_context.id;
+      if (active_context?.tipo === 'regional') where.regional_id = active_context.id;
+
       const entregaveis = await this.prisma.entregavelLinkSei.findMany({
-        where: {
-          criado_em: {
-            lte: endOfYear,
-          },
-        },
+        where,
         orderBy: { entregavel_id: 'asc' },
       });
 
