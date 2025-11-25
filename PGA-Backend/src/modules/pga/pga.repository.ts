@@ -68,6 +68,32 @@ export class PgaRepository extends BaseRepository<PGA> {
     });
   }
 
+  async findOneWithRelations(id: number) {
+    return this.prisma.pGA.findFirst({
+      where: this.whereActive({ pga_id: id }),
+      include: {
+        unidade: true,
+        regionalResponsavel: true,
+        situacoesProblemas: {
+          where: this.whereActive(),
+          include: { situacaoProblema: true },
+        },
+        acoesProjetos: {
+          where: { ativo: true },
+          include: {
+            eixo: true,
+            tema: true,
+            prioridade: true,
+            situacoesProblemas: { include: { situacaoProblema: true } },
+            etapas: { include: { entregavel_link_sei: true, anexos: true } },
+            pessoas: { include: { pessoa: true } },
+          },
+          orderBy: [{ codigo_projeto: 'asc' }],
+        },
+      },
+    });
+  }
+
   async update(id: number, data: UpdatePgaDto) {
     return this.prisma.pGA.update({
       where: { pga_id: id },

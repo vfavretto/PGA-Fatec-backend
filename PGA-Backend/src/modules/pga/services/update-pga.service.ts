@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PgaRepository } from '../pga.repository';
 import { UpdatePgaDto } from '../dto/update-pga.dto';
 import { PGA } from '../entities/pga.entity';
+import { StatusPGA } from '@prisma/client';
 
 @Injectable()
 export class UpdatePgaService {
@@ -10,6 +11,15 @@ export class UpdatePgaService {
   async execute(id: number, data: UpdatePgaDto): Promise<PGA> {
     const pga = await this.repository.findOne(id);
     if (!pga) throw new NotFoundException('PGA não encontrada');
-    return this.repository.update(id, data);
+    const payload: any = { ...data };
+    if (
+      data &&
+      (data as any).status === StatusPGA.Submetido &&
+      pga.status !== StatusPGA.Submetido
+    ) {
+      payload.data_elaboracao = new Date();
+    }
+
+    return this.repository.update(id, payload);
   }
 }
