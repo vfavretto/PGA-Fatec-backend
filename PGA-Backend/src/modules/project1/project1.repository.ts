@@ -139,7 +139,7 @@ export class Project1Repository extends BaseRepository<AcaoProjeto> {
   async update(id: number, data: UpdateProject1Dto) {
     return this.prisma.acaoProjeto.update({
       where: { acao_projeto_id: id },
-      data,
+      data: data as any,
     });
   }
 

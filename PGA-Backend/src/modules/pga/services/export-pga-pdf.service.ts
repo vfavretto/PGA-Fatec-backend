@@ -87,7 +87,6 @@ export class ExportPgaPdfService {
     let html = '';
     for (const eixo of eixos) {
       html += `<h3>${String(eixo.numero).padStart(2, '0')} - ${this.escapeHtml(String(eixo.nome))}</h3>`;
-      html += '<table><thead><tr><th>Código</th><th>Projeto</th><th>Tema</th><th>Prioridade</th><th>Responsável</th><th>Colaboradores</th><th>Início</th><th>Fim</th><th>Custo</th></tr></thead><tbody>';
 
       eixo.projetos.sort((a: any, b: any) => {
         const pa = parseInt(String(a.codigo_projeto || '').trim().split(/[^0-9]/)[0] || '0', 10);
@@ -101,8 +100,36 @@ export class ExportPgaPdfService {
         const tema = proj.tema ? `${proj.tema.tema_num} - ${this.escapeHtml(String(proj.tema.descricao ?? ''))}` : '';
         const prioridade = proj.prioridade ? `${proj.prioridade.grau} - ${this.escapeHtml(String(proj.prioridade.descricao ?? ''))}` : '';
         const pessoas = proj.pessoas ?? [];
-        const responsavel = pessoas.find((pp: any) => pp.papel === 'Responsavel')?.pessoa?.nome ?? '';
-        const colaboradores = pessoas.filter((pp: any) => pp.papel !== 'Responsavel').map((pp: any) => pp.pessoa?.nome).filter(Boolean).join(', ');
+        const respObj = pessoas.find((pp: any) => pp.papel === 'Responsavel');
+        const responsavelNome = respObj?.pessoa?.nome ?? '';
+        const responsavelCH = respObj?.carga_horaria_semanal ?? '';
+        const responsavelTipo = respObj?.tipo_vinculo_hae ? this.escapeHtml(String(respObj.tipo_vinculo_hae.sigla ?? respObj.tipo_vinculo_hae.descricao ?? '')) : '';
+
+        const colaboradoresArr = pessoas.filter((pp: any) => pp.papel !== 'Responsavel').map((pp: any) => ({
+          nome: pp.pessoa?.nome ?? '',
+          ch: pp.carga_horaria_semanal ?? '',
+          tipo: pp.tipo_vinculo_hae ? (pp.tipo_vinculo_hae.sigla ?? pp.tipo_vinculo_hae.descricao ?? '') : '',
+        }));
+
+        const oQue = this.escapeHtml(String(proj.o_que_sera_feito ?? ''));
+        const porQue = this.escapeHtml(String(proj.por_que_sera_feito ?? ''));
+        const objetivosRef = this.escapeHtml(String(proj.objetivos_institucionais_referenciados ?? ''));
+        const fonteRec = this.escapeHtml(String(proj.fonte_recursos ?? ''));
+
+        const situacoesProjArr = (proj.situacoesProblemas ?? [])
+          .map((sp: any) => {
+            if (!sp) return '';
+            if (sp.situacaoProblema && sp.situacaoProblema.descricao) {
+              return sp.situacaoProblema.descricao;
+            }
+            if (sp.descricao) {
+              return sp.descricao;
+            }
+            return '';
+          })
+          .filter((desc: string) => desc && desc.trim().length > 0);
+        const situacoesProj = situacoesProjArr.join('; ');
+
         const formatDate = (d: any) => {
           if (!d) return '';
           const dt = d instanceof Date ? d : new Date(d);
@@ -114,24 +141,56 @@ export class ExportPgaPdfService {
         const dataFinal = formatDate(proj.data_final);
         const custo = proj.custo_total_estimado ? String(proj.custo_total_estimado) : '';
 
-        html += `<tr><td>${codigo}</td><td>${nome}</td><td>${tema}</td><td>${prioridade}</td><td>${this.escapeHtml(responsavel)}</td><td>${this.escapeHtml(colaboradores)}</td><td>${dataInicio}</td><td>${dataFinal}</td><td>${custo}</td></tr>`;
+        html += `<table style="width:100%;border:1px solid #bbb;margin-top:8px;border-collapse:collapse"><tbody>`;
+        html += `<tr style="background:#eee"><th style="width:35%;padding:6px;border:1px solid #ccc;text-align:left">AÇÃO/PROJETO (Tema)</th><td colspan="3" style="padding:6px;border:1px solid #ccc">${codigo} - ${nome} ${tema ? ` - ${this.escapeHtml(tema)}` : ''}</td></tr>`;
+        html += `<tr><th style="padding:6px;border:1px solid #ccc;text-align:left">Origem (prioridade):</th><td colspan="3" style="padding:6px;border:1px solid #ccc">${this.escapeHtml(prioridade)}</td></tr>`;
+
+        if (objetivosRef) html += `<tr><th style="padding:6px;border:1px solid #ccc;text-align:left">Referente ao(s) projeto(s):</th><td colspan="3" style="padding:6px;border:1px solid #ccc">${objetivosRef}</td></tr>`;
+        if (oQue) html += `<tr><th style="padding:6px;border:1px solid #ccc;text-align:left">O que será feito:</th><td colspan="3" style="padding:6px;border:1px solid #ccc">${oQue}</td></tr>`;
+        if (porQue) html += `<tr><th style="padding:6px;border:1px solid #ccc;text-align:left">Por que será feito:</th><td colspan="3" style="padding:6px;border:1px solid #ccc">${porQue}</td></tr>`;
+
+        html += `<tr><th style="padding:6px;border:1px solid #ccc;text-align:left">Responsável:</th><td colspan="3" style="padding:6px;border:1px solid #ccc">${this.escapeHtml(responsavelNome)}${responsavelCH ? ` (CH/sem: ${responsavelCH})` : ''}${responsavelTipo ? ` (Tipo: ${responsavelTipo})` : ''}</td></tr>`;
+
+        if (colaboradoresArr.length) {
+          for (const col of colaboradoresArr) {
+            html += `<tr><th style="padding:6px;border:1px solid #ccc;text-align:left">Colaborador(a):</th><td colspan="3" style="padding:6px;border:1px solid #ccc">${this.escapeHtml(col.nome)}${col.ch ? ` (CH/sem: ${col.ch})` : ''}${col.tipo ? ` (Tipo: ${this.escapeHtml(col.tipo)})` : ''}</td></tr>`;
+          }
+        } else {
+          html += `<tr><th style="padding:6px;border:1px solid #ccc;text-align:left">Colaborador(a)</th><td colspan="3" style="padding:6px;border:1px solid #ccc">-</td></tr>`;
+        }
+
+        html += `<tr><th style="padding:6px;border:1px solid #ccc;text-align:left">Período de execução:</th><td style="padding:6px;border:1px solid #ccc;white-space:nowrap"><b>Data inicial:</b> ${dataInicio}</td><td style="padding:6px;border:1px solid #ccc;white-space:nowrap"><b>Data final:</b> ${dataFinal}</td><td style="padding:6px;border:1px solid #ccc">&nbsp;</td></tr>`;
 
         const etapas = proj.etapas ?? [];
+        html += `<tr><td colspan="4" style="padding:6px;border:1px solid #ccc"><table style="width:100%;border-collapse:collapse"><thead><tr style="background:#f6f6f6"><th style="border:1px solid #ddd;padding:6px;width:5%">#</th><th style="border:1px solid #ddd;padding:6px;width:40%">Atividade</th><th style="border:1px solid #ddd;padding:6px;width:25%">Entregável</th><th style="border:1px solid #ddd;padding:6px;width:10%">Nº Ref</th><th style="border:1px solid #ddd;padding:6px;width:10%">Verificação</th><th style="border:1px solid #ddd;padding:6px;width:10%">Data</th></tr></thead><tbody>`;
+
         if (etapas.length) {
-          html += `<tr><td colspan="9"><strong>Etapas:</strong><table style="width:100%;border:0;margin-top:4px"><thead><tr><th>Etapa</th><th>Entregável</th><th>Anexos</th><th>Verificação</th></tr></thead><tbody>`;
+          let idx = 1;
           for (const e of etapas) {
             const desc = this.escapeHtml(String(e.descricao ?? ''));
             const entregavelObj = e.entregavel ?? e.entregavel_link_sei;
             const entregavel = entregavelObj ? this.escapeHtml(String(entregavelObj.descricao ?? entregavelObj.entregavel_numero ?? '')) : '';
-            const anexos = (e.anexos ?? []).map((a: any) => this.escapeHtml(String(a.descricao ?? ''))).join(', ');
+            const numeroRef = this.escapeHtml(String(e.numero_ref ?? ''));
             const verif = e.status_verificacao ?? '';
-            html += `<tr><td style="width:25%">${desc}</td><td style="width:35%">${entregavel}</td><td style="width:25%">${anexos}</td><td style="width:15%">${this.escapeHtml(verif)}</td></tr>`;
+            const dataPrev = e.data_verificacao_prevista ? (new Date(e.data_verificacao_prevista)).toISOString().split('T')[0] : '';
+            const dataReal = e.data_verificacao_realizada ? (new Date(e.data_verificacao_realizada)).toISOString().split('T')[0] : '';
+            const dataStr = dataReal || dataPrev || '';
+            html += `<tr><td style="border:1px solid #eee;padding:6px;text-align:center">${String(idx).padStart(2,'0')}</td><td style="border:1px solid #eee;padding:6px">${desc}</td><td style="border:1px solid #eee;padding:6px">${entregavel}</td><td style="border:1px solid #eee;padding:6px;text-align:center">${numeroRef}</td><td style="border:1px solid #eee;padding:6px;text-align:center">${this.escapeHtml(String(verif ?? ''))}</td><td style="border:1px solid #eee;padding:6px;text-align:center">${dataStr}</td></tr>`;
+            idx += 1;
           }
-          html += '</tbody></table></td></tr>';
+        } else {
+          for (let i = 1; i <= 8; i++) {
+            html += `<tr><td style="border:1px solid #eee;padding:6px;text-align:center">${String(i).padStart(2,'0')}</td><td style="border:1px solid #eee;padding:6px">&nbsp;</td><td style="border:1px solid #eee;padding:6px">&nbsp;</td><td style="border:1px solid #eee;padding:6px">&nbsp;</td><td style="border:1px solid #eee;padding:6px">&nbsp;</td><td style="border:1px solid #eee;padding:6px">&nbsp;</td></tr>`;
+          }
         }
-      }
 
-      html += '</tbody></table>';
+        html += `</tbody></table></td></tr>`;
+
+        html += `<tr><th style="padding:6px;border:1px solid #ccc;text-align:left">Custo R$ (se houver):</th><td style="padding:6px;border:1px solid #ccc">${custo}</td><th style="padding:6px;border:1px solid #ccc;text-align:left">Fonte(s) dos recursos</th><td style="padding:6px;border:1px solid #ccc">${fonteRec}</td></tr>`;
+        if (situacoesProj) html += `<tr><th style="padding:6px;border:1px solid #ccc;text-align:left">Situação(s) problema:</th><td colspan="3" style="padding:6px;border:1px solid #ccc">${this.escapeHtml(situacoesProj)}</td></tr>`;
+
+        html += `</tbody></table>`;
+      }
     }
 
     return html;
@@ -153,6 +212,15 @@ export class ExportPgaPdfService {
 
     const pga = await this.repository.findOneWithRelations(id);
     if (!pga) throw new NotFoundException('PGA não encontrada após carregamento de relações');
+
+    console.log('[ExportPgaPdfService] PGA carregado:', JSON.stringify({
+      pga_id: pga.pga_id,
+      projetos_count: pga.acoesProjetos?.length ?? 0,
+      projetos_situacoes: pga.acoesProjetos?.map((p: any) => ({
+        codigo: p.codigo_projeto,
+        situacoes_count: p.situacoesProblemas?.length ?? 0
+      }))
+    }, null, 2));
 
     const html = this.buildHtml(pga);
 

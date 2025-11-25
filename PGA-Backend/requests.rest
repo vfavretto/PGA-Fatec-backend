@@ -1,8 +1,8 @@
-@baseURL = http://192.168.0.244:3000/
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwicGVzc29hX2lkIjoxLCJub21lIjoiQWRtaW4iLCJ0aXBvX3VzdWFyaW8iOiJBZG1pbmlzdHJhZG9yIiwiaWF0IjoxNzY0MDA2NTIzLCJleHAiOjE3NjQwOTI5MjN9.bovdQhHlFpp-imPVhi7kIn8XmWx5JUU8qzN7eD8lw_I
-@userID = 1
+@baseURL = http://192.168.0.7:3000/
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwicGVzc29hX2lkIjoxLCJub21lIjoiQWRtaW4iLCJ0aXBvX3VzdWFyaW8iOiJBZG1pbmlzdHJhZG9yIiwiaWF0IjoxNzY0MDg1NzU5LCJleHAiOjE3NjQxNzIxNTl9.8So4c2N4NuPzjS72JiI3y6bBlMp6-knvBtNYsEnpNJU
 @regionalId = 1
-@unitId = 2
+@userID = 1
+@unitId = 1
 @pgaId = 1
 @projectId = 1
 @deliverableId = 1
@@ -315,6 +315,14 @@ Content-Type: application/json
 DELETE {{baseURL}}pga/{{pgaId}}
 Authorization: Bearer {{token}}
 
+### Gerar PDF do PGA
+GET {{baseURL}}pga/{{pgaId}}/export/pdf
+Authorization: Bearer {{token}}
+
+### Gerar CSV do PGA
+GET {{baseURL}}pga/{{pgaId}}/export/csv
+Authorization: Bearer {{token}}
+
 ### --------------------------
 ### PROJECT1 (Projetos)
 ### --------------------------
@@ -344,7 +352,26 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-	"nome_projeto": "Projeto Atualizado"
+	"nome_projeto": "Projeto Atualizado",
+	"situacoes_problema_ids": [1, 2],
+	"pessoas": [
+		{
+			"pessoa_id": 1,
+			"papel": "Responsavel",
+			"carga_horaria_semanal": null,
+			"tipo_vinculo_hae_id": null
+		}
+	],
+	"etapas": [
+		{
+			"descricao": "Etapa 1",
+			"entregavel_id": null,
+			"numero_ref": "E1",
+			"status_verificacao": "Pendente",
+			"data_verificacao_prevista": "2025-12-31",
+			"data_verificacao_realizada": null
+		}
+	]
 }
 
 ### Deletar projeto

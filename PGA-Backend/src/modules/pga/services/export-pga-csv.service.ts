@@ -68,7 +68,7 @@ export class ExportPgaCsvService {
       .map((k) => ({ numero: Number(k), nome: eixoMap[Number(k)].eixo_nome, projetos: eixoMap[Number(k)].projetos }))
       .sort((a, b) => a.numero - b.numero);
 
-    csv += 'eixo_num,eixo_nome,projeto_codigo,projeto_nome,tema_num,prioridade_grau,responsavel,collaboradores,custo_total_estimado,fonte_recursos,data_inicio,data_final,etapas_count,entregaveis_count\n';
+    csv += 'eixo_num,eixo_nome,projeto_codigo,projeto_nome,tema_num,prioridade_grau,responsavel,collaboradores,colaboradores_detalhados,situacoes_problema,o_que_sera_feito,por_que_sera_feito,objetivos_institucionais_referenciados,custo_total_estimado,fonte_recursos,data_inicio,data_final,etapas_count,entregaveis_count,etapas_detalhes\n';
 
     for (const eixo of eixosOrdenados) {
       eixo.projetos.sort((a: any, b: any) => {
@@ -83,11 +83,45 @@ export class ExportPgaCsvService {
         const pessoas = proj.pessoas ?? [];
         const responsavel = pessoas.find((pp: any) => pp.papel === 'Responsavel')?.pessoa?.nome ?? '';
         const colaboradores = pessoas.filter((pp: any) => pp.papel !== 'Responsavel').map((pp: any) => pp.pessoa?.nome).filter(Boolean).join('; ');
+        const colaboradoresDetalhados = pessoas
+          .filter((pp: any) => pp.papel !== 'Responsavel')
+          .map((pp: any) => `${pp.pessoa?.nome ?? ''}${pp.carga_horaria_semanal ? ` (CH/sem: ${pp.carga_horaria_semanal})` : ''}${pp.tipo_vinculo_hae ? ` (Tipo: ${pp.tipo_vinculo_hae.sigla ?? pp.tipo_vinculo_hae.descricao ?? ''})` : ''}`)
+          .filter(Boolean)
+          .join('; ');
         const etapas = proj.etapas ?? [];
         let entregaveisCount = 0;
         for (const e of etapas) {
           if (e.entregavel || e.entregavel_link_sei) entregaveisCount += 1;
         }
+
+        const oQue = proj.o_que_sera_feito ?? '';
+        const porQue = proj.por_que_sera_feito ?? '';
+        const objetivosRef = proj.objetivos_institucionais_referenciados ?? '';
+        const situacoesArr = (proj.situacoesProblemas ?? [])
+          .map((sp: any) => {
+            if (!sp) return '';
+            if (sp.situacaoProblema && sp.situacaoProblema.descricao) {
+              return sp.situacaoProblema.descricao;
+            }
+            if (sp.descricao) {
+              return sp.descricao;
+            }
+            return '';
+          })
+          .filter((desc: string) => desc && desc.trim().length > 0);
+        const situacoesStr = situacoesArr.join('; ');
+        const etapasDetalhesArr: string[] = [];
+        for (const e of etapas) {
+          const desc = (e.descricao ?? '').replace(/"/g, '""');
+          const entregavelObj = e.entregavel ?? e.entregavel_link_sei;
+          const entregavel = entregavelObj ? String(entregavelObj.descricao ?? entregavelObj.entregavel_numero ?? '') : '';
+          const numeroRef = e.numero_ref ?? '';
+          const verif = e.status_verificacao ?? '';
+          const dataPrev = e.data_verificacao_prevista ? e.data_verificacao_prevista.toISOString().split('T')[0] : '';
+          const dataReal = e.data_verificacao_realizada ? e.data_verificacao_realizada.toISOString().split('T')[0] : '';
+          etapasDetalhesArr.push(`${desc}|${entregavel}|${numeroRef}|${verif}|${dataPrev}|${dataReal}`);
+        }
+        const etapasDetalhes = etapasDetalhesArr.join(';;');
 
         const row = [
           eixo.numero,
@@ -98,12 +132,18 @@ export class ExportPgaCsvService {
           pri,
           '"' + String(responsavel).replace(/"/g, '""') + '"',
           '"' + String(colaboradores).replace(/"/g, '""') + '"',
+          '"' + String(colaboradoresDetalhados).replace(/"/g, '""') + '"',
+          '"' + String(situacoesStr).replace(/"/g, '""') + '"',
+          '"' + String(oQue).replace(/"/g, '""') + '"',
+          '"' + String(porQue).replace(/"/g, '""') + '"',
+          '"' + String(objetivosRef).replace(/"/g, '""') + '"',
           proj.custo_total_estimado ?? '',
           '"' + String(proj.fonte_recursos ?? '').replace(/"/g, '""') + '"',
           proj.data_inicio ? proj.data_inicio.toISOString().split('T')[0] : '',
           proj.data_final ? proj.data_final.toISOString().split('T')[0] : '',
           etapas.length,
           entregaveisCount,
+          '"' + String(etapasDetalhes).replace(/"/g, '""') + '"',
         ];
 
         csv += `${row.join(',')}\n`;

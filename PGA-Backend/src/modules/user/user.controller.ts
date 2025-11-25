@@ -67,6 +67,7 @@ export class UserController {
     private readonly changeUserRoleService: ChangeUserRoleService,
   ) {}
 
+  @Public()
   @Post()
   @UseGuards(OptionalAuthGuard)
   @ApiOperation({
