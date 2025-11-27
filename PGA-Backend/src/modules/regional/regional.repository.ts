@@ -174,7 +174,12 @@ export class RegionalRepository {
       return [];
     }
 
-    let unidadeFilter: number | { in: number[] } = { in: unidadeIds };
+    const where: Prisma.AcaoProjetoWhereInput = {
+      ativo: true,
+      pga: {
+        unidade_id: { in: unidadeIds },
+      },
+    };
 
     if (filters.unidadeId) {
       const existingPga = (where.pga ?? {}) as Prisma.PGAWhereInput;
@@ -183,13 +188,6 @@ export class RegionalRepository {
         unidade_id: { equals: filters.unidadeId },
       };
     }
-
-    const where: Prisma.AcaoProjetoWhereInput = {
-      ativo: true,
-      pga: {
-        unidade_id: unidadeFilter,
-      },
-    };
 
     if (filters.pgaId) {
       where.pga_id = filters.pgaId;
