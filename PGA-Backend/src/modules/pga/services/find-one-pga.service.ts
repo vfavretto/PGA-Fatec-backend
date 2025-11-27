@@ -6,9 +6,10 @@ import { PGA } from '../entities/pga.entity';
 export class FindOnePgaService {
   constructor(private readonly repository: PgaRepository) {}
 
-  async execute(id: number): Promise<PGA> {
-    const pga = await this.repository.findOne(id);
-    if (!pga) throw new NotFoundException('PGA não encontrada');
+  async execute(id: number, user?: any): Promise<PGA> {
+    const active = user?.active_context ?? null;
+    const pga = await this.repository.findOneWithContext(id, active);
+    if (!pga) throw new NotFoundException('PGA não encontrada ou sem acesso');
     return pga;
   }
 }

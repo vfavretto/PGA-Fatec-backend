@@ -26,19 +26,10 @@ export class CreateProject1Service {
 
     const { situacao_problema_ids, ...projectData } = dto;
 
-    return this.prisma.acaoProjeto.create({
+    const projeto = await this.prisma.acaoProjeto.create({
       data: {
         ...projectData,
         codigo_projeto,
-        ...(situacao_problema_ids &&
-          situacao_problema_ids.length > 0 && {
-            situacoesProblemas: {
-              create: situacao_problema_ids.map((situacao_id) => ({
-                situacao_problema_id: situacao_id,
-                ativo: true,
-              })),
-            },
-          }),
       },
       include: {
         situacoesProblemas: {
@@ -48,5 +39,32 @@ export class CreateProject1Service {
         },
       },
     });
+
+    
+    if (situacao_problema_ids && situacao_problema_ids.length > 0) {
+      for (const situacao_id of situacao_problema_ids) {
+        await this.prisma.acaoProjetoSituacaoProblema.create({
+          data: {
+            acao_projeto_id: projeto.acao_projeto_id,
+            situacao_problema_id: situacao_id,
+            ativo: true,
+          },
+        });
+      }
+
+      
+      return this.prisma.acaoProjeto.findUnique({
+        where: { acao_projeto_id: projeto.acao_projeto_id },
+        include: {
+          situacoesProblemas: {
+            include: {
+              situacaoProblema: true,
+            },
+          },
+        },
+      });
+    }
+
+    return projeto;
   }
 }

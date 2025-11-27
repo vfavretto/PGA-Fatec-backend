@@ -19,24 +19,13 @@ export class RegionalRepository {
   }
 
   async findUnitsByRegional(regionalId: number) {
-    const vinculos = await this.prisma.pessoaUnidade.findMany({
+    return this.prisma.unidade.findMany({
       where: {
-        pessoa_id: regionalId,
+        regional_id: regionalId,
         ativo: true,
       },
-      include: {
-        unidade: true,
-      },
-      orderBy: {
-        unidade: {
-          nome_completo: 'asc',
-        },
-      },
+      orderBy: { nome_unidade: 'asc' },
     });
-
-    return vinculos
-      .map((vinculo) => vinculo.unidade)
-      .filter((unidade): unidade is NonNullable<typeof unidade> => Boolean(unidade));
   }
 
   async findPgasByRegional(
@@ -45,19 +34,32 @@ export class RegionalRepository {
   ) {
     const unidadeIds = await this.getRegionalUnitIds(regionalId);
 
+    if (filters.unidadeId) {
+      const where: Prisma.PGAWhereInput = {
+        ativo: true,
+        unidade_id: filters.unidadeId,
+      };
+
+      if (filters.status) {
+        where.status = filters.status;
+      }
+
+      return this.prisma.pGA.findMany({
+        where,
+        include: {
+          unidade: true,
+          regionalResponsavel: true,
+          usuarioCriacao: true,
+        },
+        orderBy: [{ ano: 'desc' }, { unidade: { nome_unidade: 'asc' } }],
+      });
+    }
+
     if (!unidadeIds.length) {
       return [];
     }
 
-    let unidadeFilter: number | { in: number[] } = { in: unidadeIds };
-
-    if (filters.unidadeId) {
-      if (!unidadeIds.includes(filters.unidadeId)) {
-        return [];
-      }
-
-      unidadeFilter = filters.unidadeId;
-    }
+    const unidadeFilter: number | { in: number[] } = { in: unidadeIds };
 
     const where: Prisma.PGAWhereInput = {
       ativo: true,
@@ -75,7 +77,7 @@ export class RegionalRepository {
         regionalResponsavel: true,
         usuarioCriacao: true,
       },
-      orderBy: [{ ano: 'desc' }, { unidade: { nome_completo: 'asc' } }],
+      orderBy: [{ ano: 'desc' }, { unidade: { nome_unidade: 'asc' } }],
     });
   }
 
@@ -106,7 +108,10 @@ export class RegionalRepository {
     });
   }
 
-  async updatePgaReview(pgaId: number, data: { status: StatusPGA; parecer?: string; regionalId: number }) {
+  async updatePgaReview(
+    pgaId: number,
+    data: { status: StatusPGA; parecer?: string; regionalId: number },
+  ) {
     return this.prisma.pGA.update({
       where: { pga_id: pgaId },
       data: {
@@ -125,9 +130,45 @@ export class RegionalRepository {
 
   async findProjectsByRegional(
     regionalId: number,
-    filters: { status?: StatusProjetoRegional; pgaId?: number; unidadeId?: number } = {},
+    filters: {
+      status?: StatusProjetoRegional;
+      pgaId?: number;
+      unidadeId?: number;
+    } = {},
   ) {
     const unidadeIds = await this.getRegionalUnitIds(regionalId);
+
+    if (
+      filters.unidadeId &&
+      (!unidadeIds.length || !unidadeIds.includes(filters.unidadeId))
+    ) {
+      const whereByUnit: Prisma.AcaoProjetoWhereInput = {
+        ativo: true,
+        pga: {
+          unidade_id: { equals: filters.unidadeId },
+        },
+      };
+
+      if (filters.pgaId) {
+        whereByUnit.pga_id = filters.pgaId;
+      }
+
+      if (filters.status) {
+        whereByUnit.status_regional = filters.status;
+      }
+
+      return this.prisma.acaoProjeto.findMany({
+        where: whereByUnit,
+        include: {
+          pga: { include: { unidade: true } },
+          regionalResponsavel: true,
+          eixo: true,
+          tema: true,
+          prioridade: true,
+        },
+        orderBy: [{ pga: { ano: 'desc' } }, { codigo_projeto: 'asc' }],
+      });
+    }
 
     if (!unidadeIds.length) {
       return [];
@@ -136,11 +177,11 @@ export class RegionalRepository {
     let unidadeFilter: number | { in: number[] } = { in: unidadeIds };
 
     if (filters.unidadeId) {
-      if (!unidadeIds.includes(filters.unidadeId)) {
-        return [];
-      }
-
-      unidadeFilter = filters.unidadeId;
+      const existingPga = (where.pga ?? {}) as Prisma.PGAWhereInput;
+      where.pga = {
+        ...existingPga,
+        unidade_id: { equals: filters.unidadeId },
+      };
     }
 
     const where: Prisma.AcaoProjetoWhereInput = {
@@ -171,10 +212,7 @@ export class RegionalRepository {
         tema: true,
         prioridade: true,
       },
-      orderBy: [
-        { pga: { ano: 'desc' } },
-        { codigo_projeto: 'asc' },
-      ],
+      orderBy: [{ pga: { ano: 'desc' } }, { codigo_projeto: 'asc' }],
     });
   }
 
@@ -224,7 +262,11 @@ export class RegionalRepository {
 
   async updateProjectReview(
     projetoId: number,
-    data: { status: StatusProjetoRegional; parecer?: string; regionalId: number },
+    data: {
+      status: StatusProjetoRegional;
+      parecer?: string;
+      regionalId: number;
+    },
   ) {
     return this.prisma.acaoProjeto.update({
       where: { acao_projeto_id: projetoId },
@@ -246,5 +288,50 @@ export class RegionalRepository {
         prioridade: true,
       },
     });
+  }
+
+  async findAll() {
+    const regionais = await this.prisma.regional.findMany({
+      where: { ativo: true },
+      select: {
+        regional_id: true,
+        nome_regional: true,
+        codigo_regional: true,
+        responsavel_id: true,
+        responsavel: {
+          select: {
+            pessoa_id: true,
+            nome: true,
+            email: true,
+          },
+        },
+      },
+      orderBy: { nome_regional: 'asc' },
+    });
+
+    return regionais.map((r) => ({
+      ...r,
+      pessoa_id: r.responsavel_id ?? null,
+      nome: r.nome_regional,
+    }));
+  }
+
+  async findRegionalByResponsavelId(pessoaId: number) {
+    return this.prisma.regional.findFirst({
+      where: {
+        responsavel_id: pessoaId,
+        ativo: true,
+      },
+    });
+  }
+
+  async findById(regionalId: number) {
+    return this.prisma.regional.findUnique({
+      where: { regional_id: regionalId },
+    });
+  }
+
+  async create(data: Prisma.RegionalCreateInput) {
+    return this.prisma.regional.create({ data });
   }
 }

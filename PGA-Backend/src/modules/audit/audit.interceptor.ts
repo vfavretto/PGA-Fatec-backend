@@ -56,7 +56,8 @@ export class AuditInterceptor implements NestInterceptor {
             this.extractIdFromResponse(response, auditInfo.tabela);
 
           if (!registroId) {
-            this.logger.warn(
+            // Registrar como debug para evitar poluição de logs em operações sem id recuperável
+            this.logger.debug(
               `⚠️ Não foi possível extrair registro_id para ${auditInfo.tabela}`,
             );
             return;

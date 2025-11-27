@@ -80,4 +80,60 @@ export class InstitutionalRoutineRepository extends BaseRepository<RotinaInstitu
       },
     });
   }
+
+  async findAllByUnit(unidadeId: number) {
+    return this.prisma.rotinaInstitucional.findMany({
+      where: this.whereActive({ unidade_id: unidadeId }),
+      include: {
+        curso: true,
+        responsavel: true,
+      },
+    });
+  }
+
+  async findAllByRegional(regionalId: number) {
+    return this.prisma.rotinaInstitucional.findMany({
+      where: this.whereActive({ regional_id: regionalId }),
+      include: {
+        curso: true,
+        responsavel: true,
+      },
+    });
+  }
+
+  async findOneWithContext(id: number, active_context?: any) {
+    if (active_context && active_context.tipo === 'unidade') {
+      return this.prisma.rotinaInstitucional.findFirst({
+        where: this.whereActive({ rotina_id: id, unidade_id: active_context.id }),
+        include: { curso: true, responsavel: true },
+      });
+    }
+
+    if (active_context && active_context.tipo === 'regional') {
+      return this.prisma.rotinaInstitucional.findFirst({
+        where: this.whereActive({ rotina_id: id, regional_id: active_context.id }),
+        include: { curso: true, responsavel: true },
+      });
+    }
+
+    return this.findOne(id);
+  }
+
+  async findByPgaIdWithContext(pgaId: number, active_context?: any) {
+    if (active_context && active_context.tipo === 'unidade') {
+      return this.prisma.rotinaInstitucional.findMany({
+        where: this.whereActive({ pga_id: pgaId, unidade_id: active_context.id }),
+        include: { curso: true, responsavel: true },
+      });
+    }
+
+    if (active_context && active_context.tipo === 'regional') {
+      return this.prisma.rotinaInstitucional.findMany({
+        where: this.whereActive({ pga_id: pgaId, regional_id: active_context.id }),
+        include: { curso: true, responsavel: true },
+      });
+    }
+
+    return this.findByPgaId(pgaId);
+  }
 }

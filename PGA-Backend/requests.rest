@@ -1,12 +1,14 @@
-@baseURL = http://192.168.50.54:3000/
+@baseURL = http://192.168.0.7:3000/
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwicGVzc29hX2lkIjoxLCJub21lIjoiQWRtaW4iLCJ0aXBvX3VzdWFyaW8iOiJBZG1pbmlzdHJhZG9yIiwiaWF0IjoxNzY0MDg1NzU5LCJleHAiOjE3NjQxNzIxNTl9.8So4c2N4NuPzjS72JiI3y6bBlMp6-knvBtNYsEnpNJU
+@regionalId = 1
 @userID = 1
-@pgaId = 1
 @unitId = 1
+@pgaId = 1
 @projectId = 1
 @deliverableId = 1
 @attachmentId = 1
 @themeId = 1
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbUBleGFtcGxlLmNvbSIsInBlc3NvYV9pZCI6MSwibm9tZSI6IkFkbWluIiwidGlwb191c3VhcmlvIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc2MjEwMTAxNywiZXhwIjoxNzYyMTg3NDE3fQ.UVrSKkWvwWB5AOo5aPUoQdS5QMbSQ7TnAYDzkw8XK34
+@processStepId = 1
 
 ### --------------------------
 ### AUTH
@@ -17,130 +19,122 @@ POST {{baseURL}}auth/login
 Content-Type: application/json
 
 {
-  "email": "adm@example.com",
-  "senha": "Senh@123"
+	"email": "admin@example.com",
+	"senha": "Senh@123"
 }
 
+### Listar contexts disponíveis
+GET {{baseURL}}auth/contexts
+Authorization: Bearer {{token}}
+
+### Selecionar contexto (unidade|regional)
+POST {{baseURL}}auth/select-context
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+	"tipo": "unidade",
+	"id": 1
+}
+
+### Obter usuário atual
+GET {{baseURL}}auth/me
+Authorization: Bearer {{token}}
+
+### Refresh token
+POST {{baseURL}}auth/refresh
+Content-Type: application/json
+
+{
+	"refresh_token": "<REFRESH_TOKEN>"
+}
 
 ### --------------------------
 ### USERS
 ### --------------------------
 
-### Criar usuário (rota pública — primeiro usuário vira Administrador)
+### Criar usuário (público só funciona se não houver usuários no sistema, o primeiro usuário será administrador)
 POST {{baseURL}}users
 Content-Type: application/json
 
-// O DTO `RegisterDto` exige `nome`, `email`, `senha` e `tipo_usuario`.
-// Observação: se for o primeiro usuário no sistema, o backend força `tipo_usuario = 'Administrador'`.
 {
-  "nome": "Admin",
-  "email": "adm@example.com",
-  "senha": "Senh@123",
-  "tipo_usuario": "Docente"
+	"nome": "Admin",
+	"email": "admin@example.com",
+	"senha": "Senh@123",
+	"tipo_usuario": "Docente"
 }
-
 
 ### Listar usuários
 GET {{baseURL}}users
 Authorization: Bearer {{token}}
 
-
-### Listar solicitações de acesso (usuário autenticado)
-GET {{baseURL}}users/access-requests
-Authorization: Bearer {{token}}
-
-
 ### Buscar usuário por ID
 GET {{baseURL}}users/{{userID}}
 Authorization: Bearer {{token}}
 
-
-### Atualizar usuário por ID
+### Atualizar usuário
 PUT {{baseURL}}users/{{userID}}
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "nome": "Murilo"
+	"nome": "Nome Atualizado"
 }
 
-
-### Remover usuário por ID
+### Remover usuário
 DELETE {{baseURL}}users/{{userID}}
 Authorization: Bearer {{token}}
 
-
-### Solicitar redefinição de senha
+### Solicitar redefinição de senha (público)
 POST {{baseURL}}users/reset-password
 Content-Type: application/json
-// Nesse caso é somente exemplo. Use um email válido para receber o token temporário.
+
 {
-  "email": "adm@example.com"
+	"email": "usuario@fatec.sp.gov.br"
 }
 
-
-### Confirmar redefinição de senha
+### Confirmar redefinição de senha (público)
 POST {{baseURL}}users/reset-password/confirm
 Content-Type: application/json
-// Use o token temporário recebido por email.
+
 {
-  "token": "token-temporario",
-  "password": "novaSenh@123"
+	"token": "token-temporario",
+	"password": "novaSenh@123"
 }
 
-
 ### Solicitar acesso (público)
-### Use o campo `codigo_unidade` no formato FNNN (ex: F301). O endpoint retorna `data.solicitacao_id`.
 POST {{baseURL}}users/request-access
 Content-Type: application/json
 
 {
-  "nome": "Murilo R Santos",
-  "email": "murilo.santos58@fatec.sp.gov.br",
-  "codigo_unidade": "F301"
+	"nome": "Fulano",
+	"email": "fulano@fatec.sp.gov.br",
+	"codigo_unidade": "F301"
 }
 
-
-### Processar solicitação de acesso (aprovador autenticado)
-### Substitua :id pelo solicitacao_id retornado ao criar a solicitação.
-POST {{baseURL}}users/process-access-request/<<SOLICITACAO_ID>>
+### Processar solicitação de acesso (aprovador)
+POST {{baseURL}}users/process-access-request/1
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
-// Exemplo de aprovação (não-diretor)
 {
-  "status": "Aprovada",
-  "tipo_usuario": "Docente"
+	"status": "Aprovada",
+	"tipo_usuario": "Docente"
 }
-
-// Exemplo de aprovação como Diretor (necessário enviar unidade_id)
-{
-  "status": "Aprovada",
-  "tipo_usuario": "Diretor",
-  "unidade_id": {{unitId}}
-}
-
-// Exemplo de rejeição
-{
-  "status": "Rejeitada"
-}
-
 
 ### Buscar usuários por unidade
 GET {{baseURL}}users/by-unidade/{{unitId}}
 Authorization: Bearer {{token}}
 
-
-### Trocar papel/role (exemplo)
-PATCH {{baseURL}}users/1/change-role
+### Trocar papel/role
+PATCH {{baseURL}}users/2/change-role
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "novoTipo": "CPS",
-  "unidadeId": {{unitId}}
+	"novoTipo": "Regional",
+	"unidadeId": {{unitId}}
 }
-
 
 ### --------------------------
 ### UNITS
@@ -152,20 +146,18 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "nome_completo": "Fatec Votorantim",
-  "codigo_fnnn": "F301"
+	"nome_unidade": "Fatec Votorantim",
+	"codigo_fnnn": "F301",
+	"regional_id": {{regionalId}}
 }
-
 
 ### Listar unidades
 GET {{baseURL}}unit
 Authorization: Bearer {{token}}
 
-
 ### Buscar unidade por ID
 GET {{baseURL}}unit/{{unitId}}
 Authorization: Bearer {{token}}
-
 
 ### Atualizar unidade
 PUT {{baseURL}}unit/{{unitId}}
@@ -173,185 +165,221 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "nome_completo": "Unidade Atualizada"
+	"nome_unidade": "Unidade Atualizada",
+	"regional_id": null
 }
-
 
 ### Excluir unidade
 DELETE {{baseURL}}unit/{{unitId}}
 Authorization: Bearer {{token}}
 
-
 ### --------------------------
-### COURSES
+### REGIONAL
 ### --------------------------
 
-POST {{baseURL}}course
+### Criar regional (Administrador)
+POST {{baseURL}}regional
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "nome": "Desenvolvimento de Software Multiplataforma",
-  "codigo": "DSM"
+	"nome_regional": "Regional Sorocaba",
+	"codigo_regional": "R001",
+	"responsavel_id": {{userID}},
+	"ativo": true
 }
 
-GET {{baseURL}}course
+### Listar regionais
+GET {{baseURL}}regional
 Authorization: Bearer {{token}}
 
-GET {{baseURL}}course/1
+### Listar unidades sob responsabilidade
+GET {{baseURL}}regional/unidades
 Authorization: Bearer {{token}}
 
-PUT {{baseURL}}course/1
+### Listar regional por ID
+GET {{baseURL}}regional/{{regionalId}}
+Authorization: Bearer {{token}}
+
+### Listar PGAs (regional)
+GET {{baseURL}}regional/pgas
+Authorization: Bearer {{token}}
+
+### Obter PGA (regional)
+GET {{baseURL}}regional/pgas/{{pgaId}}
+Authorization: Bearer {{token}}
+
+### Avaliar PGA (regional)
+PATCH {{baseURL}}regional/pgas/{{pgaId}}/avaliacao
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "nome": "Curso Atualizado"
+	"status": "Aprovado",
+	"parecer": "PGA aprovado"
 }
 
-DELETE {{baseURL}}course/1
+### Listar projetos (regional)
+GET {{baseURL}}regional/projetos
 Authorization: Bearer {{token}}
 
+### Obter projeto (regional)
+GET {{baseURL}}regional/projetos/{{projectId}}
+Authorization: Bearer {{token}}
 
-### --------------------------
-### DELIVERABLES
-### --------------------------
-
-POST {{baseURL}}deliverable
+### Avaliar projeto (regional)
+PATCH {{baseURL}}regional/projetos/{{projectId}}/avaliacao
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "titulo": "Entregável Exemplo",
-  "descricao": "Descrição"
+	"status": "Aprovado",
+	"parecer": "Projeto aprovado"
 }
-
-GET {{baseURL}}deliverable
-Authorization: Bearer {{token}}
-
-GET {{baseURL}}deliverable/{{deliverableId}}
-Authorization: Bearer {{token}}
-
-PUT {{baseURL}}deliverable/{{deliverableId}}
-Authorization: Bearer {{token}}
-Content-Type: application/json
-
-{
-  "titulo": "Atualizado"
-}
-
-DELETE {{baseURL}}deliverable/{{deliverableId}}
-Authorization: Bearer {{token}}
-
 
 ### --------------------------
 ### ATTACHMENTS
 ### --------------------------
 
+### Criar anexo (público)
 POST {{baseURL}}attachments
-Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "nome": "Arquivo.pdf",
-  "url": "http://exemplo/arquivo.pdf",
-  "entregavel_id": {{deliverableId}}
+	"nome": "Arquivo.pdf",
+	"url": "http://exemplo/arquivo.pdf",
+	"entregavel_id": {{deliverableId}}
 }
 
+### Listar anexos
 GET {{baseURL}}attachments
 Authorization: Bearer {{token}}
 
+### Anexos por etapa
 GET {{baseURL}}attachments/etapa-processo/{{processStepId}}
 Authorization: Bearer {{token}}
 
+### Anexos por entregável
 GET {{baseURL}}attachments/entregavel/{{deliverableId}}
 Authorization: Bearer {{token}}
 
+### Buscar anexo
 GET {{baseURL}}attachments/{{attachmentId}}
 Authorization: Bearer {{token}}
 
+### Atualizar anexo
 PUT {{baseURL}}attachments/{{attachmentId}}
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "nome": "Arquivo Atualizado.pdf"
+	"nome": "Arquivo Atualizado.pdf"
 }
 
+### Excluir anexo
 DELETE {{baseURL}}attachments/{{attachmentId}}
 Authorization: Bearer {{token}}
-
 
 ### --------------------------
 ### PGA
 ### --------------------------
 
+### Criar PGA
 POST {{baseURL}}pga
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "ano": 2025,
-  "unidade_id": {{unitId}}
+	"ano": 2025,
+	"unidade_id": {{unitId}}
 }
-### Exibe PGA
+
+### Listar PGAs
 GET {{baseURL}}pga
 Authorization: Bearer {{token}}
 
-### Exibe PGA pelo ID
+### Obter PGA por ID
 GET {{baseURL}}pga/{{pgaId}}
 Authorization: Bearer {{token}}
 
-
-### Atualiza um PGA pelo ID
+### Atualizar PGA
 PUT {{baseURL}}pga/{{pgaId}}
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "titulo": "PGA Atualizado"
+	"titulo": "PGA Atualizado"
 }
 
-
-### Deleta um PGA pelo ID
+### Deletar PGA
 DELETE {{baseURL}}pga/{{pgaId}}
 Authorization: Bearer {{token}}
 
+### Gerar PDF do PGA
+GET {{baseURL}}pga/{{pgaId}}/export/pdf
+Authorization: Bearer {{token}}
+
+### Gerar CSV do PGA
+GET {{baseURL}}pga/{{pgaId}}/export/csv
+Authorization: Bearer {{token}}
 
 ### --------------------------
-### PROJECT1
+### PROJECT1 (Projetos)
 ### --------------------------
 
+### Listar projetos
 GET {{baseURL}}project1
 Authorization: Bearer {{token}}
 
+### Obter projeto por ID
 GET {{baseURL}}project1/{{projectId}}
 Authorization: Bearer {{token}}
 
+### Criar projeto
 POST {{baseURL}}project1
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "codigo_projeto": "P-001",
-  "nome_projeto": "Projeto Exemplo",
-  "pga_id": {{pgaId}}
+	"codigo_projeto": "P-001",
+	"nome_projeto": "Projeto Exemplo",
+	"pga_id": {{pgaId}}
 }
 
+### Atualizar projeto
 PUT {{baseURL}}project1/{{projectId}}
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "nome_projeto": "Projeto Atualizado"
+	"nome_projeto": "Projeto Atualizado",
+	"situacoes_problema_ids": [1, 2],
+	"pessoas": [
+		{
+			"pessoa_id": 1,
+			"papel": "Responsavel",
+			"carga_horaria_semanal": null,
+			"tipo_vinculo_hae_id": null
+		}
+	],
+	"etapas": [
+		{
+			"descricao": "Etapa 1",
+			"entregavel_id": null,
+			"numero_ref": "E1",
+			"status_verificacao": "Pendente",
+			"data_verificacao_prevista": "2025-12-31",
+			"data_verificacao_realizada": null
+		}
+	]
 }
 
+### Deletar projeto
 DELETE {{baseURL}}project1/{{projectId}}
 Authorization: Bearer {{token}}
 
-
 ### --------------------------
-### CONFIGURATION (priority-action, problem-situation, thematic-axis, themes)
+### CONFIGURATION
 ### --------------------------
 
 POST {{baseURL}}priority-action
@@ -359,108 +387,48 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "titulo": "Alta Prioridade"
+	"titulo": "Alta Prioridade"
 }
 
 GET {{baseURL}}priority-action
 Authorization: Bearer {{token}}
-
-GET {{baseURL}}priority-action/1
-Authorization: Bearer {{token}}
-
-PUT {{baseURL}}priority-action/1
-Authorization: Bearer {{token}}
-Content-Type: application/json
-
-{
-  "titulo": "Atualizado"
-}
-
-DELETE {{baseURL}}priority-action/1
-Authorization: Bearer {{token}}
-
 
 POST {{baseURL}}problem-situation
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "titulo": "Problema Exemplo"
+	"titulo": "Problema Exemplo"
 }
 
 GET {{baseURL}}problem-situation
 Authorization: Bearer {{token}}
-
-GET {{baseURL}}problem-situation/1
-Authorization: Bearer {{token}}
-
-PUT {{baseURL}}problem-situation/1
-Authorization: Bearer {{token}}
-Content-Type: application/json
-
-{
-  "titulo": "Atualizado"
-}
-
-DELETE {{baseURL}}problem-situation/1
-Authorization: Bearer {{token}}
-
 
 POST {{baseURL}}thematic-axis
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "titulo": "Eixo Exemplo"
+	"titulo": "Eixo Exemplo"
 }
 
 GET {{baseURL}}thematic-axis
 Authorization: Bearer {{token}}
-
-GET {{baseURL}}thematic-axis/1
-Authorization: Bearer {{token}}
-
-PUT {{baseURL}}thematic-axis/1
-Authorization: Bearer {{token}}
-Content-Type: application/json
-
-{
-  "titulo": "Atualizado"
-}
-
-DELETE {{baseURL}}thematic-axis/1
-Authorization: Bearer {{token}}
-
 
 POST {{baseURL}}themes
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "titulo": "Tema Exemplo",
-  "eixo_id": 1
+	"titulo": "Tema Exemplo",
+	"eixo_id": 1
 }
 
 GET {{baseURL}}themes
 Authorization: Bearer {{token}}
 
-GET {{baseURL}}themes/1
-Authorization: Bearer {{token}}
-
-PUT {{baseURL}}themes/1
-Authorization: Bearer {{token}}
-Content-Type: application/json
-
-{
-  "titulo": "Atualizado"
-}
-
-DELETE {{baseURL}}themes/1
-Authorization: Bearer {{token}}
-
-
 ### --------------------------
-### PROCESS-STEP / ROUTINE / PROJECT-PERSON / WORKLOAD
+### PROCESS-STEP / ROUTINES / PARTICIPANTS
 ### --------------------------
 
 POST {{baseURL}}process-step
@@ -468,133 +436,63 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "titulo": "Etapa X"
+	"titulo": "Etapa X"
 }
 
 GET {{baseURL}}process-step
 Authorization: Bearer {{token}}
-
-GET {{baseURL}}process-step/1
-Authorization: Bearer {{token}}
-
-PUT {{baseURL}}process-step/1
-Authorization: Bearer {{token}}
-Content-Type: application/json
-
-{
-  "titulo": "Atualizado"
-}
-
-DELETE {{baseURL}}process-step/1
-Authorization: Bearer {{token}}
-
 
 POST {{baseURL}}routine-occurrence
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "descricao": "Ocorrência X"
+	"descricao": "Ocorrência X"
 }
 
 GET {{baseURL}}routine-occurrence
 Authorization: Bearer {{token}}
-
-GET {{baseURL}}routine-occurrence/1
-Authorization: Bearer {{token}}
-
-PUT {{baseURL}}routine-occurrence/1
-Authorization: Bearer {{token}}
-Content-Type: application/json
-
-{
-  "descricao": "Atualizado"
-}
-
-DELETE {{baseURL}}routine-occurrence/1
-Authorization: Bearer {{token}}
-
 
 POST {{baseURL}}routine-participant
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "pessoa_id": {{userID}},
-  "rotina_id": 1
+	"pessoa_id": {{userID}},
+	"rotina_id": 1
 }
 
-GET {{baseURL}}routine-participant
-Authorization: Bearer {{token}}
-
-GET {{baseURL}}routine-participant/1
-Authorization: Bearer {{token}}
-
-PUT {{baseURL}}routine-participant/1
-Authorization: Bearer {{token}}
-Content-Type: application/json
-
-{
-  "pessoa_id": {{userID}}
-}
-
-DELETE {{baseURL}}routine-participant/1
-Authorization: Bearer {{token}}
-
+### --------------------------
+### PROJECT-PERSON
+### --------------------------
 
 POST {{baseURL}}project-person
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "pessoa_id": {{userID}},
-  "project_id": {{projectId}}
+	"pessoa_id": {{userID}},
+	"project_id": {{projectId}}
 }
 
 GET {{baseURL}}project-person
 Authorization: Bearer {{token}}
 
-GET {{baseURL}}project-person/1
-Authorization: Bearer {{token}}
-
-PUT {{baseURL}}project-person/1
-Authorization: Bearer {{token}}
-Content-Type: application/json
-
-{
-  "pessoa_id": {{userID}}
-}
-
-DELETE {{baseURL}}project-person/1
-Authorization: Bearer {{token}}
-
+### --------------------------
+### WORKLOAD HAE
+### --------------------------
 
 POST {{baseURL}}workload-hae
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "descricao": "HAE X",
-  "horas": 10
+	"descricao": "HAE X",
+	"horas": 10
 }
 
 GET {{baseURL}}workload-hae
 Authorization: Bearer {{token}}
-
-GET {{baseURL}}workload-hae/1
-Authorization: Bearer {{token}}
-
-PUT {{baseURL}}workload-hae/1
-Authorization: Bearer {{token}}
-Content-Type: application/json
-
-{
-  "horas": 12
-}
-
-DELETE {{baseURL}}workload-hae/1
-Authorization: Bearer {{token}}
-
 
 ### --------------------------
 ### AUDIT
@@ -605,14 +503,11 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "ano": 2025,
-  "usuarioId": {{userID}}
+	"ano": 2025,
+	"usuarioId": {{userID}}
 }
 
 GET {{baseURL}}audit/configurations/year/2025
-Authorization: Bearer {{token}}
-
-GET {{baseURL}}audit/configurations/pessoas/year/2025
 Authorization: Bearer {{token}}
 
 POST {{baseURL}}audit/log
@@ -620,25 +515,74 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "tabela": "pessoa",
-  "registroId": 1,
-  "operacao": "UPDATE",
-  "dados_antes": {},
-  "dados_depois": {}
+	"tabela": "pessoa",
+	"registroId": 1,
+	"operacao": "UPDATE",
+	"dados_antes": {},
+	"dados_depois": {}
 }
 
 GET {{baseURL}}audit/history/pessoa/1
 Authorization: Bearer {{token}}
 
-GET {{baseURL}}audit/year/2025
+### --------------------------
+### COURSE
+### --------------------------
+
+POST {{baseURL}}course
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+	"nome": "Desenvolvimento de Software Multiplataforma",
+	"codigo": "DSM"
+}
+
+GET {{baseURL}}course
 Authorization: Bearer {{token}}
 
-GET {{baseURL}}audit/table/pessoa
+### --------------------------
+### DELIVERABLES
+### --------------------------
+
+POST {{baseURL}}deliverable
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+	"titulo": "Entregável Exemplo",
+	"descricao": "Descrição"
+}
+
+GET {{baseURL}}deliverable
 Authorization: Bearer {{token}}
 
-GET {{baseURL}}audit/report/changes/year/2025
+### --------------------------
+### CPA-ACTION
+### --------------------------
+
+POST {{baseURL}}cpa-action
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+	"titulo": "Ação CPA Exemplo"
+}
+
+GET {{baseURL}}cpa-action
 Authorization: Bearer {{token}}
 
-GET {{baseURL}}audit/report/summary
-Authorization: Bearer {{token}}
+### --------------------------
+### INSTITUTIONAL ROUTINE
+### --------------------------
 
+POST {{baseURL}}institutional-routine
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+	"titulo": "Rotina X"
+}
+
+GET {{baseURL}}institutional-routine
+Authorization: Bearer {{token}}

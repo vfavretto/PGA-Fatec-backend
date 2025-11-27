@@ -146,7 +146,7 @@ export class ConfigurationSnapshotService {
               eixo_base_id: eixo.eixo_id,
               ano: ano,
               numero: eixo.numero,
-              nome: eixo.nome,
+              nome: eixo.nome_eixo,
               descricao: eixo.descricao ?? undefined,
               criado_por: usuarioId,
               motivo_alteracao: `Versão criada automaticamente para ano ${ano}`,

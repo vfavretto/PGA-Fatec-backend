@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Put, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Put, Delete, ParseIntPipe, Request, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
 import { CreateCpaActionDto } from './dto/create-cpa-action.dto';
 import { UpdateCpaActionDto } from './dto/update-cpa-action.dto';
@@ -7,10 +7,12 @@ import { FindAllCpaActionService } from './services/find-all-cpa-action.service'
 import { FindOneCpaActionService } from './services/find-one-cpa-action.service';
 import { UpdateCpaActionService } from './services/update-cpa-action.service';
 import { DeleteCpaActionService } from './services/delete-cpa-action.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('PGA')
 @ApiBearerAuth('JWT-auth')
 @Controller('cpa-action')
+@UseGuards(JwtAuthGuard)
 export class CpaActionController {
   constructor(
     private readonly createService: CreateCpaActionService,
@@ -32,8 +34,8 @@ export class CpaActionController {
   @Get()
   @ApiOperation({ summary: 'Listar ações CPA', description: 'Retorna lista de todas as ações CPA' })
   @ApiResponse({ status: 200, description: 'Lista de ações CPA retornada com sucesso' })
-  findAll() {
-    return this.findAllService.execute();
+  findAll(@Request() req: any) {
+    return this.findAllService.execute(req.user);
   }
 
   @Get(':id')
@@ -41,8 +43,8 @@ export class CpaActionController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID da ação CPA' })
   @ApiResponse({ status: 200, description: 'Ação CPA encontrada com sucesso' })
   @ApiResponse({ status: 404, description: 'Ação CPA não encontrada' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.findOneService.execute(id);
+  findOne(@Request() req: any, @Param('id', ParseIntPipe) id: number) {
+    return this.findOneService.execute(id, req.user);
   }
 
   @Put(':id')

@@ -62,4 +62,58 @@ export class ProcessStepRepository extends BaseRepository<EtapaProcesso> {
       },
     });
   }
+
+  async findAllByUnit(unidadeId: number) {
+    return this.prisma.etapaProcesso.findMany({
+      where: this.whereActive({ unidade_id: unidadeId }),
+      include: { entregavel_link_sei: true },
+      orderBy: { data_verificacao_prevista: 'asc' },
+    });
+  }
+
+  async findAllByRegional(regionalId: number) {
+    return this.prisma.etapaProcesso.findMany({
+      where: this.whereActive({ regional_id: regionalId }),
+      include: { entregavel_link_sei: true },
+      orderBy: { data_verificacao_prevista: 'asc' },
+    });
+  }
+
+  async findOneWithContext(id: number, active_context?: any) {
+    if (active_context && active_context.tipo === 'unidade') {
+      return this.prisma.etapaProcesso.findFirst({
+        where: this.whereActive({ etapa_id: id, unidade_id: active_context.id }),
+        include: { entregavel_link_sei: true },
+      });
+    }
+
+    if (active_context && active_context.tipo === 'regional') {
+      return this.prisma.etapaProcesso.findFirst({
+        where: this.whereActive({ etapa_id: id, regional_id: active_context.id }),
+        include: { entregavel_link_sei: true },
+      });
+    }
+
+    return this.findOne(id);
+  }
+
+  async findByProjectIdWithContext(projectId: number, active_context?: any) {
+    if (active_context && active_context.tipo === 'unidade') {
+      return this.prisma.etapaProcesso.findMany({
+        where: this.whereActive({ acao_projeto_id: projectId, unidade_id: active_context.id }),
+        include: { entregavel_link_sei: true },
+        orderBy: { data_verificacao_prevista: 'asc' },
+      });
+    }
+
+    if (active_context && active_context.tipo === 'regional') {
+      return this.prisma.etapaProcesso.findMany({
+        where: this.whereActive({ acao_projeto_id: projectId, regional_id: active_context.id }),
+        include: { entregavel_link_sei: true },
+        orderBy: { data_verificacao_prevista: 'asc' },
+      });
+    }
+
+    return this.findByProjectId(projectId);
+  }
 }
