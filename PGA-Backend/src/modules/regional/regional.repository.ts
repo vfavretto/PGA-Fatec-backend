@@ -182,16 +182,10 @@ export class RegionalRepository {
       return [];
     }
 
-    let unidadeFilter: string | { in: string[] } = { in: unidadeIds };
-
-    if (filters.unidadeId) {
-      unidadeFilter = filters.unidadeId;
-    }
-
     const where: Prisma.AcaoProjetoWhereInput = {
       ativo: true,
       pga: {
-        unidade_id: unidadeFilter,
+        unidade_id: { in: unidadeIds },
       },
     };
 
