@@ -170,6 +170,7 @@ export class RegionalRepository {
       });
     }
 
+    
     if (!unidadeIds.length) {
       return [];
     }
