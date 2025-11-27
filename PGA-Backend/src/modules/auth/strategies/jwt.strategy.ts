@@ -39,11 +39,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException('Usuário não existe ou token inválido');
     }
 
+    const active_context = (payload && (payload as any).active_context) || null;
+
     return {
       pessoa_id: user.pessoa_id,
       email: user.email,
       nome: user.nome,
       tipo_usuario: user.tipo_usuario,
+      active_context,
     };
   }
 }

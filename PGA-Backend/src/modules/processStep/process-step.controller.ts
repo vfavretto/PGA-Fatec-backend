@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Put, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Put, Delete, ParseIntPipe, Request, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
 import { CreateProcessStepDto } from './dto/create-process-step.dto';
 import { UpdateProcessStepDto } from './dto/update-process-step.dto';
@@ -7,10 +7,12 @@ import { FindAllProcessStepService } from './services/find-all-process-step.serv
 import { FindOneProcessStepService } from './services/find-one-process-step.service';
 import { UpdateProcessStepService } from './services/update-process-step.service';
 import { DeleteProcessStepService } from './services/delete-process-step.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('Projects')
 @ApiBearerAuth('JWT-auth')
 @Controller('process-step')
+@UseGuards(JwtAuthGuard)
 export class ProcessStepController {
   constructor(
     private readonly createService: CreateProcessStepService,
@@ -32,8 +34,8 @@ export class ProcessStepController {
   @Get()
   @ApiOperation({ summary: 'Listar etapas de processo', description: 'Retorna lista de todas as etapas de processo' })
   @ApiResponse({ status: 200, description: 'Lista de etapas de processo retornada com sucesso' })
-  findAll() {
-    return this.findAllService.execute();
+  findAll(@Request() req: any) {
+    return this.findAllService.execute(req.user);
   }
 
   @Get(':id')
@@ -41,8 +43,8 @@ export class ProcessStepController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID da etapa de processo' })
   @ApiResponse({ status: 200, description: 'Etapa de processo encontrada com sucesso' })
   @ApiResponse({ status: 404, description: 'Etapa de processo não encontrada' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.findOneService.execute(id);
+  findOne(@Request() req: any, @Param('id', ParseIntPipe) id: number) {
+    return this.findOneService.execute(id, req.user);
   }
 
   @Put(':id')

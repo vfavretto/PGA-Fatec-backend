@@ -115,12 +115,12 @@ export class ProcessAccessRequestService {
       if (tipoUsuario === 'Diretor') {
         const unidadeAtual = await this.prisma.unidade.findUnique({
           where: { unidade_id: solicitacao.unidade_id },
-          select: { diretor_id: true, nome_completo: true } as any,
+          select: { diretor_id: true, nome_unidade: true } as any,
         }) as any;
 
         if (unidadeAtual?.diretor_id) {
           throw new ConflictException(
-            `A unidade ${unidadeAtual.nome_completo} já possui um diretor atribuído. Remova o diretor atual antes de atribuir um novo.`,
+            `A unidade ${unidadeAtual.nome_unidade} já possui um diretor atribuído. Remova o diretor atual antes de atribuir um novo.`,
           );
         }
       }
@@ -153,7 +153,7 @@ export class ProcessAccessRequestService {
         solicitacao.email,
         solicitacao.nome,
         tempPassword,
-        solicitacao.unidade.nome_completo,
+        solicitacao.unidade.nome_unidade,
         tipoUsuario as string,
       );
 

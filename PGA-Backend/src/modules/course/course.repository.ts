@@ -40,6 +40,24 @@ export class CourseRepository extends BaseRepository<Curso> {
     });
   }
 
+  async findOneWithContext(id: number, active_context?: any) {
+    if (active_context && active_context.tipo === 'unidade') {
+      return this.prisma.curso.findFirst({
+        where: this.whereActive({ curso_id: id, unidade_id: active_context.id }),
+        include: { coordenador: true, unidade: true },
+      });
+    }
+
+    if (active_context && active_context.tipo === 'regional') {
+      return this.prisma.curso.findFirst({
+        where: this.whereActive({ curso_id: id, regional_id: active_context.id }),
+        include: { coordenador: true, unidade: true },
+      });
+    }
+
+    return this.findOne(id);
+  }
+
   async update(id: number, data: UpdateCourseDto) {
     return this.prisma.curso.update({
       where: { curso_id: id },
@@ -59,6 +77,19 @@ export class CourseRepository extends BaseRepository<Curso> {
       where: this.whereActive({ unidade_id: unitId }),
       include: {
         coordenador: true,
+      },
+      orderBy: {
+        nome: 'asc',
+      },
+    });
+  }
+
+  async findAllByRegional(regionalId: number) {
+    return this.prisma.curso.findMany({
+      where: this.whereActive({ regional_id: regionalId }),
+      include: {
+        coordenador: true,
+        unidade: true,
       },
       orderBy: {
         nome: 'asc',

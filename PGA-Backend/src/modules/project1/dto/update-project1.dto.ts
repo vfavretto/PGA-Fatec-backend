@@ -1,4 +1,4 @@
-import { IsOptional } from 'class-validator';
+import { IsOptional, IsArray, IsNumber } from 'class-validator';
 import { Prisma, StatusProjetoRegional } from '@prisma/client';
 
 export class UpdateProject1Dto {
@@ -96,4 +96,30 @@ export class UpdateProject1Dto {
     | number
     | Prisma.NullableIntFieldUpdateOperationsInput
     | null;
+
+  @IsOptional()
+  @IsArray()
+  situacoes_problema_ids?: number[];
+
+  @IsOptional()
+  @IsArray()
+  pessoas?: Array<{
+    pessoa_id: number;
+    papel: 'Responsavel' | 'Colaborador';
+    carga_horaria_semanal?: number | null;
+    tipo_vinculo_hae_id?: number | null;
+    projeto_pessoa_id?: number;
+  }>;
+
+  @IsOptional()
+  @IsArray()
+  etapas?: Array<{
+    descricao: string;
+    entregavel_id?: number | null;
+    numero_ref?: string | null;
+    status_verificacao?: string | null;
+    data_verificacao_prevista?: string | null;
+    data_verificacao_realizada?: string | null;
+    etapa_id?: number;
+  }>;
 }
