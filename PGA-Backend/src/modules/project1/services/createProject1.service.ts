@@ -24,11 +24,47 @@ export class CreateProject1Service {
 
     const codigo_projeto = `${eixo.numero}${sequencial}`;
 
-    return this.prisma.acaoProjeto.create({
+    const { situacao_problema_ids, ...projectData } = dto;
+
+    const projeto = await this.prisma.acaoProjeto.create({
       data: {
-        ...dto,
+        ...projectData,
         codigo_projeto,
       },
+      include: {
+        situacoesProblemas: {
+          include: {
+            situacaoProblema: true,
+          },
+        },
+      },
     });
+
+    
+    if (situacao_problema_ids && situacao_problema_ids.length > 0) {
+      for (const situacao_id of situacao_problema_ids) {
+        await this.prisma.acaoProjetoSituacaoProblema.create({
+          data: {
+            acao_projeto_id: projeto.acao_projeto_id,
+            situacao_problema_id: situacao_id,
+            ativo: true,
+          },
+        });
+      }
+
+      
+      return this.prisma.acaoProjeto.findUnique({
+        where: { acao_projeto_id: projeto.acao_projeto_id },
+        include: {
+          situacoesProblemas: {
+            include: {
+              situacaoProblema: true,
+            },
+          },
+        },
+      });
+    }
+
+    return projeto;
   }
 }

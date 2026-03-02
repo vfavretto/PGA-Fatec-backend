@@ -1,6 +1,6 @@
 {
   "name": "pga-backend",
-  "version": "1.4.0",
+  "version": "1.7.0",
   "description": "",
   "author": "",
   "private": true,
@@ -27,11 +27,11 @@
     "prisma:migrate:docker": "docker-compose exec api npx prisma migrate deploy"
   },
   "dependencies": {
-    "@nestjs-modules/mailer": "^2.0.2",
+    "@nestjs-modules/mailer": "^2.0.1",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
-    "@nestjs/jwt": "^11.0.0",
+    "@nestjs/jwt": "^11.0.1",
     "@nestjs/mapped-types": "*",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
@@ -44,6 +44,7 @@
     "nodemailer": "^7.0.3",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
+    "puppeteer": "^24.31.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "swagger-ui-express": "^5.0.1"
@@ -95,5 +96,10 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "overrides": {
+    "jsonwebtoken": "^9.0.2",
+    "jwa": "^2.0.0",
+    "buffer-equal-constant-time": "^1.0.1"
   }
 }

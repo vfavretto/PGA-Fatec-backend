@@ -1,10 +1,12 @@
 import {
   EixoTematico,
   EtapaProcesso,
+  Pessoa,
   PGA,
   PrioridadeAcao,
   ProjetoPessoa,
   SituacaoProblema,
+  StatusProjetoRegional,
   Tema,
 } from '@prisma/client';
 
@@ -26,6 +28,10 @@ export class AcaoProjeto {
   ativo: boolean;
   custo_total_estimado?: number | null;
   fonte_recursos?: string | null;
+  status_regional: StatusProjetoRegional;
+  regional_responsavel_id?: number | null;
+  parecer_regional?: string | null;
+  data_parecer_regional?: Date | null;
 
   eixo?: EixoTematico;
   tema?: Tema;
@@ -34,4 +40,5 @@ export class AcaoProjeto {
   situacoesProblemas?: SituacaoProblema[];
   etapas?: EtapaProcesso[];
   pessoas?: ProjetoPessoa[];
+  regionalResponsavel?: Pessoa | null;
 }

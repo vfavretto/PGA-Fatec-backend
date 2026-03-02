@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, Matches } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, Matches, IsInt } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUnitDto {
@@ -15,12 +15,12 @@ export class CreateUnitDto {
   codigo_fnnn: string;
 
   @ApiProperty({
-    description: 'Nome completo da unidade Fatec',
+    description: 'Nome da unidade Fatec (campo no banco: nome_unidade)',
     example: 'Fatec São Paulo',
   })
   @IsString({ message: 'O nome deve ser uma string' })
   @IsNotEmpty({ message: 'O nome da unidade é obrigatório' })
-  nome_completo: string;
+  nome_unidade: string;
 
   @ApiProperty({
     description: 'Endereço completo da unidade',
@@ -39,23 +39,19 @@ export class CreateUnitDto {
   @IsString({ message: 'O telefone deve ser uma string' })
   @IsOptional()
   telefone?: string;
+  @ApiProperty({
+    description: 'ID da regional à qual a unidade pertence',
+    example: 1,
+  })
+  @IsInt({ message: 'O id da regional deve ser um inteiro' })
+  regional_id: number;
 
   @ApiProperty({
-    description: 'Email de contato da unidade',
-    example: 'contato@fatecsp.edu.br',
-    format: 'email',
+    description: 'ID da pessoa que é diretor da unidade (opcional)',
+    example: 123,
     required: false,
   })
-  @IsString({ message: 'O email deve ser uma string' })
+  @IsInt({ message: 'O id do diretor deve ser um inteiro' })
   @IsOptional()
-  email?: string;
-
-  @ApiProperty({
-    description: 'Nome do diretor da unidade',
-    example: 'Dr. João Silva Santos',
-    required: false,
-  })
-  @IsString({ message: 'O nome do diretor deve ser uma string' })
-  @IsOptional()
-  diretor_nome?: string;
+  diretor_id?: number;
 }

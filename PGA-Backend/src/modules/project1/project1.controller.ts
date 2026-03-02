@@ -8,6 +8,8 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
+import { Request, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import {
   ApiTags,
   ApiOperation,
@@ -29,6 +31,7 @@ import { UpdateProject1Dto } from './dto/update-project1.dto';
 @ApiTags('Projects')
 @ApiBearerAuth('JWT-auth')
 @Controller('project1')
+@UseGuards(JwtAuthGuard)
 export class Project1Controller {
   constructor(
     private readonly createProject1Service: CreateProject1Service,
@@ -47,8 +50,8 @@ export class Project1Controller {
     status: 200,
     description: 'Lista de projetos retornada com sucesso',
   })
-  async findAll() {
-    return this.findAllProject1Service.execute();
+  async findAll(@Request() req: any) {
+    return this.findAllProject1Service.execute(req.user);
   }
 
   @Get(':id')
@@ -59,8 +62,8 @@ export class Project1Controller {
   @ApiParam({ name: 'id', type: 'number', description: 'ID do projeto' })
   @ApiResponse({ status: 200, description: 'Projeto encontrado com sucesso' })
   @ApiResponse({ status: 404, description: 'Projeto não encontrado' })
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.findOneProject1Service.execute(id);
+  async findOne(@Request() req: any, @Param('id', ParseIntPipe) id: number) {
+    return this.findOneProject1Service.execute(id, req.user);
   }
 
   @Post()

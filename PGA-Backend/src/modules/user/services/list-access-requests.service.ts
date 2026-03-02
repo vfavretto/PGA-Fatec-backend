@@ -15,7 +15,7 @@ export class ListAccessRequestsService {
           unidade: {
             select: {
               unidade_id: true,
-              nome_completo: true,
+              nome_unidade: true,
               codigo_fnnn: true,
             },
           },
@@ -61,7 +61,7 @@ export class ListAccessRequestsService {
           unidade: {
             select: {
               unidade_id: true,
-              nome_completo: true,
+              nome_unidade: true,
               codigo_fnnn: true,
             },
           },

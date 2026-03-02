@@ -6,9 +6,10 @@ import { ProjectPerson } from '../entities/project-person.entity';
 export class FindOneProjectPersonService {
   constructor(private readonly repository: ProjectPersonRepository) {}
 
-  async execute(id: number): Promise<ProjectPerson> {
-    const projectPerson = await this.repository.findOne(id);
-    if (!projectPerson) throw new NotFoundException('ProjectPerson not found');
+  async execute(id: number, user?: any): Promise<ProjectPerson> {
+    const active = user?.active_context ?? null;
+    const projectPerson = await this.repository.findOneWithContext(id, active);
+    if (!projectPerson) throw new NotFoundException('Vínculo não encontrado ou sem acesso');
     return projectPerson;
   }
 }

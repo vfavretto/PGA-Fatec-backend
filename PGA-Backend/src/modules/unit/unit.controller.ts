@@ -6,6 +6,8 @@ import {
   Param,
   Put,
   Delete,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -22,10 +24,12 @@ import { FindAllUnitsService } from './services/find-all-units.service';
 import { FindOneUnitService } from './services/find-one-unit.service';
 import { UpdateUnitService } from './services/update-unit.service';
 import { DeleteUnitService } from './services/delete-unit.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('Academic')
 @ApiBearerAuth('JWT-auth')
 @Controller('unit')
+@UseGuards(JwtAuthGuard)
 export class UnitController {
   constructor(
     private readonly createUnitService: CreateUnitService,
@@ -56,8 +60,8 @@ export class UnitController {
     status: 200,
     description: 'Lista de unidades retornada com sucesso',
   })
-  findAll() {
-    return this.findAllUnitsService.execute();
+  findAll(@Request() req: any) {
+    return this.findAllUnitsService.execute(req.user);
   }
 
   @Get(':id')
@@ -68,8 +72,8 @@ export class UnitController {
   @ApiParam({ name: 'id', type: 'string', description: 'ID da unidade' })
   @ApiResponse({ status: 200, description: 'Unidade encontrada com sucesso' })
   @ApiResponse({ status: 404, description: 'Unidade não encontrada' })
-  findOne(@Param('id') id: string) {
-    return this.findOneUnitService.execute(Number(id));
+  findOne(@Request() req: any, @Param('id') id: string) {
+    return this.findOneUnitService.execute(Number(id), req.user);
   }
 
   @Put(':id')

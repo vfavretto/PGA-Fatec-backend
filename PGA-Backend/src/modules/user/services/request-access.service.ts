@@ -52,7 +52,7 @@ export class RequestAccessService {
           select: {
             unidade_id: true,
             codigo_fnnn: true,
-            nome_completo: true,
+            nome_unidade: true,
           },
         },
       },

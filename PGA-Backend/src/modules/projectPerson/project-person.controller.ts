@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Put, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Put, Delete, ParseIntPipe, Request, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
 import { CreateProjectPersonDto } from './dto/create-project-person.dto';
 import { UpdateProjectPersonDto } from './dto/update-project-person.dto';
@@ -7,10 +7,12 @@ import { FindAllProjectPersonService } from './services/find-all-project-person.
 import { FindOneProjectPersonService } from './services/find-one-project-person.service';
 import { UpdateProjectPersonService } from './services/update-project-person.service';
 import { DeleteProjectPersonService } from './services/delete-project-person.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('Projects')
 @ApiBearerAuth('JWT-auth')
 @Controller('project-person')
+@UseGuards(JwtAuthGuard)
 export class ProjectPersonController {
   constructor(
     private readonly createService: CreateProjectPersonService,
@@ -32,8 +34,8 @@ export class ProjectPersonController {
   @Get()
   @ApiOperation({ summary: 'Listar vínculos projeto-pessoa', description: 'Retorna lista de todos os vínculos entre projetos e pessoas' })
   @ApiResponse({ status: 200, description: 'Lista de vínculos retornada com sucesso' })
-  findAll() {
-    return this.findAllService.execute();
+  findAll(@Request() req: any) {
+    return this.findAllService.execute(req.user);
   }
 
   @Get(':id')
@@ -41,8 +43,8 @@ export class ProjectPersonController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID do vínculo projeto-pessoa' })
   @ApiResponse({ status: 200, description: 'Vínculo encontrado com sucesso' })
   @ApiResponse({ status: 404, description: 'Vínculo não encontrado' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.findOneService.execute(id);
+  findOne(@Request() req: any, @Param('id', ParseIntPipe) id: number) {
+    return this.findOneService.execute(id, req.user);
   }
 
   @Put(':id')

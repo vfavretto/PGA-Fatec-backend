@@ -54,4 +54,48 @@ export class CpaActionRepository extends BaseRepository<AcaoCPA> {
       where: this.whereActive({ pga_id: pgaId }),
     });
   }
+
+  async findAllByUnit(unidadeId: number) {
+    return this.prisma.acaoCPA.findMany({
+      where: this.whereActive({ unidade_id: unidadeId }),
+    });
+  }
+
+  async findAllByRegional(regionalId: number) {
+    return this.prisma.acaoCPA.findMany({
+      where: this.whereActive({ regional_id: regionalId }),
+    });
+  }
+
+  async findOneWithContext(id: number, active_context?: any) {
+    if (active_context && active_context.tipo === 'unidade') {
+      return this.prisma.acaoCPA.findFirst({
+        where: this.whereActive({ acao_cpa_id: id, unidade_id: active_context.id }),
+      });
+    }
+
+    if (active_context && active_context.tipo === 'regional') {
+      return this.prisma.acaoCPA.findFirst({
+        where: this.whereActive({ acao_cpa_id: id, regional_id: active_context.id }),
+      });
+    }
+
+    return this.findOne(id);
+  }
+
+  async findByPgaIdWithContext(pgaId: number, active_context?: any) {
+    if (active_context && active_context.tipo === 'unidade') {
+      return this.prisma.acaoCPA.findMany({
+        where: this.whereActive({ pga_id: pgaId, unidade_id: active_context.id }),
+      });
+    }
+
+    if (active_context && active_context.tipo === 'regional') {
+      return this.prisma.acaoCPA.findMany({
+        where: this.whereActive({ pga_id: pgaId, regional_id: active_context.id }),
+      });
+    }
+
+    return this.findByPgaId(pgaId);
+  }
 }

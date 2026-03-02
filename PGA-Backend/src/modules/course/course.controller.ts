@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Put, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Put, Delete, ParseIntPipe, Request, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
@@ -7,10 +7,12 @@ import { FindAllCourseService } from './services/find-all-course.service';
 import { FindOneCourseService } from './services/find-one-course.service';
 import { UpdateCourseService } from './services/update-course.service';
 import { DeleteCourseService } from './services/delete-course.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('Academic')
 @ApiBearerAuth('JWT-auth')
 @Controller('course')
+@UseGuards(JwtAuthGuard)
 export class CourseController {
   constructor(
     private readonly createService: CreateCourseService,
@@ -32,8 +34,8 @@ export class CourseController {
   @Get()
   @ApiOperation({ summary: 'Listar cursos', description: 'Retorna lista de todos os cursos' })
   @ApiResponse({ status: 200, description: 'Lista de cursos retornada com sucesso' })
-  findAll() {
-    return this.findAllService.execute();
+  findAll(@Request() req: any) {
+    return this.findAllService.execute(req.user);
   }
 
   @Get(':id')
@@ -41,8 +43,8 @@ export class CourseController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID do curso' })
   @ApiResponse({ status: 200, description: 'Curso encontrado com sucesso' })
   @ApiResponse({ status: 404, description: 'Curso não encontrado' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.findOneService.execute(id);
+  findOne(@Request() req: any, @Param('id', ParseIntPipe) id: number) {
+    return this.findOneService.execute(id, req.user);
   }
 
   @Put(':id')

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Put, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Put, Delete, ParseIntPipe, Request, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
 import { CreateInstitutionalRoutineDto } from './dto/create-institutional-routine.dto';
 import { UpdateInstitutionalRoutineDto } from './dto/update-institutional-routine.dto';
@@ -7,10 +7,12 @@ import { FindAllInstitutionalRoutineService } from './services/find-all-institut
 import { FindOneInstitutionalRoutineService } from './services/find-one-institutional-routine.service';
 import { UpdateInstitutionalRoutineService } from './services/update-institutional-routine.service';
 import { DeleteInstitutionalRoutineService } from './services/delete-institutional-routine.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('PGA')
 @ApiBearerAuth('JWT-auth')
 @Controller('institutional-routine')
+@UseGuards(JwtAuthGuard)
 export class InstitutionalRoutineController {
   constructor(
     private readonly createService: CreateInstitutionalRoutineService,
@@ -32,8 +34,8 @@ export class InstitutionalRoutineController {
   @Get()
   @ApiOperation({ summary: 'Listar rotinas institucionais', description: 'Retorna lista de todas as rotinas institucionais' })
   @ApiResponse({ status: 200, description: 'Lista de rotinas institucionais retornada com sucesso' })
-  findAll() {
-    return this.findAllService.execute();
+  findAll(@Request() req: any) {
+    return this.findAllService.execute(req.user);
   }
 
   @Get(':id')
@@ -41,8 +43,8 @@ export class InstitutionalRoutineController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID da rotina institucional' })
   @ApiResponse({ status: 200, description: 'Rotina institucional encontrada com sucesso' })
   @ApiResponse({ status: 404, description: 'Rotina institucional não encontrada' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.findOneService.execute(id);
+  findOne(@Request() req: any, @Param('id', ParseIntPipe) id: number) {
+    return this.findOneService.execute(id, req.user);
   }
 
   @Put(':id')
