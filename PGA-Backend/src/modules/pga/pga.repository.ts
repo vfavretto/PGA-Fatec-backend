@@ -24,7 +24,31 @@ export class PgaRepository extends BaseRepository<PGA> {
         unidade: true,
         regionalResponsavel: true,
       },
-      orderBy: [{ ano: 'desc' }, { unidade: { nome_completo: 'asc' } }],
+      orderBy: [{ ano: 'desc' }, { unidade: { nome_unidade: 'asc' } }],
+    });
+  }
+
+  async findAllByUnit(unidadeId: number) {
+    return this.prisma.pGA.findMany({
+      where: this.whereActive({ unidade_id: unidadeId }),
+      include: { unidade: true, regionalResponsavel: true },
+      orderBy: [{ ano: 'desc' }, { unidade: { nome_unidade: 'asc' } }],
+    });
+  }
+
+  async findAllByRegional(regionalId: number) {
+    const vinculos = await this.prisma.pessoaUnidade.findMany({
+      where: { pessoa_id: regionalId, ativo: true },
+      select: { unidade_id: true },
+    });
+
+    const unidadeIds = vinculos.map((v) => v.unidade_id);
+    if (!unidadeIds.length) return [];
+
+    return this.prisma.pGA.findMany({
+      where: this.whereActive({ unidade_id: { in: unidadeIds } }),
+      include: { unidade: true, regionalResponsavel: true },
+      orderBy: [{ ano: 'desc' }, { unidade: { nome_unidade: 'asc' } }],
     });
   }
 
@@ -39,6 +63,32 @@ export class PgaRepository extends BaseRepository<PGA> {
           include: {
             situacaoProblema: true,
           },
+        },
+      },
+    });
+  }
+
+  async findOneWithRelations(id: number) {
+    return this.prisma.pGA.findFirst({
+      where: this.whereActive({ pga_id: id }),
+      include: {
+        unidade: true,
+        regionalResponsavel: true,
+        situacoesProblemas: {
+          where: this.whereActive(),
+          include: { situacaoProblema: true },
+        },
+        acoesProjetos: {
+          where: { ativo: true },
+          include: {
+            eixo: true,
+            tema: true,
+            prioridade: true,
+            situacoesProblemas: { include: { situacaoProblema: true } },
+            etapas: { include: { entregavel_link_sei: true, anexos: true } },
+            pessoas: { include: { pessoa: true } },
+          },
+          orderBy: [{ codigo_projeto: 'asc' }],
         },
       },
     });
@@ -68,5 +118,27 @@ export class PgaRepository extends BaseRepository<PGA> {
         unidade: true,
       },
     });
+  }
+
+  async findOneWithContext(id: number, active_context?: { tipo: string; id?: number } | null) {
+    const pga = await this.findOne(id);
+    if (!pga) return null;
+
+    if (active_context) {
+      if (active_context.tipo === 'unidade') {
+        if (pga.unidade_id !== Number(active_context.id)) return null;
+      }
+
+      if (active_context.tipo === 'regional') {
+        const vinculos = await this.prisma.pessoaUnidade.findMany({
+          where: { pessoa_id: Number(active_context.id), ativo: true },
+          select: { unidade_id: true },
+        });
+        const unidadeIds = vinculos.map((v) => v.unidade_id);
+        if (!unidadeIds.includes(pga.unidade_id)) return null;
+      }
+    }
+
+    return pga;
   }
 }

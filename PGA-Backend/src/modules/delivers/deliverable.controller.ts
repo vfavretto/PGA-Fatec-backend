@@ -1,4 +1,15 @@
-import { Controller, Post, Get, Put, Delete, Param, Body, ParseIntPipe, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Put,
+  Delete,
+  Param,
+  Body,
+  ParseIntPipe,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -9,10 +20,12 @@ import { UpdateDeliverableService } from './services/update-deliverable.service'
 import { DeleteDeliverableService } from './services/delete-deliverable.service';
 import { CreateDeliverableDto } from './dto/create-deliverable.dto';
 import { UpdateDeliverableDto } from './dto/update-deliverable.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('Projects')
 @ApiBearerAuth('JWT-auth')
 @Controller('deliverable')
+@UseGuards(JwtAuthGuard)
 export class DeliverableController {
   constructor(
     private readonly createService: CreateDeliverableService,
@@ -36,8 +49,8 @@ export class DeliverableController {
   @Get()
   @ApiOperation({ summary: 'Listar entregáveis', description: 'Retorna lista de todos os entregáveis' })
   @ApiResponse({ status: 200, description: 'Lista de entregáveis retornada com sucesso' })
-  findAll() {
-    return this.findAllService.execute();
+  findAll(@Request() req: any) {
+    return this.findAllService.execute(req.user);
   }
 
   @Get(':id')
@@ -45,8 +58,8 @@ export class DeliverableController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID do entregável' })
   @ApiResponse({ status: 200, description: 'Entregável encontrado com sucesso' })
   @ApiResponse({ status: 404, description: 'Entregável não encontrado' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.findOneService.execute(id);
+  findOne(@Request() req: any, @Param('id', ParseIntPipe) id: number) {
+    return this.findOneService.execute(id, req.user);
   }
 
   @Put(':id')

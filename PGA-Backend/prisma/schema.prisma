@@ -11,7 +11,8 @@ datasource db {
 model Unidade {
   unidade_id    Int     @id @default(autoincrement())
   codigo_fnnn   String  @unique @db.VarChar(10)
-  nome_completo String  @db.VarChar(255)
+  nome_unidade String  @db.VarChar(255)
+  regional_id   Int
   ativo         Boolean @default(true)
   diretor_id    Int?    @unique
   endereco      String?  @db.VarChar(255)
@@ -35,6 +36,9 @@ model Unidade {
   diretor       Pessoa? @relation("DiretorUnidade", fields: [diretor_id], references: [pessoa_id])
   criadoPor     Pessoa? @relation("UnidadeCriadaPor", fields: [criado_por], references: [pessoa_id])
   atualizadoPor Pessoa? @relation("UnidadeAtualizadaPor", fields: [atualizado_por], references: [pessoa_id])
+  regional      Regional? @relation(fields: [regional_id], references: [regional_id], onDelete: SetNull)
+
+  @@index([regional_id])
 }
 
 model PGA {
@@ -91,7 +95,7 @@ model SituacaoProblema {
 model EixoTematico {
   eixo_id             Int             @id @default(autoincrement())
   numero              Int             @unique
-  nome                String          @db.VarChar(255)
+  nome_eixo           String          @db.VarChar(255)
   descricao           String?
   ativo               Boolean         @default(true)
 
@@ -185,6 +189,7 @@ model AcaoProjeto {
 
   @@index([codigo_projeto])
   @@index([status_regional])
+  @@index([pga_id])
 }
 
 model Pessoa {
@@ -218,6 +223,11 @@ model Pessoa {
 
   unidades_criadas         Unidade[]       @relation("UnidadeCriadaPor")
   unidades_atualizadas     Unidade[]       @relation("UnidadeAtualizadaPor")
+
+  regionaisCriadas         Regional[]      @relation("RegionalCriador")
+  regionaisAtualizadas     Regional[]      @relation("RegionalAtualizador")
+  regionaisResponsavel     Regional[]      @relation("RegionalResponsavel")
+  pessoaRegionais          PessoaRegional[]
 
   rotinas_responsaveis RotinaInstitucional[] @relation("ResponsavelRotina")
   pgasCriados                    PGA[]                        @relation("PGACriador")
@@ -681,4 +691,35 @@ model PessoaUnidade {
   unidade Unidade @relation(fields: [unidade_id], references: [unidade_id], onDelete: Cascade)
   
   @@id([pessoa_id, unidade_id])
+}
+
+model PessoaRegional {
+  pessoa_id   Int
+  regional_id Int
+  data_vinculo DateTime @default(now())
+  ativo       Boolean @default(true)
+
+  pessoa   Pessoa    @relation(fields: [pessoa_id], references: [pessoa_id], onDelete: Cascade)
+  regional Regional  @relation(fields: [regional_id], references: [regional_id], onDelete: Cascade)
+
+  @@id([pessoa_id, regional_id])
+}
+
+model Regional {
+  regional_id        Int      @id @default(autoincrement())
+  nome_regional      String   @db.VarChar(255)
+  codigo_regional    String?   @unique @db.VarChar(10)
+  responsavel_id     Int?
+  ativo              Boolean  @default(true)
+  criado_em          DateTime @default(now())
+  atualizado_em      DateTime @updatedAt
+  criado_por         Int?
+  atualizado_por     Int?
+
+  unidades       Unidade[]
+  pessoas        PessoaRegional[]
+
+  responsavel        Pessoa? @relation("RegionalResponsavel", fields: [responsavel_id], references: [pessoa_id])
+  usuarioCriador     Pessoa? @relation("RegionalCriador", fields: [criado_por], references: [pessoa_id])
+  usuarioAtualizador Pessoa? @relation("RegionalAtualizador", fields: [atualizado_por], references: [pessoa_id])
 }

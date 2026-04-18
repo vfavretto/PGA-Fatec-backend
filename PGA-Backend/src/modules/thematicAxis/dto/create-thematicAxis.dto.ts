@@ -16,7 +16,7 @@ export class CreateThematicAxisDto {
   })
   @IsString()
   @IsNotEmpty()
-  nome: string;
+  nome_eixo: string;
 
   @ApiProperty({
     description: 'Descrição detalhada do eixo temático',

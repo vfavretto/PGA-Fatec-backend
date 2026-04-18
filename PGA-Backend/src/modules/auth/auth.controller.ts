@@ -1,21 +1,14 @@
-import {
-  Controller,
-  Post,
-  Body,
-  UseGuards,
-  HttpCode,
-  HttpStatus,
-  Request,
-  Get,
-} from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, HttpCode, HttpStatus, Request, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { LoginService } from './services/login.service';
 import { JwtService } from '@nestjs/jwt';
 import { Public } from './decorators/is-public.decorator';
 import { LocalAuthGuard } from './guards/local-auth.guard';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { LoginDto } from './dto/login.dto';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { ContextService } from './services/context.service';
+import { SelectContextDto } from './dto/select-context.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -23,6 +16,7 @@ export class AuthController {
   constructor(
     private readonly loginService: LoginService,
     private readonly jwtService: JwtService,
+    private readonly contextService: ContextService,
   ) {}
 
   @Public()
@@ -77,6 +71,19 @@ export class AuthController {
     return this.loginService.execute(req.user);
   }
 
+  @Get('contexts')
+  @UseGuards(JwtAuthGuard)
+  async contexts(@Request() req: any) {
+    return this.contextService.getAvailableContexts(req.user);
+  }
+
+  @Post('select-context')
+  @UseGuards(JwtAuthGuard)
+  async selectContext(@Request() req: any, @Body() body: SelectContextDto) {
+    const { tipo, id } = body;
+    return this.contextService.selectContext(req.user, tipo, id);
+  }
+
   @Get('me')
   @UseGuards(JwtAuthGuard)
   @ApiOperation({
@@ -86,7 +93,6 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Token válido - retorna usuário' })
   @ApiResponse({ status: 401, description: 'Token inválido ou ausente' })
   me(@CurrentUser() user: any) {
-    // apenas retorna o objeto user que já foi populado pela estratégia JWT
     return user;
   }
 
@@ -101,7 +107,6 @@ export class AuthController {
     }
     try {
       const payload: any = this.jwtService.verify(refreshToken);
-      // re-emit access token with standard expiry
       const access = this.jwtService.sign(payload, { expiresIn: '24h' });
       return { access_token: access };
     } catch (e) {

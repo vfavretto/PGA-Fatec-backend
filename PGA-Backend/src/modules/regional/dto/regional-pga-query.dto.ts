@@ -23,4 +23,3 @@ export class RegionalPgaQueryDto {
   @IsInt()
   unidadeId?: number;
 }
-

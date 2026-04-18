@@ -8,6 +8,8 @@ import { FindOnePgaService } from './services/find-one-pga.service';
 import { UpdatePgaService } from './services/update-pga.service';
 import { DeletePgaService } from './services/delete-pga.service';
 import { SubmitPgaService } from './services/submit-pga.service';
+import { ExportPgaCsvService } from './services/export-pga-csv.service';
+import { ExportPgaPdfService } from './services/export-pga-pdf.service';
 
 @Module({
   imports: [PrismaModule],
@@ -20,6 +22,8 @@ import { SubmitPgaService } from './services/submit-pga.service';
     UpdatePgaService,
     DeletePgaService,
     SubmitPgaService,
+    ExportPgaCsvService,
+    ExportPgaPdfService,
   ],
   exports: [
     PgaRepository,
@@ -29,6 +33,8 @@ import { SubmitPgaService } from './services/submit-pga.service';
     UpdatePgaService,
     DeletePgaService,
     SubmitPgaService,
+    ExportPgaCsvService,
+    ExportPgaPdfService,
   ],
 })
 export class PgaModule {}

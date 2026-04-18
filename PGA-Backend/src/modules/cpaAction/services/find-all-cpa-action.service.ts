@@ -6,7 +6,16 @@ import { CpaAction } from '../entities/cpa-action.entity';
 export class FindAllCpaActionService {
   constructor(private readonly repository: CpaActionRepository) {}
 
-  async execute(): Promise<CpaAction[]> {
+  async execute(user?: any): Promise<CpaAction[]> {
+    const active = user?.active_context;
+    if (active?.tipo === 'unidade') {
+      return this.repository.findAllByUnit(active.id);
+    }
+
+    if (active?.tipo === 'regional') {
+      return this.repository.findAllByRegional(active.id);
+    }
+
     return this.repository.findAll();
   }
 }

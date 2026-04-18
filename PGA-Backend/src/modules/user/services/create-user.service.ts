@@ -1,24 +1,35 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  ForbiddenException,
+  BadRequestException,
+  Logger,
+} from '@nestjs/common';
+import { TipoUsuario } from '@prisma/client';
 import { UserRepository } from '../user.repository';
 import { Prisma, Pessoa } from '@prisma/client';
 import { CreateUserDto } from '../dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
-import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../../../config/prisma.service';
+import { ForgotPasswordService } from './forgot-password.service';
 
 const TIPOS_AUTORIZADOS_CRIACAO = ['Administrador', 'CPS', 'Diretor'] as const;
 
 @Injectable()
 export class CreateUserService {
+  private readonly logger = new Logger(CreateUserService.name);
+
   constructor(
     private readonly userRepository: UserRepository,
     private readonly prisma: PrismaService,
+    @Inject(ForgotPasswordService)
+    private readonly forgotPasswordService: ForgotPasswordService,
   ) {}
 
   async execute(
     data: CreateUserDto,
     reqUser?: Partial<Pessoa> | null,
-  ): Promise<Pessoa> {
+  ): Promise<{ user: Pessoa; email_sent: boolean }> {
     const total = await this.userRepository.countActiveUsers();
 
     if (total > 0) {
@@ -33,7 +44,6 @@ export class CreateUserService {
         );
       }
 
-      // Diretor só pode criar pessoa da própria unidade
       if (tipo === 'Diretor') {
         if (!data.unidade_id) {
           throw new BadRequestException(
@@ -57,7 +67,6 @@ export class CreateUserService {
           );
         }
 
-        // Diretor não pode criar Administrador, CPS ou Regional
         const tipoAlvo = data.tipo_usuario as string;
         if (
           tipoAlvo === 'Administrador' ||
@@ -73,10 +82,48 @@ export class CreateUserService {
       data.tipo_usuario = 'Administrador';
     }
 
-    if (data.senha) {
-      data.senha = await bcrypt.hash(data.senha, 10);
+    if (
+      data.tipo_usuario === (TipoUsuario as any).Regional ||
+      data.tipo_usuario === 'Regional'
+    ) {
+      if (!data.regional_id) {
+        throw new BadRequestException(
+          'Campo regional_id é obrigatório para tipo Regional',
+        );
+      }
     }
 
-    return this.userRepository.create(data as Prisma.PessoaCreateInput);
+    const unitRoles = ['Docente', 'Diretor', 'Coordenador', 'Administrativo'];
+    if (unitRoles.includes(String(data.tipo_usuario)) && !data.unidade_id) {
+      throw new BadRequestException(
+        'Campo unidade_id é obrigatório para o tipo de usuário selecionado',
+      );
+    }
+
+    if (data.senha) {
+      data.senha = await bcrypt.hash(data.senha, 10);
+      const user = await this.userRepository.create(
+        data as Prisma.PessoaCreateInput,
+      );
+      return { user, email_sent: false };
+    }
+
+    const createData = { ...data } as Prisma.PessoaCreateInput;
+    createData.senha = null;
+
+    this.logger.debug(
+      `Criando usuário com payload: ${JSON.stringify(createData)}`,
+    );
+    const user = await this.userRepository.create(createData);
+
+    let emailSent = false;
+    try {
+      if (user.email) {
+        await this.forgotPasswordService.execute(user.email);
+        emailSent = true;
+      }
+    } catch (err) {}
+
+    return { user, email_sent: emailSent };
   }
 }

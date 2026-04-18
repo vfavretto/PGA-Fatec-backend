@@ -33,8 +33,9 @@ import { DeleteUserService } from './services/delete-user.service';
 import { ForgotPasswordService } from './services/forgot-password.service';
 import { ResetPasswordService } from './services/reset-password.service';
 import { Prisma } from '@prisma/client';
+import { OptionalAuthGuard } from '../auth/guards/optional-auth.guard';
 import { Public } from '../auth/decorators/is-public.decorator';
-import { RegisterDto } from '../auth/dto/register.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { RequestAccessService } from './services/request-access.service';
 import { RequestAccessDto } from './dto/request-access.dto';
@@ -68,17 +69,20 @@ export class UserController {
 
   @Public()
   @Post()
+  @UseGuards(OptionalAuthGuard)
   @ApiOperation({
     summary: 'Criar novo usuário',
     description: 'Cria um novo usuário no sistema',
   })
-  @ApiBody({ type: RegisterDto })
+  @ApiBody({ type: CreateUserDto })
   @ApiResponse({ status: 201, description: 'Usuário criado com sucesso' })
   @ApiResponse({ status: 400, description: 'Dados inválidos' })
-  async create(@Body() data: RegisterDto, @Request() req?: ExpressRequest & { user?: any }) {
+  async create(@Body() data: CreateUserDto, @Request() req?: ExpressRequest & { user?: any }) {
     // req.user pode ser undefined para chamadas públicas
     const reqUser = req?.user ?? null;
-    return this.createUserService.execute(data as any, reqUser);
+      const result = await this.createUserService.execute(data as any, reqUser);
+      // result has shape { user, email_sent }
+      return result;
   }
 
   @Get()

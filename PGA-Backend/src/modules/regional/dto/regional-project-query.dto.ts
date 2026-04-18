@@ -33,4 +33,3 @@ export class RegionalProjectQueryDto {
   @IsInt()
   unidadeId?: number;
 }
-

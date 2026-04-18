@@ -9,7 +9,9 @@ import {
   ParseIntPipe,
   Request,
   UseGuards,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import {
   ApiTags,
   ApiOperation,
@@ -28,10 +30,14 @@ import { FindOnePgaService } from './services/find-one-pga.service';
 import { UpdatePgaService } from './services/update-pga.service';
 import { DeletePgaService } from './services/delete-pga.service';
 import { SubmitPgaService } from './services/submit-pga.service';
+import { ExportPgaCsvService } from './services/export-pga-csv.service';
+import { ExportPgaPdfService } from './services/export-pga-pdf.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('PGA')
 @ApiBearerAuth('JWT-auth')
 @Controller('pga')
+@UseGuards(JwtAuthGuard)
 export class PgaController {
   constructor(
     private readonly createPgaService: CreatePgaService,
@@ -40,6 +46,8 @@ export class PgaController {
     private readonly updatePgaService: UpdatePgaService,
     private readonly deletePgaService: DeletePgaService,
     private readonly submitPgaService: SubmitPgaService,
+    private readonly exportPgaCsvService: ExportPgaCsvService,
+    private readonly exportPgaPdfService: ExportPgaPdfService,
   ) {}
 
   @Post()
@@ -63,8 +71,36 @@ export class PgaController {
     status: 200,
     description: 'Lista de PGAs retornada com sucesso',
   })
-  findAll() {
-    return this.findAllPgaService.execute();
+  findAll(@Request() req: any) {
+    return this.findAllPgaService.execute(req.user);
+  }
+
+  @Get(':id/export/csv')
+  @ApiOperation({ summary: 'Exportar PGA como CSV' })
+  async exportCsv(
+    @Param('id', ParseIntPipe) id: number,
+    @Request() req: any,
+    @Res() res: Response,
+  ) {
+    const csv = await this.exportPgaCsvService.execute(id, req.user);
+    const filename = `pga-${id}.csv`;
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(csv);
+  }
+
+  @Get(':id/export/pdf')
+  @ApiOperation({ summary: 'Exportar PGA como PDF' })
+  async exportPdf(
+    @Param('id', ParseIntPipe) id: number,
+    @Request() req: any,
+    @Res() res: Response,
+  ) {
+    const pdfBuffer = await this.exportPgaPdfService.execute(id, req.user);
+    const filename = `pga-${id}.pdf`;
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(pdfBuffer);
   }
 
   @Get(':id')
@@ -75,8 +111,8 @@ export class PgaController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID do PGA' })
   @ApiResponse({ status: 200, description: 'PGA encontrado com sucesso' })
   @ApiResponse({ status: 404, description: 'PGA não encontrado' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.findOnePgaService.execute(id);
+  findOne(@Request() req: any, @Param('id', ParseIntPipe) id: number) {
+    return this.findOnePgaService.execute(id, req.user);
   }
 
   @Put(':id')

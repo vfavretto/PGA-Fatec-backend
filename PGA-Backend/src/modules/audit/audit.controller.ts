@@ -6,6 +6,8 @@ import {
   Body,
   Query,
   ParseIntPipe,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -16,6 +18,7 @@ import {
   ApiBody,
   ApiQuery,
 } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ConfigurationSnapshotService } from './services/configuration-snapshot.service';
 import { VersionManagerService } from './services/version-manager.service';
 import { AuditLogService } from './services/audit-log.service';
@@ -31,6 +34,7 @@ import {
 @ApiTags('Audit')
 @ApiBearerAuth('JWT-auth')
 @Controller('audit')
+@UseGuards(JwtAuthGuard)
 export class AuditController {
   constructor(
     private readonly snapshotService: ConfigurationSnapshotService,
@@ -76,8 +80,8 @@ export class AuditController {
     status: 200,
     description: 'Configurações retornadas com sucesso',
   })
-  async getConfigurationsByYear(@Param('ano', ParseIntPipe) ano: number) {
-    return this.auditLogService.getConfigurationsByYear(ano);
+  async getConfigurationsByYear(@Request() req: any, @Param('ano', ParseIntPipe) ano: number) {
+    return this.auditLogService.getConfigurationsByYear(ano, req.user?.active_context);
   }
 
   @Get('configurations/situacoes-problema/year/:ano')
