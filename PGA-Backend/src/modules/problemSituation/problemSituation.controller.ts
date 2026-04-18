@@ -1,5 +1,7 @@
-import { Controller, Post, Get, Put, Delete, Body, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Get, Put, Delete, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { RolesGuard } from '../auth/guards/roles.guard';
 import { CreateProblemSituationService } from './services/create-problemSituation.service';
 import { FindAllProblemSituationService } from './services/find-all-problemSituation.service';
 import { FindOneProblemSituationService } from './services/find-one-problemSituation.service';
@@ -21,6 +23,8 @@ export class ProblemSituationController {
   ) {}
 
   @Post()
+  @UseGuards(RolesGuard)
+  @Roles('Administrador', 'CPS')
   @ApiOperation({ summary: 'Criar situação problema', description: 'Cria uma nova situação problema no sistema' })
   @ApiBody({ type: CreateProblemSituationDto })
   @ApiResponse({ status: 201, description: 'Situação problema criada com sucesso' })
@@ -46,6 +50,8 @@ export class ProblemSituationController {
   }
 
   @Put(':id')
+  @UseGuards(RolesGuard)
+  @Roles('Administrador', 'CPS')
   @ApiOperation({ summary: 'Atualizar situação problema', description: 'Atualiza dados de uma situação problema específica' })
   @ApiParam({ name: 'id', type: 'number', description: 'ID da situação problema' })
   @ApiBody({ type: UpdateProblemSituationDto })
@@ -56,6 +62,8 @@ export class ProblemSituationController {
   }
 
   @Delete(':id')
+  @UseGuards(RolesGuard)
+  @Roles('Administrador', 'CPS')
   @ApiOperation({ summary: 'Excluir situação problema', description: 'Remove uma situação problema do sistema' })
   @ApiParam({ name: 'id', type: 'number', description: 'ID da situação problema' })
   @ApiResponse({ status: 200, description: 'Situação problema excluída com sucesso' })

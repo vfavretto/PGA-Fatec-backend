@@ -1,5 +1,7 @@
-import { Controller, Post, Get, Put, Delete, Param, Body, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Get, Put, Delete, Param, Body, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { RolesGuard } from '../auth/guards/roles.guard';
 import { CreateDeliverableService } from './services/create-deliverable.service';
 import { FindAllDeliverableService } from './services/find-all-deliverable.service';
 import { FindOneDeliverableService } from './services/find-one-deliverable.service';
@@ -21,6 +23,8 @@ export class DeliverableController {
   ) {}
 
   @Post()
+  @UseGuards(RolesGuard)
+  @Roles('Administrador', 'CPS')
   @ApiOperation({ summary: 'Criar entregável', description: 'Cria um novo entregável no sistema' })
   @ApiBody({ type: CreateDeliverableDto })
   @ApiResponse({ status: 201, description: 'Entregável criado com sucesso' })
@@ -46,6 +50,8 @@ export class DeliverableController {
   }
 
   @Put(':id')
+  @UseGuards(RolesGuard)
+  @Roles('Administrador', 'CPS')
   @ApiOperation({ summary: 'Atualizar entregável', description: 'Atualiza dados de um entregável específico' })
   @ApiParam({ name: 'id', type: 'number', description: 'ID do entregável' })
   @ApiBody({ type: UpdateDeliverableDto })
@@ -56,6 +62,8 @@ export class DeliverableController {
   }
 
   @Delete(':id')
+  @UseGuards(RolesGuard)
+  @Roles('Administrador', 'CPS')
   @ApiOperation({ summary: 'Excluir entregável', description: 'Remove um entregável do sistema' })
   @ApiParam({ name: 'id', type: 'number', description: 'ID do entregável' })
   @ApiResponse({ status: 200, description: 'Entregável excluído com sucesso' })

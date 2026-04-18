@@ -1,5 +1,7 @@
-import { Controller, Post, Get, Put, Delete, Param, Body, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Get, Put, Delete, Param, Body, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { RolesGuard } from '../auth/guards/roles.guard';
 import { CreateWorkloadHaeService } from './services/create-workload-hae.service';
 import { FindAllWorkloadHaeService } from './services/find-all-workload-hae.service';
 import { FindOneWorkloadHaeService } from './services/find-one-workload-hae.service';
@@ -21,6 +23,8 @@ export class WorkloadHaeController {
   ) {}
 
   @Post()
+  @UseGuards(RolesGuard)
+  @Roles('Administrador', 'CPS')
   @ApiOperation({ summary: 'Criar carga horária HAE', description: 'Cria uma nova carga horária de Hora Atividade Específica' })
   @ApiBody({ type: CreateWorkloadHaeDto })
   @ApiResponse({ status: 201, description: 'Carga horária HAE criada com sucesso' })
@@ -46,6 +50,8 @@ export class WorkloadHaeController {
   }
 
   @Put(':id')
+  @UseGuards(RolesGuard)
+  @Roles('Administrador', 'CPS')
   @ApiOperation({ summary: 'Atualizar carga horária HAE', description: 'Atualiza dados de uma carga horária HAE específica' })
   @ApiParam({ name: 'id', type: 'number', description: 'ID da carga horária HAE' })
   @ApiBody({ type: UpdateWorkloadHaeDto })
@@ -56,6 +62,8 @@ export class WorkloadHaeController {
   }
 
   @Delete(':id')
+  @UseGuards(RolesGuard)
+  @Roles('Administrador', 'CPS')
   @ApiOperation({ summary: 'Excluir carga horária HAE', description: 'Remove uma carga horária HAE do sistema' })
   @ApiParam({ name: 'id', type: 'number', description: 'ID da carga horária HAE' })
   @ApiResponse({ status: 200, description: 'Carga horária HAE excluída com sucesso' })

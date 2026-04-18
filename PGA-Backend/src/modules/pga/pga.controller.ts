@@ -7,6 +7,8 @@ import {
   Put,
   Delete,
   ParseIntPipe,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -16,6 +18,8 @@ import {
   ApiParam,
   ApiBody,
 } from '@nestjs/swagger';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { RolesGuard } from '../auth/guards/roles.guard';
 import { CreatePgaDto } from './dto/create-pga.dto';
 import { UpdatePgaDto } from './dto/update-pga.dto';
 import { CreatePgaService } from './services/create-pga.service';
@@ -23,6 +27,7 @@ import { FindAllPgaService } from './services/find-all-pga.service';
 import { FindOnePgaService } from './services/find-one-pga.service';
 import { UpdatePgaService } from './services/update-pga.service';
 import { DeletePgaService } from './services/delete-pga.service';
+import { SubmitPgaService } from './services/submit-pga.service';
 
 @ApiTags('PGA')
 @ApiBearerAuth('JWT-auth')
@@ -34,6 +39,7 @@ export class PgaController {
     private readonly findOnePgaService: FindOnePgaService,
     private readonly updatePgaService: UpdatePgaService,
     private readonly deletePgaService: DeletePgaService,
+    private readonly submitPgaService: SubmitPgaService,
   ) {}
 
   @Post()
@@ -96,5 +102,22 @@ export class PgaController {
   @ApiResponse({ status: 404, description: 'PGA não encontrado' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.deletePgaService.execute(id);
+  }
+
+  @Post(':id/submeter')
+  @UseGuards(RolesGuard)
+  @Roles('Administrador', 'CPS', 'Diretor')
+  @ApiOperation({
+    summary: 'Submeter PGA para análise regional',
+    description:
+      'Altera o status do PGA de EmElaboracao para Submetido. Diretor só pode submeter PGA da própria unidade.',
+  })
+  @ApiParam({ name: 'id', type: 'number', description: 'ID do PGA' })
+  @ApiResponse({ status: 200, description: 'PGA submetido com sucesso' })
+  @ApiResponse({ status: 400, description: 'PGA não está em elaboração' })
+  @ApiResponse({ status: 403, description: 'Sem permissão para submeter o PGA' })
+  @ApiResponse({ status: 404, description: 'PGA não encontrado' })
+  submit(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    return this.submitPgaService.execute(id, req.user.pessoa_id);
   }
 }
