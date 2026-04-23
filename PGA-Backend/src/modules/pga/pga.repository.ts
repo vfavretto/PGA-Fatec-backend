@@ -85,10 +85,36 @@ export class PgaRepository extends BaseRepository<PGA> {
             tema: true,
             prioridade: true,
             situacoesProblemas: { include: { situacaoProblema: true } },
-            etapas: { include: { entregavel_link_sei: true, anexos: true } },
-            pessoas: { include: { pessoa: true } },
+            etapas: {
+              where: { ativo: true },
+              include: { entregavel_link_sei: true, anexos: { where: { ativo: true } } },
+            },
+            pessoas: {
+              where: { ativo: true },
+              include: { pessoa: true, tipo_vinculo_hae: true },
+            },
           },
           orderBy: [{ codigo_projeto: 'asc' }],
+        },
+        acoesCPA: {
+          where: { ativo: true },
+          orderBy: [{ acao_cpa_id: 'asc' }],
+        },
+        rotinas: {
+          where: { ativo: true },
+          include: {
+            curso: true,
+            responsavel: { select: { nome: true } },
+            ocorrencias: {
+              where: { ativo: true },
+              orderBy: [{ data_realizacao: 'asc' }],
+            },
+            participantes: {
+              where: { ativo: true },
+              include: { pessoa: { select: { nome: true } } },
+            },
+          },
+          orderBy: [{ tipo_rotina: 'asc' }, { titulo: 'asc' }],
         },
       },
     });
