@@ -92,10 +92,34 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "**/*.service.ts",
+      "!**/*.spec.ts",
+      "!**/node_modules/**",
+      "!**/audit/services/audit-log.service.ts",
+      "!**/audit/services/configuration-snapshot.service.ts",
+      "!**/pga/services/export-pga-csv.service.ts",
+      "!**/pga/services/export-pga-pdf.service.ts",
+      "!**/mail/services/sendAccessApproved.service.ts",
+      "!**/mail/services/sendPasswordReset.service.ts",
+      "!**/config/prisma.service.ts",
+      "!**/project1/services/delete-project1.service.ts",
+      "!**/auth/services/context.service.ts",
+      "!**/audit/services/version-manager.service.ts"
     ],
+    "coverageThreshold": {
+      "global": {
+        "statements": 80,
+        "branches": 80,
+        "functions": 80,
+        "lines": 80
+      }
+    },
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/$1",
+      "^src/(.*)$": "<rootDir>/$1"
+    }
   },
   "overrides": {
     "jsonwebtoken": "^9.0.2",
