@@ -61,6 +61,8 @@ model PGA {
   parecer_regional          String?               @db.Text
   data_parecer_regional     DateTime?
   parecer_cps               String?               @db.Text
+  cps_aprovador_id          String?
+  data_parecer_cps          DateTime?
   ativo                     Boolean               @default(true)
   acoesCPA                  AcaoCPA[]
   acoesProjetos             AcaoProjeto[]
@@ -69,12 +71,14 @@ model PGA {
   situacoesProblemas        PGASituacaoProblema[]
   usuarioCriacao            Pessoa?               @relation("PGACriador", fields: [usuario_criacao_id], references: [pessoa_id])
   regionalResponsavel       Pessoa?               @relation("PGARegionalResponsavel", fields: [regional_responsavel_id], references: [pessoa_id], onDelete: SetNull)
+  cpsAprovador              Pessoa?               @relation("PGACpsAprovador", fields: [cps_aprovador_id], references: [pessoa_id], onDelete: SetNull)
   templateOrigem            PGA?                  @relation("PGATemplateOrigin", fields: [template_pga_id], references: [pga_id])
   copias                    PGA[]                 @relation("PGATemplateOrigin")
 
   @@index([unidade_id])
   @@index([is_template])
   @@index([template_pga_id])
+  @@index([cps_aprovador_id])
 }
 
 model SituacaoProblema {
@@ -269,6 +273,7 @@ model Pessoa {
 
   solicitacoesProcessadas  SolicitacaoAcesso[] @relation("ProcessadorSolicitacao")
   pgasAvaliadosRegional    PGA[]               @relation("PGARegionalResponsavel")
+  pgasAvaliadosCps         PGA[]               @relation("PGACpsAprovador")
   projetosAvaliadosRegional AcaoProjeto[]      @relation("ProjetoRegionalResponsavel")
 }
 

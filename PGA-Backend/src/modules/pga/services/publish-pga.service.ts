@@ -76,7 +76,9 @@ export class PublishPgaService {
               is_template: false,
               template_pga_id: pgaId,
               status: StatusPGA.EmElaboracao,
-              usuario_criacao_id: pessoaId,              data_limite_submissao: (template as any).data_limite_submissao ?? undefined,            },
+              usuario_criacao_id: pessoaId,
+              data_limite_submissao: template.data_limite_submissao ?? undefined,
+            },
           }),
         ),
       );

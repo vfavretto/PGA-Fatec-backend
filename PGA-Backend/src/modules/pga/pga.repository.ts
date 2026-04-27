@@ -1,7 +1,7 @@
-﻿import { Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../config/prisma.service';
 import { BaseRepository } from '../../common/repositories/base.repository';
-import { PGA } from '@prisma/client';
+import { PGA, Prisma } from '@prisma/client';
 import { CreatePgaDto } from './dto/create-pga.dto';
 import { UpdatePgaDto } from './dto/update-pga.dto';
 
@@ -133,6 +133,18 @@ export class PgaRepository extends BaseRepository<PGA> {
   }
 
   async update(id: string, data: UpdatePgaDto) {
+    return this.prisma.pGA.update({
+      where: { pga_id: id },
+      data,
+    });
+  }
+
+  /**
+   * Método dedicado para atualizações internas de fluxo (status, pareceres,
+   * campos de auditoria) que não fazem parte do UpdatePgaDto público.
+   * Aceita diretamente o tipo Prisma para garantir type-safety sem `as any`.
+   */
+  async updateWorkflow(id: string, data: Prisma.PGAUpdateInput) {
     return this.prisma.pGA.update({
       where: { pga_id: id },
       data,

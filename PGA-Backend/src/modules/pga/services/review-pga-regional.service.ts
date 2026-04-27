@@ -27,12 +27,12 @@ export class ReviewPgaRegionalService {
 
     await this.checkRegionalAccess(pga.unidade_id, pessoaId);
 
-    return this.repository.update(pgaId, {
+    return this.repository.updateWorkflow(pgaId, {
       status: StatusPGA.AguardandoCPS,
       parecer_regional: parecer ?? null,
       data_parecer_regional: new Date(),
-      regional_responsavel_id: pessoaId,
-    } as any);
+      regionalResponsavel: { connect: { pessoa_id: pessoaId } },
+    });
   }
 
   async reprovar(pgaId: string, pessoaId: string, parecer: string) {
@@ -51,12 +51,12 @@ export class ReviewPgaRegionalService {
 
     await this.checkRegionalAccess(pga.unidade_id, pessoaId);
 
-    return this.repository.update(pgaId, {
+    return this.repository.updateWorkflow(pgaId, {
       status: StatusPGA.Reprovado,
       parecer_regional: parecer,
       data_parecer_regional: new Date(),
-      regional_responsavel_id: pessoaId,
-    } as any);
+      regionalResponsavel: { connect: { pessoa_id: pessoaId } },
+    });
   }
 
   private async checkRegionalAccess(unidadeId: string | null, pessoaId: string) {

@@ -55,8 +55,8 @@ export class SubmitPgaService {
       }
     }
 
-    return this.repository.update(pgaId, {
+    return this.repository.updateWorkflow(pgaId, {
       status: StatusPGA.Submetido,
-    } as any);
+    });
   }
 }

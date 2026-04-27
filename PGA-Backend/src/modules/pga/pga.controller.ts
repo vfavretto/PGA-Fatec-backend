@@ -138,10 +138,10 @@ export class PgaController {
 
   @Post(':id/submeter')
   @UseGuards(RolesGuard)
-  @Roles('Diretor')
+  @Roles('Administrador', 'CPS', 'Diretor')
   @ApiOperation({
     summary: 'Submeter PGA para análise regional',
-    description: 'Apenas o Diretor da própria unidade pode submeter.',
+    description: 'Diretor submete o PGA da própria unidade. Administrador e CPS podem submeter qualquer PGA.',
   })
   @ApiParam({ name: 'id', type: 'string', description: 'UUID do PGA' })
   @ApiResponse({ status: 200, description: 'PGA submetido com sucesso' })

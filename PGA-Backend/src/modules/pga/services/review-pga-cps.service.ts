@@ -20,10 +20,12 @@ export class ReviewPgaCpsService {
       );
     }
 
-    return this.repository.update(pgaId, {
+    return this.repository.updateWorkflow(pgaId, {
       status: StatusPGA.AprovadoCPS,
       parecer_cps: parecer ?? null,
-    } as any);
+      cpsAprovador: { connect: { pessoa_id: pessoaId } },
+      data_parecer_cps: new Date(),
+    });
   }
 
   async reprovar(pgaId: string, pessoaId: string, parecer: string) {
@@ -40,9 +42,11 @@ export class ReviewPgaCpsService {
       );
     }
 
-    return this.repository.update(pgaId, {
+    return this.repository.updateWorkflow(pgaId, {
       status: StatusPGA.Reprovado,
       parecer_cps: parecer,
-    } as any);
+      cpsAprovador: { connect: { pessoa_id: pessoaId } },
+      data_parecer_cps: new Date(),
+    });
   }
 }

@@ -24,9 +24,14 @@ export class UpdatePgaService {
     const isAdminCps = tipo === 'Administrador' || tipo === 'CPS';
 
     if (!isAdminCps) {
-      // Diretor só pode editar o PGA da própria unidade e somente quando EmElaboracao
+      // Diretor só pode editar o PGA da própria unidade e somente quando EmElaboracao.
+      // Verifica explicitamente que o contexto ativo é do tipo 'unidade' e corresponde
+      // ao PGA — impede falso-positivo quando o contexto ativo for de regional.
       if (tipo === 'Diretor') {
-        if (pga.unidade_id !== user?.active_context?.id) {
+        const contextIsUnit =
+          user?.active_context?.tipo === 'unidade' &&
+          user?.active_context?.id === pga.unidade_id;
+        if (!contextIsUnit) {
           throw new ForbiddenException('Você só pode editar o PGA da sua própria unidade.');
         }
         if (pga.status !== StatusPGA.EmElaboracao) {
