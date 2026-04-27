@@ -6,11 +6,16 @@ export class OptionalAuthGuard extends AuthGuard('jwt') {
   async canActivate(context: ExecutionContext) {
     const req = context.switchToHttp().getRequest();
     const authHeader = req.headers?.authorization || req.headers?.Authorization;
+    const authCookie = req.cookies?.access_token;
 
-    if (!authHeader) {
+    if (!authHeader && !authCookie) {
       return true;
     }
 
-    return (await super.canActivate(context)) as boolean;
+    try {
+      return (await super.canActivate(context)) as boolean;
+    } catch {
+      return true;
+    }
   }
 }

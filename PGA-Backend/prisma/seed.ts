@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+﻿import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
@@ -8,40 +8,40 @@ async function main() {
 
   // ─── 1. Tipos de Vínculo HAE ────────────────────────────────────────────────
   const haeCC = await prisma.tipoVinculoHAE.upsert({
-    where: { id: 'hae-CC' },
+    where: { id: 'aa000000-0000-4000-a000-000000000001' },
     update: {},
     create: {
-      id: 'hae-CC',
+      id: 'aa000000-0000-4000-a000-000000000001',
       sigla: 'CC',
       descricao: 'Coordenação de Curso',
       detalhes: 'HAE destinada ao coordenador do CST',
     },
   });
   const haeEXT = await prisma.tipoVinculoHAE.upsert({
-    where: { id: 'hae-EXT' },
+    where: { id: 'aa000000-0000-4000-a000-000000000002' },
     update: {},
     create: {
-      id: 'hae-EXT',
+      id: 'aa000000-0000-4000-a000-000000000002',
       sigla: 'EXT',
       descricao: 'Extensão Universitária',
       detalhes: 'HAE destinada a projetos de extensão curricularizada',
     },
   });
   const haePEQ = await prisma.tipoVinculoHAE.upsert({
-    where: { id: 'hae-PEQ' },
+    where: { id: 'aa000000-0000-4000-a000-000000000003' },
     update: {},
     create: {
-      id: 'hae-PEQ',
+      id: 'aa000000-0000-4000-a000-000000000003',
       sigla: 'PEQ',
       descricao: 'Pesquisa e Equipamentos',
       detalhes: 'HAE destinada a atividades de pesquisa aplicada',
     },
   });
   const haeTUT = await prisma.tipoVinculoHAE.upsert({
-    where: { id: 'hae-TUT' },
+    where: { id: 'aa000000-0000-4000-a000-000000000004' },
     update: {},
     create: {
-      id: 'hae-TUT',
+      id: 'aa000000-0000-4000-a000-000000000004',
       sigla: 'TUT',
       descricao: 'Tutoria e Monitoria',
       detalhes:
@@ -49,10 +49,10 @@ async function main() {
     },
   });
   const haeADM = await prisma.tipoVinculoHAE.upsert({
-    where: { id: 'hae-ADM' },
+    where: { id: 'aa000000-0000-4000-a000-000000000005' },
     update: {},
     create: {
-      id: 'hae-ADM',
+      id: 'aa000000-0000-4000-a000-000000000005',
       sigla: 'ADM',
       descricao: 'Gestão Administrativa',
       detalhes:
@@ -62,10 +62,10 @@ async function main() {
 
   // ─── 2. Eixos Temáticos (9 eixos do template) ───────────────────────────────
   const eixo1 = await prisma.eixoTematico.upsert({
-    where: { eixo_id: 'eixo-01' },
+    where: { eixo_id: 'bb000000-0000-4000-a000-000000000001' },
     update: {},
     create: {
-      eixo_id: 'eixo-01',
+      eixo_id: 'bb000000-0000-4000-a000-000000000001',
       numero: 1,
       nome_eixo: 'Didático-pedagógico',
       descricao:
@@ -73,10 +73,10 @@ async function main() {
     },
   });
   const eixo2 = await prisma.eixoTematico.upsert({
-    where: { eixo_id: 'eixo-02' },
+    where: { eixo_id: 'bb000000-0000-4000-a000-000000000002' },
     update: {},
     create: {
-      eixo_id: 'eixo-02',
+      eixo_id: 'bb000000-0000-4000-a000-000000000002',
       numero: 2,
       nome_eixo: 'Laboratórios - Ensino e Equipamentos Associados',
       descricao:
@@ -84,10 +84,10 @@ async function main() {
     },
   });
   const eixo3 = await prisma.eixoTematico.upsert({
-    where: { eixo_id: 'eixo-03' },
+    where: { eixo_id: 'bb000000-0000-4000-a000-000000000003' },
     update: {},
     create: {
-      eixo_id: 'eixo-03',
+      eixo_id: 'bb000000-0000-4000-a000-000000000003',
       numero: 3,
       nome_eixo: 'Pesquisa / Extensão e Equipamentos Associados',
       descricao:
@@ -95,10 +95,10 @@ async function main() {
     },
   });
   const eixo4 = await prisma.eixoTematico.upsert({
-    where: { eixo_id: 'eixo-04' },
+    where: { eixo_id: 'bb000000-0000-4000-a000-000000000004' },
     update: {},
     create: {
-      eixo_id: 'eixo-04',
+      eixo_id: 'bb000000-0000-4000-a000-000000000004',
       numero: 4,
       nome_eixo: 'Atividades Formativas em Projetos (nível tático)',
       descricao:
@@ -106,10 +106,10 @@ async function main() {
     },
   });
   const eixo5 = await prisma.eixoTematico.upsert({
-    where: { eixo_id: 'eixo-05' },
+    where: { eixo_id: 'bb000000-0000-4000-a000-000000000005' },
     update: {},
     create: {
-      eixo_id: 'eixo-05',
+      eixo_id: 'bb000000-0000-4000-a000-000000000005',
       numero: 5,
       nome_eixo: 'Infraestrutura (instalações prediais)',
       descricao:
@@ -117,10 +117,10 @@ async function main() {
     },
   });
   const eixo6 = await prisma.eixoTematico.upsert({
-    where: { eixo_id: 'eixo-06' },
+    where: { eixo_id: 'bb000000-0000-4000-a000-000000000006' },
     update: {},
     create: {
-      eixo_id: 'eixo-06',
+      eixo_id: 'bb000000-0000-4000-a000-000000000006',
       numero: 6,
       nome_eixo: 'Desenvolvimento de pessoas (docentes e servidores)',
       descricao:
@@ -128,10 +128,10 @@ async function main() {
     },
   });
   const eixo7 = await prisma.eixoTematico.upsert({
-    where: { eixo_id: 'eixo-07' },
+    where: { eixo_id: 'bb000000-0000-4000-a000-000000000007' },
     update: {},
     create: {
-      eixo_id: 'eixo-07',
+      eixo_id: 'bb000000-0000-4000-a000-000000000007',
       numero: 7,
       nome_eixo: 'Convênios e Parcerias Institucionais',
       descricao:
@@ -139,10 +139,10 @@ async function main() {
     },
   });
   const eixo8 = await prisma.eixoTematico.upsert({
-    where: { eixo_id: 'eixo-08' },
+    where: { eixo_id: 'bb000000-0000-4000-a000-000000000008' },
     update: {},
     create: {
-      eixo_id: 'eixo-08',
+      eixo_id: 'bb000000-0000-4000-a000-000000000008',
       numero: 8,
       nome_eixo: 'Implantação de UE / Cursos',
       descricao:
@@ -150,10 +150,10 @@ async function main() {
     },
   });
   const eixo9 = await prisma.eixoTematico.upsert({
-    where: { eixo_id: 'eixo-09' },
+    where: { eixo_id: 'bb000000-0000-4000-a000-000000000009' },
     update: {},
     create: {
-      eixo_id: 'eixo-09',
+      eixo_id: 'bb000000-0000-4000-a000-000000000009',
       numero: 9,
       nome_eixo: 'Gestão da Rotina Educacional',
       descricao:
@@ -163,40 +163,40 @@ async function main() {
 
   // ─── 3. Temas por Eixo ───────────────────────────────────────────────────────
   const t1_1 = await prisma.tema.upsert({
-    where: { tema_id: 'tema-1-1' },
+    where: { tema_id: 'cc000000-0000-4000-a000-000000000001' },
     update: {},
     create: {
-      tema_id: 'tema-1-1',
+      tema_id: 'cc000000-0000-4000-a000-000000000001',
       tema_num: 1,
       eixo_id: eixo1.eixo_id,
       descricao: 'Implantação / Alteração / Readequação de CST',
     },
   });
   const t1_2 = await prisma.tema.upsert({
-    where: { tema_id: 'tema-1-2' },
+    where: { tema_id: 'cc000000-0000-4000-a000-000000000002' },
     update: {},
     create: {
-      tema_id: 'tema-1-2',
+      tema_id: 'cc000000-0000-4000-a000-000000000002',
       tema_num: 2,
       eixo_id: eixo1.eixo_id,
       descricao: 'Plano de Ensino (PE) e Prática Pedagógica',
     },
   });
   const t1_3 = await prisma.tema.upsert({
-    where: { tema_id: 'tema-1-3' },
+    where: { tema_id: 'cc000000-0000-4000-a000-000000000003' },
     update: {},
     create: {
-      tema_id: 'tema-1-3',
+      tema_id: 'cc000000-0000-4000-a000-000000000003',
       tema_num: 3,
       eixo_id: eixo1.eixo_id,
       descricao: 'Projeto Interdisciplinar / Integrador',
     },
   });
   const t1_4 = await prisma.tema.upsert({
-    where: { tema_id: 'tema-1-4' },
+    where: { tema_id: 'cc000000-0000-4000-a000-000000000004' },
     update: {},
     create: {
-      tema_id: 'tema-1-4',
+      tema_id: 'cc000000-0000-4000-a000-000000000004',
       tema_num: 4,
       eixo_id: eixo1.eixo_id,
       descricao: 'Extensão Curricularizada',
@@ -204,30 +204,30 @@ async function main() {
   });
 
   const t2_1 = await prisma.tema.upsert({
-    where: { tema_id: 'tema-2-1' },
+    where: { tema_id: 'cc000000-0000-4000-a000-000000000005' },
     update: {},
     create: {
-      tema_id: 'tema-2-1',
+      tema_id: 'cc000000-0000-4000-a000-000000000005',
       tema_num: 1,
       eixo_id: eixo2.eixo_id,
       descricao: 'Instalação e Manutenção de Equipamentos de Laboratório',
     },
   });
   const t2_2 = await prisma.tema.upsert({
-    where: { tema_id: 'tema-2-2' },
+    where: { tema_id: 'cc000000-0000-4000-a000-000000000006' },
     update: {},
     create: {
-      tema_id: 'tema-2-2',
+      tema_id: 'cc000000-0000-4000-a000-000000000006',
       tema_num: 2,
       eixo_id: eixo2.eixo_id,
       descricao: 'Gestão de Ambiente Laboratorial',
     },
   });
   const t2_3 = await prisma.tema.upsert({
-    where: { tema_id: 'tema-2-3' },
+    where: { tema_id: 'cc000000-0000-4000-a000-000000000007' },
     update: {},
     create: {
-      tema_id: 'tema-2-3',
+      tema_id: 'cc000000-0000-4000-a000-000000000007',
       tema_num: 3,
       eixo_id: eixo2.eixo_id,
       descricao: 'Aquisição de Equipamentos de Ensino',
@@ -235,20 +235,20 @@ async function main() {
   });
 
   const t3_1 = await prisma.tema.upsert({
-    where: { tema_id: 'tema-3-1' },
+    where: { tema_id: 'cc000000-0000-4000-a000-000000000008' },
     update: {},
     create: {
-      tema_id: 'tema-3-1',
+      tema_id: 'cc000000-0000-4000-a000-000000000008',
       tema_num: 1,
       eixo_id: eixo3.eixo_id,
       descricao: 'Espaços de Pesquisa e Laboratórios Especializados',
     },
   });
   const t3_2 = await prisma.tema.upsert({
-    where: { tema_id: 'tema-3-2' },
+    where: { tema_id: 'cc000000-0000-4000-a000-000000000009' },
     update: {},
     create: {
-      tema_id: 'tema-3-2',
+      tema_id: 'cc000000-0000-4000-a000-000000000009',
       tema_num: 2,
       eixo_id: eixo3.eixo_id,
       descricao: 'Prestação de Serviços Tecnológicos',
@@ -256,20 +256,20 @@ async function main() {
   });
 
   const t4_1 = await prisma.tema.upsert({
-    where: { tema_id: 'tema-4-1' },
+    where: { tema_id: 'cc000000-0000-4000-a000-000000000010' },
     update: {},
     create: {
-      tema_id: 'tema-4-1',
+      tema_id: 'cc000000-0000-4000-a000-000000000010',
       tema_num: 1,
       eixo_id: eixo4.eixo_id,
       descricao: 'Rede de Tecnologia e Novotec',
     },
   });
   const t4_2 = await prisma.tema.upsert({
-    where: { tema_id: 'tema-4-2' },
+    where: { tema_id: 'cc000000-0000-4000-a000-000000000011' },
     update: {},
     create: {
-      tema_id: 'tema-4-2',
+      tema_id: 'cc000000-0000-4000-a000-000000000011',
       tema_num: 2,
       eixo_id: eixo4.eixo_id,
       descricao: 'Projetos Estudantis (Baja, Aero Design, etc.)',
@@ -277,30 +277,30 @@ async function main() {
   });
 
   const t5_1 = await prisma.tema.upsert({
-    where: { tema_id: 'tema-5-1' },
+    where: { tema_id: 'cc000000-0000-4000-a000-000000000012' },
     update: {},
     create: {
-      tema_id: 'tema-5-1',
+      tema_id: 'cc000000-0000-4000-a000-000000000012',
       tema_num: 1,
       eixo_id: eixo5.eixo_id,
       descricao: 'Reparação Predial (Civil, Elétrica, Dados)',
     },
   });
   const t5_2 = await prisma.tema.upsert({
-    where: { tema_id: 'tema-5-2' },
+    where: { tema_id: 'cc000000-0000-4000-a000-000000000013' },
     update: {},
     create: {
-      tema_id: 'tema-5-2',
+      tema_id: 'cc000000-0000-4000-a000-000000000013',
       tema_num: 2,
       eixo_id: eixo5.eixo_id,
       descricao: 'Novas Instalações Prediais',
     },
   });
   const t5_3 = await prisma.tema.upsert({
-    where: { tema_id: 'tema-5-3' },
+    where: { tema_id: 'cc000000-0000-4000-a000-000000000014' },
     update: {},
     create: {
-      tema_id: 'tema-5-3',
+      tema_id: 'cc000000-0000-4000-a000-000000000014',
       tema_num: 3,
       eixo_id: eixo5.eixo_id,
       descricao: 'Segurança Física e Sanitária / Acessibilidade',
@@ -308,30 +308,30 @@ async function main() {
   });
 
   const t6_1 = await prisma.tema.upsert({
-    where: { tema_id: 'tema-6-1' },
+    where: { tema_id: 'cc000000-0000-4000-a000-000000000015' },
     update: {},
     create: {
-      tema_id: 'tema-6-1',
+      tema_id: 'cc000000-0000-4000-a000-000000000015',
       tema_num: 1,
       eixo_id: eixo6.eixo_id,
       descricao: 'Metodologias de Ensino e Tecnologias Educacionais',
     },
   });
   const t6_2 = await prisma.tema.upsert({
-    where: { tema_id: 'tema-6-2' },
+    where: { tema_id: 'cc000000-0000-4000-a000-000000000016' },
     update: {},
     create: {
-      tema_id: 'tema-6-2',
+      tema_id: 'cc000000-0000-4000-a000-000000000016',
       tema_num: 2,
       eixo_id: eixo6.eixo_id,
       descricao: 'Capacitação em Sistemas Acadêmicos e Pedagógicos',
     },
   });
   const t6_3 = await prisma.tema.upsert({
-    where: { tema_id: 'tema-6-3' },
+    where: { tema_id: 'cc000000-0000-4000-a000-000000000017' },
     update: {},
     create: {
-      tema_id: 'tema-6-3',
+      tema_id: 'cc000000-0000-4000-a000-000000000017',
       tema_num: 3,
       eixo_id: eixo6.eixo_id,
       descricao: 'Formação Continuada – Competências Técnicas',
@@ -339,20 +339,20 @@ async function main() {
   });
 
   const t7_1 = await prisma.tema.upsert({
-    where: { tema_id: 'tema-7-1' },
+    where: { tema_id: 'cc000000-0000-4000-a000-000000000018' },
     update: {},
     create: {
-      tema_id: 'tema-7-1',
+      tema_id: 'cc000000-0000-4000-a000-000000000018',
       tema_num: 1,
       eixo_id: eixo7.eixo_id,
       descricao: 'Convênios de Estágio',
     },
   });
   const t7_2 = await prisma.tema.upsert({
-    where: { tema_id: 'tema-7-2' },
+    where: { tema_id: 'cc000000-0000-4000-a000-000000000019' },
     update: {},
     create: {
-      tema_id: 'tema-7-2',
+      tema_id: 'cc000000-0000-4000-a000-000000000019',
       tema_num: 2,
       eixo_id: eixo7.eixo_id,
       descricao: 'Parcerias com Empresas para Projetos Aplicados',
@@ -360,30 +360,30 @@ async function main() {
   });
 
   const t8_1 = await prisma.tema.upsert({
-    where: { tema_id: 'tema-8-1' },
+    where: { tema_id: 'cc000000-0000-4000-a000-000000000020' },
     update: {},
     create: {
-      tema_id: 'tema-8-1',
+      tema_id: 'cc000000-0000-4000-a000-000000000020',
       tema_num: 1,
       eixo_id: eixo8.eixo_id,
       descricao: 'Implantação de FATEC',
     },
   });
   const t8_2 = await prisma.tema.upsert({
-    where: { tema_id: 'tema-8-2' },
+    where: { tema_id: 'cc000000-0000-4000-a000-000000000021' },
     update: {},
     create: {
-      tema_id: 'tema-8-2',
+      tema_id: 'cc000000-0000-4000-a000-000000000021',
       tema_num: 2,
       eixo_id: eixo8.eixo_id,
       descricao: 'Implantação de Cursos Superiores de Tecnologia (CST)',
     },
   });
   const t8_3 = await prisma.tema.upsert({
-    where: { tema_id: 'tema-8-3' },
+    where: { tema_id: 'cc000000-0000-4000-a000-000000000022' },
     update: {},
     create: {
-      tema_id: 'tema-8-3',
+      tema_id: 'cc000000-0000-4000-a000-000000000022',
       tema_num: 3,
       eixo_id: eixo8.eixo_id,
       descricao: 'Implantação de Curso AMS',
@@ -391,30 +391,30 @@ async function main() {
   });
 
   const t9_1 = await prisma.tema.upsert({
-    where: { tema_id: 'tema-9-1' },
+    where: { tema_id: 'cc000000-0000-4000-a000-000000000023' },
     update: {},
     create: {
-      tema_id: 'tema-9-1',
+      tema_id: 'cc000000-0000-4000-a000-000000000023',
       tema_num: 1,
       eixo_id: eixo9.eixo_id,
       descricao: 'Reuniões NDE, CEPE e CPA',
     },
   });
   const t9_2 = await prisma.tema.upsert({
-    where: { tema_id: 'tema-9-2' },
+    where: { tema_id: 'cc000000-0000-4000-a000-000000000024' },
     update: {},
     create: {
-      tema_id: 'tema-9-2',
+      tema_id: 'cc000000-0000-4000-a000-000000000024',
       tema_num: 2,
       eixo_id: eixo9.eixo_id,
       descricao: 'Sustentabilidade, Inclusão e Acessibilidade',
     },
   });
   const t9_3 = await prisma.tema.upsert({
-    where: { tema_id: 'tema-9-3' },
+    where: { tema_id: 'cc000000-0000-4000-a000-000000000025' },
     update: {},
     create: {
-      tema_id: 'tema-9-3',
+      tema_id: 'cc000000-0000-4000-a000-000000000025',
       tema_num: 3,
       eixo_id: eixo9.eixo_id,
       descricao: 'Avaliação de Desempenho (ENADE, WebSAI)',
@@ -423,10 +423,10 @@ async function main() {
 
   // ─── 4. Prioridades de Ação (5 graus do template) ───────────────────────────
   const prio1 = await prisma.prioridadeAcao.upsert({
-    where: { prioridade_id: 'prio-1' },
+    where: { prioridade_id: 'dd000000-0000-4000-a000-000000000001' },
     update: {},
     create: {
-      prioridade_id: 'prio-1',
+      prioridade_id: 'dd000000-0000-4000-a000-000000000001',
       grau: 1,
       descricao: 'URGÊNCIA DE REGULAÇÃO',
       tipo_gestao: 'Regulação Normativa',
@@ -435,10 +435,10 @@ async function main() {
     },
   });
   const prio2 = await prisma.prioridadeAcao.upsert({
-    where: { prioridade_id: 'prio-2' },
+    where: { prioridade_id: 'dd000000-0000-4000-a000-000000000002' },
     update: {},
     create: {
-      prioridade_id: 'prio-2',
+      prioridade_id: 'dd000000-0000-4000-a000-000000000002',
       grau: 2,
       descricao: 'URGÊNCIA ESTRATÉGICA',
       tipo_gestao: 'Gestão Estratégica',
@@ -447,10 +447,10 @@ async function main() {
     },
   });
   const prio3 = await prisma.prioridadeAcao.upsert({
-    where: { prioridade_id: 'prio-3' },
+    where: { prioridade_id: 'dd000000-0000-4000-a000-000000000003' },
     update: {},
     create: {
-      prioridade_id: 'prio-3',
+      prioridade_id: 'dd000000-0000-4000-a000-000000000003',
       grau: 3,
       descricao: 'PRIORIDADE ALTA',
       tipo_gestao: 'Gestão Tática',
@@ -459,10 +459,10 @@ async function main() {
     },
   });
   const prio4 = await prisma.prioridadeAcao.upsert({
-    where: { prioridade_id: 'prio-4' },
+    where: { prioridade_id: 'dd000000-0000-4000-a000-000000000004' },
     update: {},
     create: {
-      prioridade_id: 'prio-4',
+      prioridade_id: 'dd000000-0000-4000-a000-000000000004',
       grau: 4,
       descricao: 'PRIORIDADE MÉDIA',
       tipo_gestao: 'Gestão Operacional',
@@ -471,10 +471,10 @@ async function main() {
     },
   });
   const prio5 = await prisma.prioridadeAcao.upsert({
-    where: { prioridade_id: 'prio-5' },
+    where: { prioridade_id: 'dd000000-0000-4000-a000-000000000005' },
     update: {},
     create: {
-      prioridade_id: 'prio-5',
+      prioridade_id: 'dd000000-0000-4000-a000-000000000005',
       grau: 5,
       descricao: 'PRIORIDADE REGULAR',
       tipo_gestao: 'Gestão Operacional',
@@ -485,10 +485,10 @@ async function main() {
 
   // ─── 5. Situações-Problema (8 categorias do template) ───────────────────────
   const sp1 = await prisma.situacaoProblema.upsert({
-    where: { situacao_id: '1' },
+    where: { situacao_id: 'ee000000-0000-4000-a000-000000000001' },
     update: {},
     create: {
-      situacao_id: '1',
+      situacao_id: 'ee000000-0000-4000-a000-000000000001',
       codigo_categoria: 'CPA',
       descricao:
         'Baixo índice de satisfação dos alunos com infraestrutura dos laboratórios de ensino',
@@ -497,10 +497,10 @@ async function main() {
     },
   });
   const sp2 = await prisma.situacaoProblema.upsert({
-    where: { situacao_id: '2' },
+    where: { situacao_id: 'ee000000-0000-4000-a000-000000000002' },
     update: {},
     create: {
-      situacao_id: '2',
+      situacao_id: 'ee000000-0000-4000-a000-000000000002',
       codigo_categoria: 'CPA',
       descricao:
         'Equipamentos de laboratório de informática obsoletos e insuficientes para a demanda atual',
@@ -509,10 +509,10 @@ async function main() {
     },
   });
   const sp3 = await prisma.situacaoProblema.upsert({
-    where: { situacao_id: '3' },
+    where: { situacao_id: 'ee000000-0000-4000-a000-000000000003' },
     update: {},
     create: {
-      situacao_id: '3',
+      situacao_id: 'ee000000-0000-4000-a000-000000000003',
       codigo_categoria: 'NDE',
       descricao:
         'PPC desatualizado em relação às tecnologias e demandas do mercado de trabalho regional',
@@ -521,10 +521,10 @@ async function main() {
     },
   });
   const sp4 = await prisma.situacaoProblema.upsert({
-    where: { situacao_id: '4' },
+    where: { situacao_id: 'ee000000-0000-4000-a000-000000000004' },
     update: {},
     create: {
-      situacao_id: '4',
+      situacao_id: 'ee000000-0000-4000-a000-000000000004',
       codigo_categoria: 'NDE',
       descricao:
         'Deficiência de práticas interdisciplinares e de integração entre disciplinas dos cursos',
@@ -533,10 +533,10 @@ async function main() {
     },
   });
   const sp5 = await prisma.situacaoProblema.upsert({
-    where: { situacao_id: '5' },
+    where: { situacao_id: 'ee000000-0000-4000-a000-000000000005' },
     update: {},
     create: {
-      situacao_id: '5',
+      situacao_id: 'ee000000-0000-4000-a000-000000000005',
       codigo_categoria: 'HORUS',
       descricao:
         'Alto índice de reprovação nas disciplinas de base matemática/exatas no 1º semestre',
@@ -545,10 +545,10 @@ async function main() {
     },
   });
   const sp6 = await prisma.situacaoProblema.upsert({
-    where: { situacao_id: '6' },
+    where: { situacao_id: 'ee000000-0000-4000-a000-000000000006' },
     update: {},
     create: {
-      situacao_id: '6',
+      situacao_id: 'ee000000-0000-4000-a000-000000000006',
       codigo_categoria: 'DA',
       descricao:
         'Insuficiência de espaços de convivência e suporte ao bem-estar estudantil',
@@ -557,10 +557,10 @@ async function main() {
     },
   });
   const sp7 = await prisma.situacaoProblema.upsert({
-    where: { situacao_id: '7' },
+    where: { situacao_id: 'ee000000-0000-4000-a000-000000000007' },
     update: {},
     create: {
-      situacao_id: '7',
+      situacao_id: 'ee000000-0000-4000-a000-000000000007',
       codigo_categoria: 'CIPA',
       descricao:
         'Instalações não plenamente adequadas às normas de acessibilidade (NBR 9050 / Lei 13.146/2015)',
@@ -569,10 +569,10 @@ async function main() {
     },
   });
   const sp8 = await prisma.situacaoProblema.upsert({
-    where: { situacao_id: '8' },
+    where: { situacao_id: 'ee000000-0000-4000-a000-000000000008' },
     update: {},
     create: {
-      situacao_id: '8',
+      situacao_id: 'ee000000-0000-4000-a000-000000000008',
       codigo_categoria: 'OUTRO',
       descricao:
         'Baixa taxa de inserção dos egressos no mercado de trabalho da área de formação',
@@ -595,91 +595,91 @@ async function main() {
     });
 
   const e01 = await ev(
-    'entr-01',
+    'ff000000-0000-4000-a000-000000000001',
     '01-Ata',
     'Ata de Reunião',
     'Documento de ata registrada no SEI',
   );
   const e02 = await ev(
-    'entr-02',
+    'ff000000-0000-4000-a000-000000000002',
     '02-Relatorio',
     'Relatório',
     'Relatório de atividades ou resultados',
   );
   const e03 = await ev(
-    'entr-03',
+    'ff000000-0000-4000-a000-000000000003',
     '03-PlanoAcao',
     'Plano de Ação',
     'Documento com plano de ação estruturado',
   );
   const e04 = await ev(
-    'entr-04',
+    'ff000000-0000-4000-a000-000000000004',
     '04-Oficio',
     'Ofício',
     'Comunicação oficial via ofício',
   );
   const e05 = await ev(
-    'entr-05',
+    'ff000000-0000-4000-a000-000000000005',
     '05-ParecerTecnico',
     'Parecer Técnico',
     'Documento de análise e parecer técnico',
   );
   const e06 = await ev(
-    'entr-06',
+    'ff000000-0000-4000-a000-000000000006',
     '06-Edital',
     'Edital',
     'Edital de processo seletivo ou licitação',
   );
   const e07 = await ev(
-    'entr-07',
+    'ff000000-0000-4000-a000-000000000007',
     '07-Contrato',
     'Contrato / Convênio',
     'Documento contratual ou de convênio',
   );
   const e08 = await ev(
-    'entr-08',
+    'ff000000-0000-4000-a000-000000000008',
     '08-PPC',
     'PPC – Projeto Pedagógico do Curso',
     'Projeto Pedagógico do Curso aprovado pela Congregação',
   );
   const e09 = await ev(
-    'entr-09',
+    'ff000000-0000-4000-a000-000000000009',
     '09-Memorando',
     'Memorando',
     'Comunicação interna por memorando SEI',
   );
   const e10 = await ev(
-    'entr-10',
+    'ff000000-0000-4000-a000-000000000010',
     '10-Certificado',
     'Certificado de Capacitação',
     'Certificado de conclusão de curso ou capacitação',
   );
   const e11 = await ev(
-    'entr-11',
+    'ff000000-0000-4000-a000-000000000011',
     '11-PSS-Prof',
     'PSS Professores',
     'Processo Seletivo Simplificado para professores',
   );
   const e12 = await ev(
-    'entr-12',
+    'ff000000-0000-4000-a000-000000000012',
     '12-PSS-AuxDoc',
     'PSS Auxiliar de Docente',
     'Processo Seletivo Simplificado para Auxiliar de Docente',
   );
   const e13 = await ev(
-    'entr-13',
+    'ff000000-0000-4000-a000-000000000013',
     '13-SolMaterial',
     'Solicitação de Material de Consumo',
     'Solicitação formal de material de consumo via sistema',
   );
   const e14 = await ev(
-    'entr-14',
+    'ff000000-0000-4000-a000-000000000014',
     '14-SolEquipamento',
     'Solicitação de Equipamento',
     'Solicitação formal de aquisição de material permanente',
   );
   const e15 = await ev(
-    'entr-15',
+    'ff000000-0000-4000-a000-000000000015',
     '15-PGA',
     'PGA Fatec',
     'Plano de Gestão Anual da unidade de ensino',
