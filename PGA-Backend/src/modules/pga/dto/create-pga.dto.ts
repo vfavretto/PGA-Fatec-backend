@@ -1,16 +1,16 @@
-import { IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, MaxLength, IsDateString } from 'class-validator';
+﻿import { IsBoolean, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, MaxLength, IsDateString, IsUUID } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { StatusPGA } from '@prisma/client';
 
 export class CreatePgaDto {
-  @ApiProperty({
-    description: 'ID da unidade responsável pelo PGA',
-    example: 1,
-    type: 'integer'
+  @ApiPropertyOptional({
+    description: 'ID da unidade responsável pelo PGA (omitir para templates)',
+    example: 'uuid-da-unidade',
+    type: 'string'
   })
-  @IsNotEmpty()
-  @IsInt()
-  unidade_id: number;
+  @IsOptional()
+  @IsUUID('4')
+  unidade_id?: string;
 
   @ApiProperty({
     description: 'Ano de referência do PGA',
@@ -67,4 +67,22 @@ export class CreatePgaDto {
   @IsOptional()
   @IsEnum(StatusPGA)
   status?: StatusPGA;
+
+  @ApiPropertyOptional({
+    description: 'Indica se este PGA é um template (criado pelo Admin/CPS antes de publicar)',
+    example: true,
+  })
+  @IsOptional()
+  @IsBoolean()
+  is_template?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Data limite para as unidades submeterem o PGA',
+    example: '2026-06-30',
+    type: 'string',
+    format: 'date',
+  })
+  @IsOptional()
+  @IsDateString()
+  data_limite_submissao?: Date;
 }

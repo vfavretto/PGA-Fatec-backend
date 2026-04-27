@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsOptional, IsEnum } from 'class-validator';
+﻿import { IsInt, IsNotEmpty, IsOptional, IsEnum, IsUUID } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { PapelProjeto } from '@prisma/client';
 
@@ -9,8 +9,8 @@ export class CreateProjectPersonDto {
     type: 'integer'
   })
   @IsNotEmpty()
-  @IsInt()
-  acao_projeto_id: number;
+  @IsUUID('4')
+  acao_projeto_id: string;
 
   @ApiProperty({
     description: 'ID da pessoa vinculada ao projeto',
@@ -18,8 +18,8 @@ export class CreateProjectPersonDto {
     type: 'integer'
   })
   @IsNotEmpty()
-  @IsInt()
-  pessoa_id: number;
+  @IsUUID('4')
+  pessoa_id: string;
 
   @ApiProperty({
     description: 'Papel da pessoa no projeto',
@@ -45,6 +45,6 @@ export class CreateProjectPersonDto {
     type: 'integer'
   })
   @IsOptional()
-  @IsInt()
-  tipo_vinculo_hae_id?: number;
+  @IsUUID('4')
+  tipo_vinculo_hae_id?: string;
 }

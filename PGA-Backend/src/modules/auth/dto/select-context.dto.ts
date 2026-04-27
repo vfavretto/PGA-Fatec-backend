@@ -1,10 +1,10 @@
-import { IsIn, IsOptional, IsNumber } from 'class-validator';
+import { IsIn, IsOptional, IsString } from 'class-validator';
 
 export class SelectContextDto {
   @IsIn(['unidade', 'regional', 'global'])
   tipo: 'unidade' | 'regional' | 'global';
 
   @IsOptional()
-  @IsNumber()
-  id?: number;
+  @IsString()
+  id?: string;
 }

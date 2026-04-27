@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Put, Delete, ParseIntPipe, Request, UseGuards } from '@nestjs/common';
+﻿import { Controller, Post, Body, Get, Param, Put, Delete, ParseUUIDPipe, Request, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
 import { CreateProjectPersonDto } from './dto/create-project-person.dto';
 import { UpdateProjectPersonDto } from './dto/update-project-person.dto';
@@ -43,7 +43,7 @@ export class ProjectPersonController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID do vínculo projeto-pessoa' })
   @ApiResponse({ status: 200, description: 'Vínculo encontrado com sucesso' })
   @ApiResponse({ status: 404, description: 'Vínculo não encontrado' })
-  findOne(@Request() req: any, @Param('id', ParseIntPipe) id: number) {
+  findOne(@Request() req: any, @Param('id', ParseUUIDPipe) id: string) {
     return this.findOneService.execute(id, req.user);
   }
 
@@ -53,7 +53,7 @@ export class ProjectPersonController {
   @ApiBody({ type: UpdateProjectPersonDto })
   @ApiResponse({ status: 200, description: 'Vínculo atualizado com sucesso' })
   @ApiResponse({ status: 404, description: 'Vínculo não encontrado' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateProjectPersonDto) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateProjectPersonDto) {
     return this.updateService.execute(id, dto);
   }
 
@@ -62,7 +62,7 @@ export class ProjectPersonController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID do vínculo projeto-pessoa' })
   @ApiResponse({ status: 200, description: 'Vínculo removido com sucesso' })
   @ApiResponse({ status: 404, description: 'Vínculo não encontrado' })
-  remove(@Param('id', ParseIntPipe) id: number) {
+  remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.deleteService.execute(id);
   }
 }

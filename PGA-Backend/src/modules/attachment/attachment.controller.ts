@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Put, Delete, Body, Param, Query, ParseIntPipe, Request, UseGuards } from '@nestjs/common';
+﻿import { Controller, Post, Get, Put, Delete, Body, Param, Query, ParseUUIDPipe, Request, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
 import { CreateAttachmentDto } from './dto/create-attachment.dto';
 import { UpdateAttachmentDto } from './dto/update-attachment.dto';
@@ -48,7 +48,7 @@ export class AttachmentController {
   @ApiOperation({ summary: 'Buscar anexos por etapa de processo', description: 'Retorna anexos de uma etapa específica' })
   @ApiParam({ name: 'id', type: 'number', description: 'ID da etapa do processo' })
   @ApiResponse({ status: 200, description: 'Anexos encontrados com sucesso' })
-  findByEtapaProcesso(@Request() req: any, @Param('id', ParseIntPipe) id: number) {
+  findByEtapaProcesso(@Request() req: any, @Param('id', ParseUUIDPipe) id: string) {
     return this.findByEtapaProcessoService.execute(id, req.user);
   }
 
@@ -56,7 +56,7 @@ export class AttachmentController {
   @ApiOperation({ summary: 'Buscar anexos por entregável', description: 'Retorna anexos de um entregável específico' })
   @ApiParam({ name: 'id', type: 'number', description: 'ID do entregável' })
   @ApiResponse({ status: 200, description: 'Anexos encontrados com sucesso' })
-  findByEntregavel(@Request() req: any, @Param('id', ParseIntPipe) id: number) {
+  findByEntregavel(@Request() req: any, @Param('id', ParseUUIDPipe) id: string) {
     return this.findByEntregavelService.execute(id, req.user);
   }
 
@@ -65,7 +65,7 @@ export class AttachmentController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID do anexo' })
   @ApiResponse({ status: 200, description: 'Anexo encontrado com sucesso' })
   @ApiResponse({ status: 404, description: 'Anexo não encontrado' })
-  findOne(@Request() req: any, @Param('id', ParseIntPipe) id: number) {
+  findOne(@Request() req: any, @Param('id', ParseUUIDPipe) id: string) {
     return this.findOneService.execute(id, req.user);
   }
 
@@ -75,7 +75,7 @@ export class AttachmentController {
   @ApiBody({ type: UpdateAttachmentDto })
   @ApiResponse({ status: 200, description: 'Anexo atualizado com sucesso' })
   @ApiResponse({ status: 404, description: 'Anexo não encontrado' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateAttachmentDto) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateAttachmentDto) {
     return this.updateService.execute(id, dto);
   }
 
@@ -84,7 +84,7 @@ export class AttachmentController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID do anexo' })
   @ApiResponse({ status: 200, description: 'Anexo excluído com sucesso' })
   @ApiResponse({ status: 404, description: 'Anexo não encontrado' })
-  remove(@Param('id', ParseIntPipe) id: number) {
+  remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.deleteService.execute(id);
   }
 }

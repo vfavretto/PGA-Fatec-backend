@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+﻿import { Injectable, NotFoundException } from '@nestjs/common';
 import { InstitutionalRoutineRepository } from '../institutional-routine.repository';
 import { UpdateInstitutionalRoutineDto } from '../dto/update-institutional-routine.dto';
 import { InstitutionalRoutine } from '../entities/institutional-routine.entity';
@@ -8,7 +8,7 @@ export class UpdateInstitutionalRoutineService {
   constructor(private readonly repository: InstitutionalRoutineRepository) {}
 
   async execute(
-    id: number,
+    id: string,
     data: UpdateInstitutionalRoutineDto,
   ): Promise<InstitutionalRoutine> {
     const rotina = await this.repository.findOne(id);

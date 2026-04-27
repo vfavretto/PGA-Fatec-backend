@@ -1,4 +1,4 @@
-import {
+﻿import {
   Injectable,
   NotFoundException,
   ConflictException,
@@ -13,7 +13,7 @@ export class DeleteCourseService {
     private readonly prisma: PrismaService,
   ) {}
 
-  async execute(id: number, usuarioLogadoId?: number, motivo?: string) {
+  async execute(id: string, usuarioLogadoId?: string, motivo?: string) {
     const course = await this.repository.findOne(id);
     if (!course) throw new NotFoundException('Curso não encontrado');
 

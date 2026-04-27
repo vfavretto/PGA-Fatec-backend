@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+﻿import { Injectable, NotFoundException } from '@nestjs/common';
 import { PriorityActionRepository } from '../priority-action.repository';
 import { UpdatePriorityActionDto } from '../dto/update-priority-action.dto';
 import { PrioridadeAcao } from '@prisma/client';
@@ -8,7 +8,7 @@ export class UpdatePriorityActionService {
   constructor(private readonly repository: PriorityActionRepository) {}
 
   async execute(
-    prioridade_id: number,
+    prioridade_id: string,
     dto: UpdatePriorityActionDto,
   ): Promise<PrioridadeAcao> {
     const exists = await this.repository.findOne(prioridade_id);

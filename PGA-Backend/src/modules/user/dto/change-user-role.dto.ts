@@ -1,4 +1,4 @@
-import { IsEnum, IsInt, IsOptional, ValidateIf } from 'class-validator';
+﻿import { IsEnum, IsUUID, IsOptional, ValidateIf } from 'class-validator';
 import { TipoUsuario } from '@prisma/client';
 
 export class ChangeUserRoleDto {
@@ -8,10 +8,10 @@ export class ChangeUserRoleDto {
   novoTipo: TipoUsuario;
 
   @ValidateIf((o) => o.novoTipo === 'Diretor')
-  @IsInt({ message: 'ID da unidade inválido' })
-  unidadeId?: number;
+  @IsUUID('4', { message: 'ID da unidade inválido' })
+  unidadeId?: string;
 
   @IsOptional()
-  @IsInt()
-  usuarioLogadoId: number;
+  @IsUUID('4')
+  usuarioLogadoId: string;
 }

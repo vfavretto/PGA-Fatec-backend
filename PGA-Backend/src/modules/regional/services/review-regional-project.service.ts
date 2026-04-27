@@ -1,4 +1,4 @@
-import {
+﻿import {
   BadRequestException,
   Injectable,
   NotFoundException,
@@ -11,7 +11,7 @@ import { StatusProjetoRegional } from '@prisma/client';
 export class ReviewRegionalProjectService {
   constructor(private readonly repository: RegionalRepository) {}
 
-  async execute(regionalId: number, projectId: number, data: ReviewProjectDto) {
+  async execute(regionalId: string, projectId: string, data: ReviewProjectDto) {
     if (
       data.status !== StatusProjetoRegional.Aprovado &&
       data.status !== StatusProjetoRegional.Reprovado

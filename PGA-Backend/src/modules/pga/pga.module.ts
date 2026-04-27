@@ -8,6 +8,9 @@ import { FindOnePgaService } from './services/find-one-pga.service';
 import { UpdatePgaService } from './services/update-pga.service';
 import { DeletePgaService } from './services/delete-pga.service';
 import { SubmitPgaService } from './services/submit-pga.service';
+import { PublishPgaService } from './services/publish-pga.service';
+import { ReviewPgaRegionalService } from './services/review-pga-regional.service';
+import { ReviewPgaCpsService } from './services/review-pga-cps.service';
 import { ExportPgaCsvService } from './services/export-pga-csv.service';
 import { ExportPgaPdfService } from './services/export-pga-pdf.service';
 
@@ -22,6 +25,9 @@ import { ExportPgaPdfService } from './services/export-pga-pdf.service';
     UpdatePgaService,
     DeletePgaService,
     SubmitPgaService,
+    PublishPgaService,
+    ReviewPgaRegionalService,
+    ReviewPgaCpsService,
     ExportPgaCsvService,
     ExportPgaPdfService,
   ],
@@ -33,8 +39,12 @@ import { ExportPgaPdfService } from './services/export-pga-pdf.service';
     UpdatePgaService,
     DeletePgaService,
     SubmitPgaService,
+    PublishPgaService,
+    ReviewPgaRegionalService,
+    ReviewPgaCpsService,
     ExportPgaCsvService,
     ExportPgaPdfService,
   ],
 })
 export class PgaModule {}
+

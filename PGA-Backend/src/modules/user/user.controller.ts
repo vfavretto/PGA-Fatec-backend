@@ -1,4 +1,4 @@
-// src/user/user.controller.ts
+﻿// src/user/user.controller.ts
 import {
   Controller,
   Post,
@@ -8,7 +8,7 @@ import {
   Patch,
   Param,
   Body,
-  ParseIntPipe,
+  ParseUUIDPipe,
   HttpCode,
   HttpStatus,
   Request,
@@ -108,10 +108,10 @@ export class UserController {
     description: 'Lista de solicitações retornada com sucesso',
   })
   async getAccessRequests(@Request() req) {
-    const usuarioId = Number(req.user.pessoa_id);
+    const usuarioId = req.user.pessoa_id;
     const tipoUsuario = req.user.tipo_usuario;
 
-    if (isNaN(usuarioId)) {
+    if (!usuarioId) {
       throw new BadRequestException('ID do usuário inválido');
     }
 
@@ -126,11 +126,13 @@ export class UserController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID do usuário' })
   @ApiResponse({ status: 200, description: 'Usuário encontrado com sucesso' })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
-  async findOne(@Param('id', ParseIntPipe) id: number) {
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.getUserService.execute(id);
   }
 
   @Put(':id')
+  @UseGuards(RolesGuard)
+  @Roles('Administrador')
   @ApiOperation({
     summary: 'Atualizar usuário',
     description: 'Atualiza dados de um usuário específico',
@@ -139,7 +141,7 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'Usuário atualizado com sucesso' })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() data: Prisma.PessoaUpdateInput,
   ) {
     return this.updateUserService.execute(id, data);
@@ -154,7 +156,7 @@ export class UserController {
   @ApiResponse({ status: 204, description: 'Usuário excluído com sucesso' })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
   @HttpCode(HttpStatus.NO_CONTENT)
-  async delete(@Param('id', ParseIntPipe) id: number) {
+  async delete(@Param('id', ParseUUIDPipe) id: string) {
     await this.deleteUserService.execute(id);
   }
 
@@ -214,7 +216,7 @@ export class UserController {
     description: 'Solicitação processada com sucesso',
   })
   async processAccessRequest(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Request() req,
     @Body() data: ProcessAccessRequestDto,
   ) {
@@ -238,7 +240,7 @@ export class UserController {
     status: 200,
     description: 'Usuários da unidade retornados com sucesso',
   })
-  async findByUnidade(@Param('id', ParseIntPipe) id: number) {
+  async findByUnidade(@Param('id', ParseUUIDPipe) id: string) {
     return this.getUsersByUnitService.execute(id);
   }
 
@@ -246,7 +248,7 @@ export class UserController {
   @UseGuards(RolesGuard)
   @Roles('Administrador', 'CPS')
   async changeRole(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() changeRoleDto: ChangeUserRoleDto,
     @Request() req: any,
   ) {

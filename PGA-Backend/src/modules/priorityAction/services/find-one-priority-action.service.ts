@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+﻿import { Injectable, NotFoundException } from '@nestjs/common';
 import { PriorityActionRepository } from '../priority-action.repository';
 import { PrioridadeAcao } from '@prisma/client';
 
@@ -6,7 +6,7 @@ import { PrioridadeAcao } from '@prisma/client';
 export class FindOnePriorityActionService {
   constructor(private readonly repository: PriorityActionRepository) {}
 
-  async execute(prioridade_id: number): Promise<PrioridadeAcao> {
+  async execute(prioridade_id: string): Promise<PrioridadeAcao> {
     const result = await this.repository.findOne(prioridade_id);
     if (!result) throw new NotFoundException('Prioridade não encontrada');
     return result;

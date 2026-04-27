@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, Matches, IsInt } from 'class-validator';
+﻿import { IsString, IsNotEmpty, IsOptional, Matches, IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUnitDto {
@@ -43,15 +43,15 @@ export class CreateUnitDto {
     description: 'ID da regional à qual a unidade pertence',
     example: 1,
   })
-  @IsInt({ message: 'O id da regional deve ser um inteiro' })
-  regional_id: number;
+  @IsUUID('4', { message: 'O id da regional deve ser um inteiro' })
+  regional_id: string;
 
   @ApiProperty({
     description: 'ID da pessoa que é diretor da unidade (opcional)',
     example: 123,
     required: false,
   })
-  @IsInt({ message: 'O id do diretor deve ser um inteiro' })
+  @IsUUID('4', { message: 'O id do diretor deve ser um inteiro' })
   @IsOptional()
-  diretor_id?: number;
+  diretor_id?: string;
 }

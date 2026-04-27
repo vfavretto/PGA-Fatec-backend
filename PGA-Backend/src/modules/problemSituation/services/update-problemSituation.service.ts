@@ -1,4 +1,4 @@
-import {
+﻿import {
   ConflictException,
   Injectable,
   NotFoundException,
@@ -10,7 +10,7 @@ import { UpdateProblemSituationDto } from '../dto/update-problemSituation.dto';
 export class UpdateProblemSituationService {
   constructor(private readonly repo: ProblemSituationRepository) {}
 
-  async execute(id: number, data: UpdateProblemSituationDto) {
+  async execute(id: string, data: UpdateProblemSituationDto) {
     const situacaoExistente = await this.repo.findOne(id);
 
     if (!situacaoExistente) {

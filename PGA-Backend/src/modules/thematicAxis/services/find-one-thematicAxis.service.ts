@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { ThematicAxisRepository } from '../thematicAxis.repository';
 
 @Injectable()
 export class FindOneThematicAxisService {
   constructor(private readonly repo: ThematicAxisRepository) {}
 
-  async execute(id: number) {
+  async execute(id: string) {
     return this.repo.findOne(id);
   }
 }

@@ -8,11 +8,11 @@ export class FindAllProject1Service {
   async execute(user?: any) {
     const active = user?.active_context ?? null;
     if (active && active.tipo === 'unidade') {
-      return this.project1Repository.findAllByUnit(Number(active.id));
+      return this.project1Repository.findAllByUnit(active.id);
     }
 
     if (active && active.tipo === 'regional') {
-      return this.project1Repository.findAllByRegional(Number(active.id));
+      return this.project1Repository.findAllByRegional(active.id);
     }
 
     return this.project1Repository.findAll();

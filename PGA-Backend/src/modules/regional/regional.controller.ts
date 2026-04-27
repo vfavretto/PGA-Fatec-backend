@@ -1,9 +1,9 @@
-import {
+﻿import {
   Body,
   Controller,
   Get,
   Param,
-  ParseIntPipe,
+  ParseUUIDPipe,
   Patch,
   Query,
   Request,
@@ -101,16 +101,16 @@ export class RegionalController {
     const userRole = req.user?.tipo_usuario;
 
     if (regionalId) {
-      const rid = Number(regionalId);
+      const rid = regionalId;
       if (userRole === 'Administrador' || userRole === 'CPS') {
         return this.listRegionalUnitsService.execute(rid);
       }
 
       if (userRole === 'Regional') {
         const active = req.user.active_context;
-        let userRegionalId: number | null = null;
+        let userRegionalId: string | null = null;
         if (active && active.tipo === 'regional') {
-          userRegionalId = Number(active.id);
+          userRegionalId = active.id;
         } else {
           const regional = await this.findRegionalByResponsavelService.execute(
             req.user.pessoa_id,
@@ -133,7 +133,7 @@ export class RegionalController {
       const results = await Promise.all(
         regionais.map(async (r: any) => {
           const unidades = await this.listRegionalUnitsService.execute(
-            Number(r.regional_id),
+            r.regional_id,
           );
           return {
             ...r,
@@ -145,23 +145,18 @@ export class RegionalController {
     }
 
     if (userRole === 'Regional') {
-      const active = req.user.active_context;
-      let userRegionalId: number | null = null;
-      if (active && active.tipo === 'regional') {
-        userRegionalId = Number(active.id);
-      } else {
-        const regional = await this.findRegionalByResponsavelService.execute(
-          req.user.pessoa_id,
-        );
-        userRegionalId = regional ? regional.regional_id : null;
-      }
+      // active.id quando tipo='regional' é pessoa_id, não regional_id.
+      // Sempre resolvemos regional_id via responsavel_id.
+      const regional = await this.findRegionalByResponsavelService.execute(
+        req.user.pessoa_id,
+      );
+      const userRegionalId = regional?.regional_id ?? null;
 
       if (!userRegionalId) return [];
 
-      const regional = await this.getRegionalService.execute(userRegionalId);
-      const unidades =
-        await this.listRegionalUnitsService.execute(userRegionalId);
-      return { ...regional, unidades };
+      const regionalData = await this.getRegionalService.execute(userRegionalId);
+      const unidades = await this.listRegionalUnitsService.execute(userRegionalId);
+      return { ...regionalData, unidades };
     }
 
     throw new ForbiddenException();
@@ -181,7 +176,7 @@ export class RegionalController {
     status: 200,
     description: 'Lista de unidades retornada com sucesso.',
   })
-  async listUnitsById(@Request() req, @Param('id', ParseIntPipe) id: number) {
+  async listUnitsById(@Request() req, @Param('id', ParseUUIDPipe) id: string) {
     const userRole = req.user?.tipo_usuario;
     if (userRole === 'Administrador' || userRole === 'CPS') {
       return this.listRegionalUnitsService.execute(id);
@@ -189,9 +184,9 @@ export class RegionalController {
 
     if (userRole === 'Regional') {
       const active = req.user.active_context;
-      let userRegionalId: number | null = null;
+      let userRegionalId: string | null = null;
       if (active && active.tipo === 'regional') {
-        userRegionalId = Number(active.id);
+        userRegionalId = active.id;
       } else {
         const regional = await this.findRegionalByResponsavelService.execute(
           req.user.pessoa_id,
@@ -209,21 +204,6 @@ export class RegionalController {
     throw new ForbiddenException();
   }
 
-  @Get(':id')
-  @ApiOperation({
-    summary: 'Obter regional por id',
-    description: 'Retorna os dados de uma regional especificada pelo id.',
-  })
-  @ApiParam({
-    name: 'id',
-    type: Number,
-    description: 'Identificador da regional',
-  })
-  @ApiResponse({ status: 200, description: 'Regional retornada com sucesso.' })
-  async getRegional(@Param('id', ParseIntPipe) id: number) {
-    return this.getRegionalService.execute(id);
-  }
-
   @Get('pgas')
   @ApiOperation({
     summary: 'Listar PGAs das unidades sob responsabilidade',
@@ -238,13 +218,13 @@ export class RegionalController {
     const active = req.user.active_context;
 
     if (active && active.tipo === 'unidade') {
-      query.unidadeId = Number(active.id);
+      query.unidadeId = active.id;
       return this.listRegionalPgasService.execute(req.user.pessoa_id, query);
     }
 
     const regionalId =
       active && active.tipo === 'regional'
-        ? Number(active.id)
+        ? active.id
         : req.user.pessoa_id;
     return this.listRegionalPgasService.execute(regionalId, query);
   }
@@ -264,7 +244,7 @@ export class RegionalController {
     status: 200,
     description: 'PGA retornado com sucesso.',
   })
-  async getPga(@Request() req, @Param('id', ParseIntPipe) id: number) {
+  async getPga(@Request() req, @Param('id', ParseUUIDPipe) id: string) {
     const active = req.user.active_context;
     if (active && active.tipo === 'unidade') {
       return this.getRegionalPgaService.execute(req.user.pessoa_id, id);
@@ -272,7 +252,7 @@ export class RegionalController {
 
     const regionalId =
       active && active.tipo === 'regional'
-        ? Number(active.id)
+        ? active.id
         : req.user.pessoa_id;
     return this.getRegionalPgaService.execute(regionalId, id);
   }
@@ -295,13 +275,13 @@ export class RegionalController {
   })
   async reviewPga(
     @Request() req,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() body: ReviewPgaDto,
   ) {
     const active = req.user.active_context;
     const regionalId =
       active && active.tipo === 'regional'
-        ? Number(active.id)
+        ? active.id
         : req.user.pessoa_id;
     return this.reviewRegionalPgaService.execute(regionalId, id, body);
   }
@@ -319,7 +299,7 @@ export class RegionalController {
   async listProjects(@Request() req, @Query() query: RegionalProjectQueryDto) {
     const active = req.user.active_context;
     if (active && active.tipo === 'unidade') {
-      query.unidadeId = Number(active.id);
+      query.unidadeId = active.id;
       return this.listRegionalProjectsService.execute(
         req.user.pessoa_id,
         query,
@@ -328,7 +308,7 @@ export class RegionalController {
 
     const regionalId =
       active && active.tipo === 'regional'
-        ? Number(active.id)
+        ? active.id
         : req.user.pessoa_id;
     return this.listRegionalProjectsService.execute(regionalId, query);
   }
@@ -348,11 +328,11 @@ export class RegionalController {
     status: 200,
     description: 'Projeto retornado com sucesso.',
   })
-  async getProject(@Request() req, @Param('id', ParseIntPipe) id: number) {
+  async getProject(@Request() req, @Param('id', ParseUUIDPipe) id: string) {
     const active = req.user.active_context;
     const regionalId =
       active && active.tipo === 'regional'
-        ? Number(active.id)
+        ? active.id
         : req.user.pessoa_id;
     return this.getRegionalProjectService.execute(regionalId, id);
   }
@@ -375,14 +355,29 @@ export class RegionalController {
   })
   async reviewProject(
     @Request() req,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() body: ReviewProjectDto,
   ) {
     const active = req.user.active_context;
     const regionalId =
       active && active.tipo === 'regional'
-        ? Number(active.id)
+        ? active.id
         : req.user.pessoa_id;
     return this.reviewRegionalProjectService.execute(regionalId, id, body);
+  }
+
+  @Get(':id')
+  @ApiOperation({
+    summary: 'Obter regional por id',
+    description: 'Retorna os dados de uma regional especificada pelo id.',
+  })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    description: 'Identificador da regional',
+  })
+  @ApiResponse({ status: 200, description: 'Regional retornada com sucesso.' })
+  async getRegional(@Param('id', ParseUUIDPipe) id: string) {
+    return this.getRegionalService.execute(id);
   }
 }

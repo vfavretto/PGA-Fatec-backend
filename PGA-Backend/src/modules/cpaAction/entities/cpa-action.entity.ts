@@ -1,6 +1,6 @@
-export class CpaAction {
-  acao_cpa_id: number;
-  pga_id: number;
+﻿export class CpaAction {
+  acao_cpa_id: string;
+  pga_id: string;
   descricao: string;
   justificativa?: string | null;
 }

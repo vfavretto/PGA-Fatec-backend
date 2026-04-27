@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/config/prisma.service';
 import { ConfiguracaoAuditoria, TipoOperacaoAuditoria } from '@prisma/client';
 
@@ -8,12 +8,12 @@ export class AuditRepository {
 
   async createAuditLog(data: {
     tabela: string;
-    registro_id: number;
+    registro_id: string;
     ano: number;
     operacao: TipoOperacaoAuditoria;
     dados_antes?: any;
     dados_depois?: any;
-    usuario_id?: number;
+    usuario_id?: string;
     motivo?: string;
   }): Promise<ConfiguracaoAuditoria> {
     return this.prisma.configuracaoAuditoria.create({
@@ -30,7 +30,7 @@ export class AuditRepository {
     });
   }
 
-  async getAuditHistory(tabela: string, registro_id: number) {
+  async getAuditHistory(tabela: string, registro_id: string) {
     return this.prisma.configuracaoAuditoria.findMany({
       where: {
         tabela,

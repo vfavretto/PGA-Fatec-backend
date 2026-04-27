@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { RegionalRepository } from '../regional.repository';
 import { RegionalProjectQueryDto } from '../dto/regional-project-query.dto';
 
@@ -6,7 +6,7 @@ import { RegionalProjectQueryDto } from '../dto/regional-project-query.dto';
 export class ListRegionalProjectsService {
   constructor(private readonly repository: RegionalRepository) {}
 
-  async execute(regionalId: number, filters: RegionalProjectQueryDto) {
+  async execute(regionalId: string, filters: RegionalProjectQueryDto) {
     return this.repository.findProjectsByRegional(regionalId, filters);
   }
 }

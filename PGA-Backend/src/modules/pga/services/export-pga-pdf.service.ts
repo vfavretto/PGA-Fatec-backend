@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+﻿import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { PgaRepository } from '../pga.repository';
 import * as puppeteer from 'puppeteer';
 
@@ -24,7 +24,7 @@ export class ExportPgaPdfService {
     }
 
     const situacoesOrdenadas = Object.keys(situacaoCountMap)
-      .map((k) => ({ situacao_id: Number(k), descricao: situacaoCountMap[Number(k)].descricao, count: situacaoCountMap[Number(k)].count }))
+      .map((k) => ({ situacao_id: k, descricao: situacaoCountMap[k].descricao, count: situacaoCountMap[k].count }))
       .sort((a, b) => b.count - a.count);
 
     let situacoesHtml = '';
@@ -385,7 +385,7 @@ export class ExportPgaPdfService {
       .replace(/'/g, '&#39;');
   }
 
-  async execute(id: number, user?: any): Promise<Buffer> {
+  async execute(id: string, user?: any): Promise<Buffer> {
     const active = user?.active_context ?? null;
     const hasAccess = await this.repository.findOneWithContext(id, active);
     if (!hasAccess) throw new NotFoundException('PGA não encontrada ou sem acesso');

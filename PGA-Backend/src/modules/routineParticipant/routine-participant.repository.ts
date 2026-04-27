@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../config/prisma.service';
 import { BaseRepository } from '../../common/repositories/base.repository';
 import { RotinaParticipante } from '@prisma/client';
@@ -27,7 +27,7 @@ export class RoutineParticipantRepository extends BaseRepository<RotinaParticipa
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return this.prisma.rotinaParticipante.findFirst({
       where: this.whereActive({ rotina_participante_id: id }),
       include: {
@@ -37,21 +37,21 @@ export class RoutineParticipantRepository extends BaseRepository<RotinaParticipa
     });
   }
 
-  async update(id: number, data: UpdateRoutineParticipantDto) {
+  async update(id: string, data: UpdateRoutineParticipantDto) {
     return this.prisma.rotinaParticipante.update({
       where: { rotina_participante_id: id },
       data,
     });
   }
 
-  async softDelete(id: number) {
+  async softDelete(id: string) {
     return this.prisma.rotinaParticipante.update({
       where: { rotina_participante_id: id },
       data: { ativo: false },
     });
   }
 
-  async findByRoutineId(routineId: number) {
+  async findByRoutineId(routineId: string) {
     return this.prisma.rotinaParticipante.findMany({
       where: this.whereActive({ rotina_id: routineId }),
       include: {

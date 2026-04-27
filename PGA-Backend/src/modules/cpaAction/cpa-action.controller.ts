@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Put, Delete, ParseIntPipe, Request, UseGuards } from '@nestjs/common';
+﻿import { Controller, Post, Body, Get, Param, Put, Delete, ParseUUIDPipe, Request, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
 import { CreateCpaActionDto } from './dto/create-cpa-action.dto';
 import { UpdateCpaActionDto } from './dto/update-cpa-action.dto';
@@ -43,7 +43,7 @@ export class CpaActionController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID da ação CPA' })
   @ApiResponse({ status: 200, description: 'Ação CPA encontrada com sucesso' })
   @ApiResponse({ status: 404, description: 'Ação CPA não encontrada' })
-  findOne(@Request() req: any, @Param('id', ParseIntPipe) id: number) {
+  findOne(@Request() req: any, @Param('id', ParseUUIDPipe) id: string) {
     return this.findOneService.execute(id, req.user);
   }
 
@@ -53,7 +53,7 @@ export class CpaActionController {
   @ApiBody({ type: UpdateCpaActionDto })
   @ApiResponse({ status: 200, description: 'Ação CPA atualizada com sucesso' })
   @ApiResponse({ status: 404, description: 'Ação CPA não encontrada' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateCpaActionDto) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateCpaActionDto) {
     return this.updateService.execute(id, dto);
   }
 
@@ -62,7 +62,7 @@ export class CpaActionController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID da ação CPA' })
   @ApiResponse({ status: 200, description: 'Ação CPA excluída com sucesso' })
   @ApiResponse({ status: 404, description: 'Ação CPA não encontrada' })
-  delete(@Param('id', ParseIntPipe) id: number) {
+  delete(@Param('id', ParseUUIDPipe) id: string) {
     return this.deleteService.execute(id);
   }
 }

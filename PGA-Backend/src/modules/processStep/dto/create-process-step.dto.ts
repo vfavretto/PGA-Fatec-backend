@@ -1,5 +1,5 @@
-import {
-  IsInt,
+﻿import {
+  IsUUID,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -17,8 +17,8 @@ export class CreateProcessStepDto {
     type: 'integer',
   })
   @IsNotEmpty()
-  @IsInt()
-  acao_projeto_id: number;
+  @IsUUID('4')
+  acao_projeto_id: string;
 
   @ApiProperty({
     description: 'Descrição da etapa do processo',
@@ -34,8 +34,8 @@ export class CreateProcessStepDto {
     type: 'integer',
   })
   @IsOptional()
-  @IsInt()
-  entregavel_id?: number;
+  @IsUUID('4')
+  entregavel_id?: string;
 
   @ApiPropertyOptional({
     description: 'Número de referência da etapa',

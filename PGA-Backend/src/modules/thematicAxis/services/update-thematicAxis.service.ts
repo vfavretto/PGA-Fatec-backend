@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+﻿import { Injectable, NotFoundException } from '@nestjs/common';
 import { ThematicAxisRepository } from '../thematicAxis.repository';
 import { UpdateThematicAxisDto } from '../dto/update-thematicAxis.dto';
 
@@ -6,7 +6,7 @@ import { UpdateThematicAxisDto } from '../dto/update-thematicAxis.dto';
 export class UpdateThematicAxisService {
   constructor(private readonly repo: ThematicAxisRepository) {}
 
-  async execute(id: number, data: UpdateThematicAxisDto) {
+  async execute(id: string, data: UpdateThematicAxisDto) {
     const eixo = await this.repo.findOne(id);
     if (!eixo) throw new NotFoundException('Eixo Temático não encontrado');
     return this.repo.update(id, data);

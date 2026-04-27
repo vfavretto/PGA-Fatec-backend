@@ -1,8 +1,8 @@
-import { Type } from 'class-transformer';
+﻿import { Type } from 'class-transformer';
 import {
   IsBoolean,
   IsDate,
-  IsInt,
+  IsUUID,
   IsOptional,
   IsString,
   IsNumber,
@@ -32,32 +32,32 @@ export class CreateProject1Dto {
     example: 1,
     type: 'integer',
   })
-  @IsInt()
-  pga_id: number;
+  @IsUUID('4')
+  pga_id: string;
 
   @ApiProperty({
     description: 'ID do eixo temático',
     example: 2,
     type: 'integer',
   })
-  @IsInt()
-  eixo_id: number;
+  @IsUUID('4')
+  eixo_id: string;
 
   @ApiProperty({
     description: 'ID da prioridade de ação',
     example: 1,
     type: 'integer',
   })
-  @IsInt()
-  prioridade_id: number;
+  @IsUUID('4')
+  prioridade_id: string;
 
   @ApiProperty({
     description: 'ID do tema específico',
     example: 3,
     type: 'integer',
   })
-  @IsInt()
-  tema_id: number;
+  @IsUUID('4')
+  tema_id: string;
 
   @ApiProperty({
     description: 'Descrição do que será feito no projeto',
@@ -147,6 +147,6 @@ export class CreateProject1Dto {
   })
   @IsOptional()
   @IsArray()
-  @IsInt({ each: true })
-  situacao_problema_ids?: number[];
+  @IsUUID('4', { each: true })
+  situacao_problema_ids?: string[];
 }

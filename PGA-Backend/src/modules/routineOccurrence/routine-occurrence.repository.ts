@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../config/prisma.service';
 import { BaseRepository } from '../../common/repositories/base.repository';
 import { RotinaOcorrencia } from '@prisma/client';
@@ -29,7 +29,7 @@ export class RoutineOccurrenceRepository extends BaseRepository<RotinaOcorrencia
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return this.prisma.rotinaOcorrencia.findFirst({
       where: this.whereActive({ ocorrencia_id: id }),
       include: {
@@ -38,21 +38,21 @@ export class RoutineOccurrenceRepository extends BaseRepository<RotinaOcorrencia
     });
   }
 
-  async update(id: number, data: UpdateRoutineOccurrenceDto) {
+  async update(id: string, data: UpdateRoutineOccurrenceDto) {
     return this.prisma.rotinaOcorrencia.update({
       where: { ocorrencia_id: id },
       data,
     });
   }
 
-  async softDelete(id: number) {
+  async softDelete(id: string) {
     return this.prisma.rotinaOcorrencia.update({
       where: { ocorrencia_id: id },
       data: { ativo: false },
     });
   }
 
-  async findByRoutineId(routineId: number) {
+  async findByRoutineId(routineId: string) {
     return this.prisma.rotinaOcorrencia.findMany({
       where: this.whereActive({ rotina_id: routineId }),
       orderBy: {

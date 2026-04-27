@@ -1,11 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+﻿import { Injectable, NotFoundException } from '@nestjs/common';
 import { RegionalRepository } from '../regional.repository';
 
 @Injectable()
 export class GetRegionalProjectService {
   constructor(private readonly repository: RegionalRepository) {}
 
-  async execute(regionalId: number, projectId: number) {
+  async execute(regionalId: string, projectId: string) {
     const projeto = await this.repository.findProjectForRegional(
       regionalId,
       projectId,

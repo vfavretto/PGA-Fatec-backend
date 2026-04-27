@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Put, Delete, ParseIntPipe } from '@nestjs/common';
+﻿import { Controller, Post, Body, Get, Param, Put, Delete, ParseUUIDPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
 import { CreateRoutineParticipantDto } from './dto/create-routine-participant.dto';
 import { UpdateRoutineParticipantDto } from './dto/update-routine-participant.dto';
@@ -41,7 +41,7 @@ export class RoutineParticipantController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID do participante' })
   @ApiResponse({ status: 200, description: 'Participante encontrado com sucesso' })
   @ApiResponse({ status: 404, description: 'Participante não encontrado' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.findOneService.execute(id);
   }
 
@@ -51,7 +51,7 @@ export class RoutineParticipantController {
   @ApiBody({ type: UpdateRoutineParticipantDto })
   @ApiResponse({ status: 200, description: 'Participante atualizado com sucesso' })
   @ApiResponse({ status: 404, description: 'Participante não encontrado' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateRoutineParticipantDto) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateRoutineParticipantDto) {
     return this.updateService.execute(id, dto);
   }
 
@@ -60,7 +60,7 @@ export class RoutineParticipantController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID do participante' })
   @ApiResponse({ status: 200, description: 'Participante removido com sucesso' })
   @ApiResponse({ status: 404, description: 'Participante não encontrado' })
-  delete(@Param('id', ParseIntPipe) id: number) {
+  delete(@Param('id', ParseUUIDPipe) id: string) {
     return this.deleteService.execute(id);
   }
 }

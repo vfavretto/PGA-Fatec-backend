@@ -1,4 +1,4 @@
-import { IsInt, IsOptional, IsString } from 'class-validator';
+﻿import { IsInt, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class UpdateThemeDto {
   @IsOptional()
@@ -6,8 +6,8 @@ export class UpdateThemeDto {
   tema_num?: number;
 
   @IsOptional()
-  @IsInt()
-  eixo_id?: number;
+  @IsUUID('4')
+  eixo_id?: string;
 
   @IsOptional()
   @IsString()

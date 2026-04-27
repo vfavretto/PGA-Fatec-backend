@@ -1,8 +1,8 @@
-import { StatusOcorrencia } from '@prisma/client';
+﻿import { StatusOcorrencia } from '@prisma/client';
 
 export class RoutineOccurrence {
-  ocorrencia_id: number;
-  rotina_id: number;
+  ocorrencia_id: string;
+  rotina_id: string;
   data_realizacao: Date;
   hora_inicio?: Date | null;
   hora_fim?: Date | null;

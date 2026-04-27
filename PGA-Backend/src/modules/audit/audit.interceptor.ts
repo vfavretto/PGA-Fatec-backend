@@ -1,4 +1,4 @@
-import {
+﻿import {
   Injectable,
   NestInterceptor,
   ExecutionContext,
@@ -97,7 +97,7 @@ export class AuditInterceptor implements NestInterceptor {
 
   private extractAuditInfo(
     url: string,
-  ): { tabela: string; registroId?: number } | null {
+  ): { tabela: string; registroId?: string } | null {
     const urlMappings = [
       { pattern: /\/thematic-axis/, tabela: 'eixo_tematico' },
       { pattern: /\/eixos-tematicos/, tabela: 'eixo_tematico' },
@@ -118,16 +118,16 @@ export class AuditInterceptor implements NestInterceptor {
     const mapping = urlMappings.find((m) => m.pattern.test(url));
     if (!mapping) return null;
 
-    let registroId: number | undefined;
-    const idMatch = url.match(/\/(\d+)(?:\/|$)/);
+    let registroId: string | undefined;
+    const idMatch = url.match(/\/([0-9a-f-]{8,})(?:\/|$)/);
     if (idMatch) {
-      registroId = parseInt(idMatch[1], 10);
+      registroId = idMatch[1];
     }
 
     return { tabela: mapping.tabela, registroId };
   }
 
-  private extractIdFromResponse(response: any, tabela: string): number | null {
+  private extractIdFromResponse(response: any, tabela: string): string | null {
     if (!response) return null;
 
     const possibleIds = [

@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+﻿import { IsUUID, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateCpaActionDto {
@@ -8,8 +8,8 @@ export class CreateCpaActionDto {
     type: 'integer'
   })
   @IsNotEmpty()
-  @IsInt()
-  pga_id: number;
+  @IsUUID('4')
+  pga_id: string;
 
   @ApiProperty({
     description: 'Descrição da ação da CPA',

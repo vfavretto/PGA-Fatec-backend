@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { RegionalRepository } from '../regional.repository';
 import { RegionalPgaQueryDto } from '../dto/regional-pga-query.dto';
 
@@ -6,7 +6,7 @@ import { RegionalPgaQueryDto } from '../dto/regional-pga-query.dto';
 export class ListRegionalPgasService {
   constructor(private readonly repository: RegionalRepository) {}
 
-  async execute(regionalId: number, filters: RegionalPgaQueryDto) {
+  async execute(regionalId: string, filters: RegionalPgaQueryDto) {
     return this.repository.findPgasByRegional(regionalId, filters);
   }
 }

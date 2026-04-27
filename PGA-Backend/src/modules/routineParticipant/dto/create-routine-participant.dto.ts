@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+﻿import { IsUUID, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateRoutineParticipantDto {
@@ -8,8 +8,8 @@ export class CreateRoutineParticipantDto {
     type: 'integer'
   })
   @IsNotEmpty()
-  @IsInt()
-  rotina_id: number;
+  @IsUUID('4')
+  rotina_id: string;
 
   @ApiProperty({
     description: 'ID da pessoa participante',
@@ -17,8 +17,8 @@ export class CreateRoutineParticipantDto {
     type: 'integer'
   })
   @IsNotEmpty()
-  @IsInt()
-  pessoa_id: number;
+  @IsUUID('4')
+  pessoa_id: string;
 
   @ApiPropertyOptional({
     description: 'Papel da pessoa na rotina',

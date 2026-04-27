@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../config/prisma.service';
 import { BaseRepository } from '../../common/repositories/base.repository';
 import { EntregavelLinkSei } from '@prisma/client';
@@ -24,41 +24,41 @@ export class DeliverableRepository extends BaseRepository<EntregavelLinkSei> {
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return this.prisma.entregavelLinkSei.findFirst({
       where: this.whereActive({ entregavel_id: id }),
     });
   }
 
-  async update(id: number, data: UpdateDeliverableDto) {
+  async update(id: string, data: UpdateDeliverableDto) {
     return this.prisma.entregavelLinkSei.update({
       where: { entregavel_id: id },
       data,
     });
   }
 
-  async softDelete(id: number) {
+  async softDelete(id: string) {
     return this.prisma.entregavelLinkSei.update({
       where: { entregavel_id: id },
       data: { ativo: false },
     });
   }
 
-  async findAllByUnit(unidadeId: number) {
+  async findAllByUnit(unidadeId: string) {
     return this.prisma.entregavelLinkSei.findMany({
       where: this.whereActive({ unidade_id: unidadeId }),
       orderBy: { entregavel_numero: 'asc' },
     });
   }
 
-  async findAllByRegional(regionalId: number) {
+  async findAllByRegional(regionalId: string) {
     return this.prisma.entregavelLinkSei.findMany({
       where: this.whereActive({ regional_id: regionalId }),
       orderBy: { entregavel_numero: 'asc' },
     });
   }
 
-  async findOneWithContext(id: number, active_context?: any) {
+  async findOneWithContext(id: string, active_context?: any) {
     if (active_context && active_context.tipo === 'unidade') {
       return this.prisma.entregavelLinkSei.findFirst({
         where: this.whereActive({ entregavel_id: id, unidade_id: active_context.id }),

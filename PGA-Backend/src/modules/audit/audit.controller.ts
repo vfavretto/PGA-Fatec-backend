@@ -1,4 +1,4 @@
-import {
+﻿import {
   Controller,
   Get,
   Post,
@@ -6,6 +6,7 @@ import {
   Body,
   Query,
   ParseIntPipe,
+  ParseUUIDPipe,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -56,8 +57,8 @@ export class AuditController {
   })
   @ApiResponse({ status: 201, description: 'Snapshot criado com sucesso' })
   async criarSnapshotPGA(
-    @Param('pgaId', ParseIntPipe) pgaId: number,
-    @Body() body: { ano: number; usuarioId: number },
+    @Param('pgaId', ParseUUIDPipe) pgaId: string,
+    @Body() body: { ano: number; usuarioId: string },
   ) {
     return this.snapshotService.criarSnapshotParaPGA(
       pgaId,
@@ -159,7 +160,7 @@ export class AuditController {
   @ApiResponse({ status: 200, description: 'Histórico retornado com sucesso' })
   async getAuditHistory(
     @Param('tabela') tabela: string,
-    @Param('registroId', ParseIntPipe) registroId: number,
+    @Param('registroId', ParseUUIDPipe) registroId: string,
   ) {
     return this.auditLogService.getAuditHistory(tabela, registroId);
   }

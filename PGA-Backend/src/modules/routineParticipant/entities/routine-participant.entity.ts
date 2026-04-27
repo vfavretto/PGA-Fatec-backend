@@ -1,6 +1,6 @@
-export class RoutineParticipant {
-  rotina_participante_id: number;
-  rotina_id: number;
-  pessoa_id: number;
+﻿export class RoutineParticipant {
+  rotina_participante_id: string;
+  rotina_id: string;
+  pessoa_id: string;
   papel?: string | null;
 }

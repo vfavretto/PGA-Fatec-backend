@@ -4,12 +4,27 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AuditInterceptor } from './modules/audit/audit.interceptor';
 import { AuditLogService } from './modules/audit/services/audit-log.service';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.use(cookieParser());
+
+  const allowedOrigins = [
+    process.env.FRONTEND_URL,
+    'http://localhost:5173',
+    'http://localhost:4173',
+  ].filter(Boolean) as string[];
+
   app.enableCors({
-    origin: process.env.FRONTEND_URL,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });

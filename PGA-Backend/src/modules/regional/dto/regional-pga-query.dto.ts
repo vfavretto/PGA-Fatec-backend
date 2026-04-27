@@ -1,6 +1,6 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
+﻿import { ApiPropertyOptional } from '@nestjs/swagger';
 import { StatusPGA } from '@prisma/client';
-import { IsEnum, IsInt, IsOptional } from 'class-validator';
+import { IsEnum, IsUUID, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class RegionalPgaQueryDto {
@@ -20,6 +20,6 @@ export class RegionalPgaQueryDto {
   })
   @IsOptional()
   @Type(() => Number)
-  @IsInt()
-  unidadeId?: number;
+  @IsUUID('4')
+  unidadeId?: string;
 }

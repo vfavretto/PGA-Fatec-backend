@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../config/prisma.service';
 import { BaseRepository } from '../../common/repositories/base.repository';
 import { AcaoProjeto } from '@prisma/client';
@@ -45,7 +45,7 @@ export class Project1Repository extends BaseRepository<AcaoProjeto> {
     });
   }
 
-  async findAllByUnit(unidadeId: number) {
+  async findAllByUnit(unidadeId: string) {
     return this.prisma.acaoProjeto.findMany({
       where: this.whereActive({ pga: { unidade_id: unidadeId } }),
       include: {
@@ -62,7 +62,7 @@ export class Project1Repository extends BaseRepository<AcaoProjeto> {
     });
   }
 
-  async findAllByRegional(regionalId: number) {
+  async findAllByRegional(regionalId: string) {
     const vinculos = await this.prisma.pessoaUnidade.findMany({
       where: { pessoa_id: regionalId, ativo: true },
       select: { unidade_id: true },
@@ -86,29 +86,29 @@ export class Project1Repository extends BaseRepository<AcaoProjeto> {
     });
   }
 
-  async findOneWithContext(id: number, active_context?: { tipo: string; id?: number } | null) {
+  async findOneWithContext(id: string, active_context?: { tipo: string; id?: string } | null) {
     const projeto = await this.findOne(id);
     if (!projeto) return null;
 
     if (active_context) {
       if (active_context.tipo === 'unidade') {
-        if (projeto.pga.unidade_id !== Number(active_context.id)) return null;
+        if (projeto.pga.unidade_id !== active_context.id) return null;
       }
 
       if (active_context.tipo === 'regional') {
         const vinculos = await this.prisma.pessoaUnidade.findMany({
-          where: { pessoa_id: Number(active_context.id), ativo: true },
+          where: { pessoa_id: active_context.id, ativo: true },
           select: { unidade_id: true },
         });
         const ids = vinculos.map((v) => v.unidade_id);
-        if (!ids.includes(projeto.pga.unidade_id)) return null;
+        if (!projeto.pga.unidade_id || !ids.includes(projeto.pga.unidade_id)) return null;
       }
     }
 
     return projeto;
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return this.prisma.acaoProjeto.findFirst({
       where: this.whereActive({ acao_projeto_id: id }),
       include: {
@@ -136,21 +136,21 @@ export class Project1Repository extends BaseRepository<AcaoProjeto> {
     });
   }
 
-  async update(id: number, data: UpdateProject1Dto) {
+  async update(id: string, data: UpdateProject1Dto) {
     return this.prisma.acaoProjeto.update({
       where: { acao_projeto_id: id },
       data: data as any,
     });
   }
 
-  async delete(id: number) {
+  async delete(id: string) {
     return this.prisma.acaoProjeto.update({
       where: { acao_projeto_id: id },
       data: { ativo: false },
     });
   }
 
-  async findByPgaId(pgaId: number) {
+  async findByPgaId(pgaId: string) {
     return this.prisma.acaoProjeto.findMany({
       where: this.whereActive({ pga_id: pgaId }),
       include: {

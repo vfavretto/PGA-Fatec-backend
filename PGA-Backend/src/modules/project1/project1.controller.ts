@@ -1,10 +1,10 @@
-import {
+﻿import {
   Body,
   Controller,
   Delete,
   Get,
   Param,
-  ParseIntPipe,
+  ParseUUIDPipe,
   Post,
   Put,
 } from '@nestjs/common';
@@ -62,7 +62,7 @@ export class Project1Controller {
   @ApiParam({ name: 'id', type: 'number', description: 'ID do projeto' })
   @ApiResponse({ status: 200, description: 'Projeto encontrado com sucesso' })
   @ApiResponse({ status: 404, description: 'Projeto não encontrado' })
-  async findOne(@Request() req: any, @Param('id', ParseIntPipe) id: number) {
+  async findOne(@Request() req: any, @Param('id', ParseUUIDPipe) id: string) {
     return this.findOneProject1Service.execute(id, req.user);
   }
 
@@ -109,7 +109,7 @@ export class Project1Controller {
   @ApiResponse({ status: 200, description: 'Projeto atualizado com sucesso' })
   @ApiResponse({ status: 404, description: 'Projeto não encontrado' })
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() data: UpdateProject1Dto,
   ) {
     return this.updateProject1Service.execute(id, data);
@@ -123,7 +123,7 @@ export class Project1Controller {
   @ApiParam({ name: 'id', type: 'number', description: 'ID do projeto' })
   @ApiResponse({ status: 200, description: 'Projeto excluído com sucesso' })
   @ApiResponse({ status: 404, description: 'Projeto não encontrado' })
-  async delete(@Param('id', ParseIntPipe) id: number) {
+  async delete(@Param('id', ParseUUIDPipe) id: string) {
     return this.deleteProject1Service.execute(id);
   }
 }
