@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { UserRepository } from '../user.repository';
 import { Pessoa } from '@prisma/client';
 
@@ -6,7 +6,7 @@ import { Pessoa } from '@prisma/client';
 export class GetUsersByUnitService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  async execute(unidadeId: number): Promise<Pessoa[]> {
+  async execute(unidadeId: string): Promise<Pessoa[]> {
     return this.userRepository.findByUnidadeId(unidadeId);
   }
 }

@@ -71,7 +71,7 @@ export class ThematicAxisController {
   @ApiResponse({ status: 200, description: 'Eixo temático encontrado' })
   @ApiResponse({ status: 404, description: 'Eixo temático não encontrado' })
   findOne(@Param('id') id: string) {
-    return this.findOneService.execute(Number(id));
+    return this.findOneService.execute(id);
   }
 
   @Put(':id')
@@ -89,7 +89,7 @@ export class ThematicAxisController {
   })
   @ApiResponse({ status: 404, description: 'Eixo temático não encontrado' })
   update(@Param('id') id: string, @Body() dto: UpdateThematicAxisDto) {
-    return this.updateService.execute(Number(id), dto);
+    return this.updateService.execute(id, dto);
   }
 
   @Delete(':id')
@@ -106,6 +106,6 @@ export class ThematicAxisController {
   })
   @ApiResponse({ status: 404, description: 'Eixo temático não encontrado' })
   remove(@Param('id') id: string) {
-    return this.deleteService.execute(Number(id));
+    return this.deleteService.execute(id);
   }
 }

@@ -1,4 +1,4 @@
-import {
+﻿import {
   IsString,
   IsEmail,
   IsNotEmpty,
@@ -62,7 +62,7 @@ export class CreateUserDto {
     required: false,
   })
   @IsOptional()
-  unidade_id?: number;
+  unidade_id?: string;
 
   @ApiProperty({
     description:
@@ -71,5 +71,5 @@ export class CreateUserDto {
     required: false,
   })
   @IsOptional()
-  regional_id?: number;
+  regional_id?: string;
 }

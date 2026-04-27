@@ -9,12 +9,12 @@ datasource db {
 }
 
 model Unidade {
-  unidade_id    Int     @id @default(autoincrement())
+  unidade_id    String  @id @default(uuid())
   codigo_fnnn   String  @unique @db.VarChar(10)
   nome_unidade String  @db.VarChar(255)
-  regional_id   Int
+  regional_id   String
   ativo         Boolean @default(true)
-  diretor_id    Int?    @unique
+  diretor_id    String?  @unique
   endereco      String?  @db.VarChar(255)
   complemento   String?  @db.VarChar(255)
   bairro        String?  @db.VarChar(100)
@@ -25,8 +25,8 @@ model Unidade {
   site          String?  @db.VarChar(255)
   criado_em     DateTime @default(now())
   atualizado_em DateTime @updatedAt
-  criado_por   Int?
-  atualizado_por Int?
+  criado_por   String?
+  atualizado_por String?
 
   cursos        Curso[]
   pgas          PGA[]
@@ -42,32 +42,47 @@ model Unidade {
 }
 
 model PGA {
-  pga_id                    Int                   @id @default(autoincrement())
-  unidade_id                Int
+  pga_id                    String                @id @default(uuid())
+  numero                    Int                   @default(autoincrement())
+  unidade_id                String?
   ano                       Int
   versao                    String?               @db.VarChar(10)
   analise_cenario           String?
   data_elaboracao           DateTime?             @db.Date
   data_parecer_gpr          DateTime?             @db.Date
   status                    StatusPGA             @default(EmElaboracao)
+  is_template               Boolean               @default(false)
+  template_pga_id           String?
+  data_limite_submissao     DateTime?
   configuracoes_snapshot    Json?
   data_snapshot_criado      DateTime              @default(now())
-  usuario_criacao_id        Int?
-  regional_responsavel_id   Int?
+  usuario_criacao_id        String?
+  regional_responsavel_id   String?
   parecer_regional          String?               @db.Text
   data_parecer_regional     DateTime?
+  parecer_cps               String?               @db.Text
+  cps_aprovador_id          String?
+  data_parecer_cps          DateTime?
   ativo                     Boolean               @default(true)
   acoesCPA                  AcaoCPA[]
   acoesProjetos             AcaoProjeto[]
-  unidade                   Unidade               @relation(fields: [unidade_id], references: [unidade_id])
+  unidade                   Unidade?              @relation(fields: [unidade_id], references: [unidade_id])
   rotinas                   RotinaInstitucional[]
   situacoesProblemas        PGASituacaoProblema[]
   usuarioCriacao            Pessoa?               @relation("PGACriador", fields: [usuario_criacao_id], references: [pessoa_id])
   regionalResponsavel       Pessoa?               @relation("PGARegionalResponsavel", fields: [regional_responsavel_id], references: [pessoa_id], onDelete: SetNull)
+  cpsAprovador              Pessoa?               @relation("PGACpsAprovador", fields: [cps_aprovador_id], references: [pessoa_id], onDelete: SetNull)
+  templateOrigem            PGA?                  @relation("PGATemplateOrigin", fields: [template_pga_id], references: [pga_id])
+  copias                    PGA[]                 @relation("PGATemplateOrigin")
+
+  @@index([unidade_id])
+  @@index([is_template])
+  @@index([template_pga_id])
+  @@index([cps_aprovador_id])
 }
 
 model SituacaoProblema {
-  situacao_id         Int                 @id @default(autoincrement())
+  situacao_id         String              @id @default(uuid())
   codigo_categoria    String              @db.VarChar(20)
   descricao           String
   fonte               String?             @db.VarChar(255)
@@ -75,9 +90,9 @@ model SituacaoProblema {
   ordem               Int?
 
   criado_em           DateTime            @default(now())
-  criado_por          Int?
+  criado_por          String?
   atualizado_em       DateTime            @updatedAt
-  atualizado_por      Int?
+  atualizado_por      String?
 
   pgas                PGASituacaoProblema[]
   acoesProjetos       AcaoProjetoSituacaoProblema[]
@@ -93,16 +108,16 @@ model SituacaoProblema {
 }
 
 model EixoTematico {
-  eixo_id             Int             @id @default(autoincrement())
-  numero              Int             @unique
+  eixo_id             String          @id @default(uuid())
+  numero              Int
   nome_eixo           String          @db.VarChar(255)
   descricao           String?
   ativo               Boolean         @default(true)
 
   criado_em           DateTime        @default(now())
-  criado_por          Int?
+  criado_por          String?
   atualizado_em       DateTime        @default(now())
-  atualizado_por      Int?
+  atualizado_por      String?
 
   acoesProjetos       AcaoProjeto[]
   temas               Tema[]
@@ -112,39 +127,43 @@ model EixoTematico {
   
   usuarioCriador      Pessoa?         @relation("EixoCriador", fields: [criado_por], references: [pessoa_id])
   usuarioAtualizador  Pessoa?         @relation("EixoAtualizador", fields: [atualizado_por], references: [pessoa_id])
+
+  @@index([numero])
 }
 
 model PrioridadeAcao {
-  prioridade_id       Int             @id @default(autoincrement())
-  grau                Int             @unique
+  prioridade_id       String          @id @default(uuid())
+  grau                Int
   descricao           String          @db.VarChar(255)
   tipo_gestao         String          @db.VarChar(100)
   detalhes            String?         @db.Text
   ativo               Boolean         @default(true)
 
   criado_em           DateTime        @default(now())
-  criado_por          Int?
+  criado_por          String?
   atualizado_em       DateTime        @updatedAt
-  atualizado_por      Int?
+  atualizado_por      String?
   
   acoesProjetos       AcaoProjeto[]
 
   versoes             PrioridadeAcaoVersao[]
   usuarioCriador      Pessoa?         @relation("PrioridadeCriador", fields: [criado_por], references: [pessoa_id])
   usuarioAtualizador  Pessoa?         @relation("PrioridadeAtualizador", fields: [atualizado_por], references: [pessoa_id])
+
+  @@index([grau])
 }
 
 model Tema {
-  tema_id             Int             @id @default(autoincrement())
+  tema_id             String          @id @default(uuid())
   tema_num            Int
-  eixo_id             Int           
+  eixo_id             String           
   descricao           String          @db.VarChar(255)
   ativo               Boolean         @default(true)
 
   criado_em           DateTime        @default(now())
-  criado_por          Int?
+  criado_por          String?
   atualizado_em       DateTime        @default(now())
-  atualizado_por      Int?
+  atualizado_por      String?
   
   eixo                EixoTematico    @relation(fields: [eixo_id], references: [eixo_id])
   acoesProjetos       AcaoProjeto[]
@@ -153,17 +172,17 @@ model Tema {
   usuarioCriador      Pessoa?         @relation("TemaCriador", fields: [criado_por], references: [pessoa_id])
   usuarioAtualizador  Pessoa?         @relation("TemaAtualizador", fields: [atualizado_por], references: [pessoa_id])
 
-  @@unique([tema_num, eixo_id])
+  @@index([tema_num, eixo_id])
 }
 
 model AcaoProjeto {
-  acao_projeto_id                        Int         @id @default(autoincrement())
+  acao_projeto_id                        String      @id @default(uuid())
   codigo_projeto                         String      @db.VarChar(20)
   nome_projeto                           String?      @db.VarChar(255)
-  pga_id                                 Int
-  eixo_id                                Int
-  prioridade_id                          Int
-  tema_id                                Int
+  pga_id                                 String
+  eixo_id                                String
+  prioridade_id                          String
+  tema_id                                String
   o_que_sera_feito                       String
   por_que_sera_feito                     String
   data_inicio                            DateTime?        @db.Date
@@ -177,7 +196,7 @@ model AcaoProjeto {
   status_regional                        StatusProjetoRegional @default(EmAnalise)
   parecer_regional                       String?         @db.Text
   data_parecer_regional                  DateTime?
-  regional_responsavel_id                Int?
+  regional_responsavel_id                String?
   eixo                                   EixoTematico     @relation(fields: [eixo_id], references: [eixo_id])
   tema                                   Tema             @relation(fields: [tema_id], references: [tema_id])
   pga                                    PGA              @relation(fields: [pga_id], references: [pga_id])
@@ -193,7 +212,7 @@ model AcaoProjeto {
 }
 
 model Pessoa {
-  pessoa_id            Int                   @id @default(autoincrement())
+  pessoa_id            String                @id @default(uuid())
   nome                 String                @db.VarChar(255)
   email                String?               @unique @db.VarChar(255)
   nome_usuario         String?               @unique @db.VarChar(30)
@@ -206,8 +225,8 @@ model Pessoa {
   
   criado_em            DateTime              @default(now())
   atualizado_em        DateTime              @updatedAt
-  criado_por           Int?
-  atualizado_por       Int?
+  criado_por           String?
+  atualizado_por       String?
 
   unidade_dirigida    Unidade?       @relation("DiretorUnidade")
 
@@ -254,16 +273,17 @@ model Pessoa {
 
   solicitacoesProcessadas  SolicitacaoAcesso[] @relation("ProcessadorSolicitacao")
   pgasAvaliadosRegional    PGA[]               @relation("PGARegionalResponsavel")
+  pgasAvaliadosCps         PGA[]               @relation("PGACpsAprovador")
   projetosAvaliadosRegional AcaoProjeto[]      @relation("ProjetoRegionalResponsavel")
 }
 
 model ProjetoPessoa {
-  projeto_pessoa_id     Int            @id @default(autoincrement())
-  acao_projeto_id       Int
-  pessoa_id             Int
+  projeto_pessoa_id     String         @id @default(uuid())
+  acao_projeto_id       String
+  pessoa_id             String
   papel                 PapelProjeto
   carga_horaria_semanal Int?
-  tipo_vinculo_hae_id   Int?            
+  tipo_vinculo_hae_id   String?            
   ativo                 Boolean        @default(true)
   tipo_vinculo_hae      TipoVinculoHAE? @relation(fields: [tipo_vinculo_hae_id], references: [id])
   acaoProjeto           AcaoProjeto     @relation(fields: [acao_projeto_id], references: [acao_projeto_id])
@@ -271,10 +291,10 @@ model ProjetoPessoa {
 }
 
 model EtapaProcesso {
-  etapa_id                   Int               @id @default(autoincrement())
-  acao_projeto_id            Int
+  etapa_id                   String            @id @default(uuid())
+  acao_projeto_id            String
   descricao                  String
-  entregavel_id              Int?            
+  entregavel_id              String?            
   entregavel_link_sei        EntregavelLinkSei? @relation(fields: [entregavel_id], references: [entregavel_id])
   numero_ref                 String?           @db.VarChar(50)
   data_verificacao_prevista  DateTime?         @db.Date
@@ -286,9 +306,9 @@ model EtapaProcesso {
 }
 
 model Anexo {
-  anexo_id                  Int             @id @default(autoincrement())
-  etapa_processo_id         Int?            
-  entregavel_id             Int
+  anexo_id                  String          @id @default(uuid())
+  etapa_processo_id         String?            
+  entregavel_id             String
   item                      String          @db.VarChar(100)
   descricao                 String          @db.VarChar(255)
   quantidade                Int
@@ -306,17 +326,17 @@ model Anexo {
 }
 
 model EntregavelLinkSei {
-  entregavel_id       Int               @id @default(autoincrement())
-  entregavel_numero   String            @unique @db.VarChar(50)
+  entregavel_id       String            @id @default(uuid())
+  entregavel_numero   String            @db.VarChar(50)
   descricao           String            @db.VarChar(255)
   detalhes            String?           @db.VarChar(500)
   requer_anexo        Boolean           @default(false)
   ativo               Boolean           @default(true)
 
   criado_em           DateTime          @default(now())
-  criado_por          Int?
+  criado_por          String?
   atualizado_em       DateTime          @default(now())
-  atualizado_por      Int?
+  atualizado_por      String?
   
   etapas              EtapaProcesso[]
   anexos              Anexo[]
@@ -324,11 +344,13 @@ model EntregavelLinkSei {
   versoes             EntregavelVersao[]
   usuarioCriador      Pessoa?           @relation("EntregavelCriador", fields: [criado_por], references: [pessoa_id])
   usuarioAtualizador  Pessoa?           @relation("EntregavelAtualizador", fields: [atualizado_por], references: [pessoa_id])
+
+  @@index([entregavel_numero])
 }
 
 model AcaoCPA {
-  acao_cpa_id   Int     @id @default(autoincrement())
-  pga_id        Int
+  acao_cpa_id   String  @id @default(uuid())
+  pga_id        String
   descricao     String
   justificativa String?
   ativo         Boolean @default(true)
@@ -336,16 +358,16 @@ model AcaoCPA {
 }
 
 model RotinaInstitucional {
-  rotina_id           Int                  @id @default(autoincrement())
-  pga_id              Int
-  curso_id            Int?
+  rotina_id           String               @id @default(uuid())
+  pga_id              String
+  curso_id            String?
   tipo_rotina         TipoRotina
   titulo              String               @db.VarChar(255)
   descricao           String
   periodicidade       PeriodicidadeRotina
   data_inicio         DateTime?            @db.Date
   data_fim            DateTime?            @db.Date
-  responsavel_id      Int
+  responsavel_id      String
   entregavel_esperado String?
   status              StatusRotina         @default(Planejada)
   ativo               Boolean              @default(true)
@@ -357,9 +379,9 @@ model RotinaInstitucional {
 }
 
 model RotinaParticipante {
-  rotina_participante_id Int                 @id @default(autoincrement())
-  rotina_id              Int
-  pessoa_id              Int
+  rotina_participante_id String              @id @default(uuid())
+  rotina_id              String
+  pessoa_id              String
   papel                  String?             @db.VarChar(100)
   ativo                  Boolean             @default(true)
   pessoa                 Pessoa              @relation(fields: [pessoa_id], references: [pessoa_id])
@@ -367,8 +389,8 @@ model RotinaParticipante {
 }
 
 model RotinaOcorrencia {
-  ocorrencia_id   Int                 @id @default(autoincrement())
-  rotina_id       Int
+  ocorrencia_id   String              @id @default(uuid())
+  rotina_id       String
   data_realizacao DateTime            @db.Date
   hora_inicio     DateTime?           @db.Time(6)
   hora_fim        DateTime?           @db.Time(6)
@@ -382,12 +404,12 @@ model RotinaOcorrencia {
 }
 
 model Curso {
-  curso_id       Int                   @id @default(autoincrement())
-  unidade_id     Int
+  curso_id       String                @id @default(uuid())
+  unidade_id     String
   nome           String                @db.VarChar(255)
   tipo           TipoCurso
   status         StatusCurso
-  coordenador_id Int?
+  coordenador_id String?
   ativo          Boolean               @default(true)
   coordenador    Pessoa?               @relation(fields: [coordenador_id], references: [pessoa_id])
   unidade        Unidade               @relation(fields: [unidade_id], references: [unidade_id])
@@ -395,17 +417,19 @@ model Curso {
 }
 
 model TipoVinculoHAE {
-  id                    Int             @id @default(autoincrement())
-  sigla                 String          @unique @db.VarChar(10)
+  id                    String          @id @default(uuid())
+  sigla                 String          @db.VarChar(10)
   descricao             String          @db.VarChar(255)
   detalhes              String?         @db.Text
   ativo                 Boolean         @default(true)
   projetos_pessoas      ProjetoPessoa[]
+
+  @@index([sigla])
 }
 
 model PGASituacaoProblema {
-  pga_id              Int
-  situacao_problema_id Int
+  pga_id              String
+  situacao_problema_id String
   ativo               Boolean         @default(true)
   pga                 PGA               @relation(fields: [pga_id], references: [pga_id])
   situacaoProblema    SituacaoProblema  @relation(fields: [situacao_problema_id], references: [situacao_id])
@@ -414,8 +438,8 @@ model PGASituacaoProblema {
 }
 
 model AcaoProjetoSituacaoProblema {
-  acao_projeto_id     Int
-  situacao_problema_id Int
+  acao_projeto_id     String
+  situacao_problema_id String
   ativo               Boolean         @default(true)
   acaoProjeto         AcaoProjeto       @relation(fields: [acao_projeto_id], references: [acao_projeto_id])
   situacaoProblema    SituacaoProblema  @relation(fields: [situacao_problema_id], references: [situacao_id])
@@ -425,8 +449,11 @@ model AcaoProjetoSituacaoProblema {
 
 enum StatusPGA {
   EmElaboracao
+  Publicado
   Submetido
   Aprovado
+  AguardandoCPS
+  AprovadoCPS
   Reprovado
 }
 
@@ -522,14 +549,14 @@ enum AnexoProjetoUm {
 }
 
 model ConfiguracaoAuditoria {
-  auditoria_id          Int                   @id @default(autoincrement())
+  auditoria_id          String                @id @default(uuid())
   tabela                String                @db.VarChar(50)
-  registro_id           Int
+  registro_id           String
   ano                   Int
   operacao              TipoOperacaoAuditoria
   dados_antes           Json?
   dados_depois          Json?
-  usuario_id            Int?
+  usuario_id            String?
   data_operacao         DateTime              @default(now())
   motivo                String?               @db.Text
   usuario               Pessoa?               @relation(fields: [usuario_id], references: [pessoa_id])
@@ -540,15 +567,15 @@ model ConfiguracaoAuditoria {
 }
 
 model SituacaoProblemaVersao {
-  versao_id           Int                 @id @default(autoincrement())
-  situacao_base_id    Int
+  versao_id           String              @id @default(uuid())
+  situacao_base_id    String
   ano                 Int
   codigo_categoria    String              @db.VarChar(20)
   descricao           String
   fonte               String?             @db.VarChar(255)
   ativo_no_ano        Boolean             @default(true)
   ordem               Int?
-  criado_por          Int?
+  criado_por          String?
   criado_em           DateTime            @default(now())
   motivo_alteracao    String?             @db.Text
 
@@ -560,14 +587,14 @@ model SituacaoProblemaVersao {
 }
 
 model EixoTematicoVersao {
-  versao_id           Int                 @id @default(autoincrement())
-  eixo_base_id        Int
+  versao_id           String              @id @default(uuid())
+  eixo_base_id        String
   ano                 Int
   numero              Int
   nome                String              @db.VarChar(255)
   descricao           String?
   ativo_no_ano        Boolean             @default(true)
-  criado_por          Int?
+  criado_por          String?
   criado_em           DateTime            @default(now())
   motivo_alteracao    String?             @db.Text
   
@@ -578,15 +605,15 @@ model EixoTematicoVersao {
 }
 
 model PrioridadeAcaoVersao {
-  versao_id           Int                 @id @default(autoincrement())
-  prioridade_base_id  Int
+  versao_id           String              @id @default(uuid())
+  prioridade_base_id  String
   ano                 Int
   grau                Int
   descricao           String              @db.VarChar(255)
   tipo_gestao         String              @db.VarChar(100)
   detalhes            String?             @db.Text
   ativo_no_ano        Boolean             @default(true)
-  criado_por          Int?
+  criado_por          String?
   criado_em           DateTime            @default(now())
   motivo_alteracao    String?             @db.Text
   
@@ -597,14 +624,14 @@ model PrioridadeAcaoVersao {
 }
 
 model TemaVersao {
-  versao_id           Int                 @id @default(autoincrement())
-  tema_base_id        Int
+  versao_id           String              @id @default(uuid())
+  tema_base_id        String
   ano                 Int
   tema_num            Int
-  eixo_id             Int
+  eixo_id             String
   descricao           String              @db.VarChar(255)
   ativo_no_ano        Boolean             @default(true)
-  criado_por          Int?
+  criado_por          String?
   criado_em           DateTime            @default(now())
   motivo_alteracao    String?             @db.Text
   
@@ -616,14 +643,14 @@ model TemaVersao {
 }
 
 model EntregavelVersao {
-  versao_id           Int                 @id @default(autoincrement())
-  entregavel_base_id  Int
+  versao_id           String              @id @default(uuid())
+  entregavel_base_id  String
   ano                 Int
   entregavel_numero   String              @db.VarChar(50)
   descricao           String              @db.VarChar(255)
   detalhes            String?             @db.VarChar(500)
   ativo_no_ano        Boolean             @default(true)
-  criado_por          Int?
+  criado_por          String?
   criado_em           DateTime            @default(now())
   motivo_alteracao    String?             @db.Text
   
@@ -634,14 +661,14 @@ model EntregavelVersao {
 }
 
 model PessoaVersao {
-  versao_id           Int                 @id @default(autoincrement())
-  pessoa_base_id      Int
+  versao_id           String              @id @default(uuid())
+  pessoa_base_id      String
   ano                 Int
   nome                String              @db.VarChar(255)
   email               String?             @db.VarChar(255)
   tipo_usuario        TipoUsuario
   ativo_no_ano        Boolean             @default(true)
-  criado_por          Int?
+  criado_por          String?
   criado_em           DateTime            @default(now())
   motivo_alteracao    String?             @db.Text
   
@@ -661,14 +688,14 @@ enum TipoOperacaoAuditoria {
 }
 
 model SolicitacaoAcesso {
-  solicitacao_id       Int              @id @default(autoincrement())
+  solicitacao_id       String           @id @default(uuid())
   nome                 String           @db.VarChar(255)
   email                String           @db.VarChar(255)
-  unidade_id           Int
+  unidade_id           String
   status               StatusSolicitacao @default(Pendente)
   data_solicitacao     DateTime         @default(now())
   data_processamento   DateTime?
-  processado_por       Int?
+  processado_por       String?
   tipo_usuario_concedido TipoUsuario?
   
   unidade              Unidade          @relation(fields: [unidade_id], references: [unidade_id])
@@ -682,8 +709,8 @@ enum StatusSolicitacao {
 }
 
 model PessoaUnidade {
-  pessoa_id  Int
-  unidade_id Int
+  pessoa_id  String
+  unidade_id String
   data_vinculo DateTime @default(now())
   ativo      Boolean @default(true)
   
@@ -694,8 +721,8 @@ model PessoaUnidade {
 }
 
 model PessoaRegional {
-  pessoa_id   Int
-  regional_id Int
+  pessoa_id   String
+  regional_id String
   data_vinculo DateTime @default(now())
   ativo       Boolean @default(true)
 
@@ -706,15 +733,15 @@ model PessoaRegional {
 }
 
 model Regional {
-  regional_id        Int      @id @default(autoincrement())
+  regional_id        String   @id @default(uuid())
   nome_regional      String   @db.VarChar(255)
-  codigo_regional    String?   @unique @db.VarChar(10)
-  responsavel_id     Int?
+  codigo_regional    String?  @unique @db.VarChar(10)
+  responsavel_id     String?
   ativo              Boolean  @default(true)
   criado_em          DateTime @default(now())
   atualizado_em      DateTime @updatedAt
-  criado_por         Int?
-  atualizado_por     Int?
+  criado_por         String?
+  atualizado_por     String?
 
   unidades       Unidade[]
   pessoas        PessoaRegional[]

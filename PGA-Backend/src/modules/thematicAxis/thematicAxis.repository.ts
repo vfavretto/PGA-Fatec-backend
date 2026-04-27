@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../config/prisma.service';
 import { BaseRepository } from '../../common/repositories/base.repository';
 import { EixoTematico } from '@prisma/client';
@@ -28,7 +28,7 @@ export class ThematicAxisRepository extends BaseRepository<EixoTematico> {
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return this.prisma.eixoTematico.findFirst({
       where: this.whereActive({ eixo_id: id }),
       include: {
@@ -39,14 +39,14 @@ export class ThematicAxisRepository extends BaseRepository<EixoTematico> {
     });
   }
 
-  async update(id: number, data: UpdateThematicAxisDto) {
+  async update(id: string, data: UpdateThematicAxisDto) {
     return this.prisma.eixoTematico.update({
       where: { eixo_id: id },
       data,
     });
   }
 
-  async softDelete(id: number) {
+  async softDelete(id: string) {
     return this.prisma.eixoTematico.update({
       where: { eixo_id: id },
       data: { ativo: false },

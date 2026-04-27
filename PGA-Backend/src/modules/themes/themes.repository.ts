@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../config/prisma.service';
 import { BaseRepository } from '../../common/repositories/base.repository';
 import { Tema } from '@prisma/client';
@@ -26,7 +26,7 @@ export class ThemesRepository extends BaseRepository<Tema> {
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return this.prisma.tema.findFirst({
       where: this.whereActive({ tema_id: id }),
       include: {
@@ -35,14 +35,14 @@ export class ThemesRepository extends BaseRepository<Tema> {
     });
   }
 
-  async update(id: number, data: UpdateThemeDto) {
+  async update(id: string, data: UpdateThemeDto) {
     return this.prisma.tema.update({
       where: { tema_id: id },
       data,
     });
   }
 
-  async delete(id: number) {
+  async delete(id: string) {
     return this.prisma.tema.update({
       where: { tema_id: id },
       data: { ativo: false },

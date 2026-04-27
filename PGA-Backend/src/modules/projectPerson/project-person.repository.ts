@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../config/prisma.service';
 import { BaseRepository } from '../../common/repositories/base.repository';
 import { ProjetoPessoa } from '@prisma/client';
@@ -28,14 +28,14 @@ export class ProjectPersonRepository extends BaseRepository<ProjetoPessoa> {
     });
   }
 
-  async findAllByUnit(unidadeId: number) {
+  async findAllByUnit(unidadeId: string) {
     return this.prisma.projetoPessoa.findMany({
       where: this.whereActive({ acao_projeto: { pga: { unidade_id: unidadeId } } }),
       include: { pessoa: true, acaoProjeto: { include: { pga: true } }, tipo_vinculo_hae: true },
     });
   }
 
-  async findAllByRegional(regionalId: number) {
+  async findAllByRegional(regionalId: string) {
     const vinculos = await this.prisma.pessoaUnidade.findMany({
       where: { pessoa_id: regionalId, ativo: true },
       select: { unidade_id: true },
@@ -49,7 +49,7 @@ export class ProjectPersonRepository extends BaseRepository<ProjetoPessoa> {
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return this.prisma.projetoPessoa.findFirst({
       where: this.whereActive({ projeto_pessoa_id: id }),
       include: {
@@ -60,43 +60,43 @@ export class ProjectPersonRepository extends BaseRepository<ProjetoPessoa> {
     });
   }
 
-  async findOneWithContext(id: number, active_context?: { tipo: string; id?: number } | null) {
+  async findOneWithContext(id: string, active_context?: { tipo: string; id?: string } | null) {
     const item = await this.findOne(id);
     if (!item) return null;
 
     if (active_context) {
       if (active_context.tipo === 'unidade') {
-        if (item.acaoProjeto.pga.unidade_id !== Number(active_context.id)) return null;
+        if (item.acaoProjeto.pga.unidade_id !== active_context.id) return null;
       }
 
       if (active_context.tipo === 'regional') {
         const vinculos = await this.prisma.pessoaUnidade.findMany({
-          where: { pessoa_id: Number(active_context.id), ativo: true },
+          where: { pessoa_id: active_context.id, ativo: true },
           select: { unidade_id: true },
         });
         const ids = vinculos.map((v) => v.unidade_id);
-        if (!ids.includes(item.acaoProjeto.pga.unidade_id)) return null;
+        if (!item.acaoProjeto.pga.unidade_id || !ids.includes(item.acaoProjeto.pga.unidade_id)) return null;
       }
     }
 
     return item;
   }
 
-  async update(id: number, data: UpdateProjectPersonDto) {
+  async update(id: string, data: UpdateProjectPersonDto) {
     return this.prisma.projetoPessoa.update({
       where: { projeto_pessoa_id: id },
       data,
     });
   }
 
-  async delete(id: number) {
+  async delete(id: string) {
     return this.prisma.projetoPessoa.update({
       where: { projeto_pessoa_id: id },
       data: { ativo: false },
     });
   }
 
-  async findByProjectId(projetoId: number) {
+  async findByProjectId(projetoId: string) {
     return this.prisma.projetoPessoa.findMany({
       where: this.whereActive({ acao_projeto_id: projetoId }),
       include: {
@@ -106,19 +106,19 @@ export class ProjectPersonRepository extends BaseRepository<ProjetoPessoa> {
     });
   }
 
-  async findByProjectIdWithContext(projetoId: number, active_context?: { tipo: string; id?: number } | null) {
+  async findByProjectIdWithContext(projetoId: string, active_context?: { tipo: string; id?: string } | null) {
     if (!active_context) return this.findByProjectId(projetoId);
 
     if (active_context.tipo === 'unidade') {
       return this.prisma.projetoPessoa.findMany({
-        where: this.whereActive({ acao_projeto_id: projetoId, acao_projeto: { pga: { unidade_id: Number(active_context.id) } } }),
+        where: this.whereActive({ acao_projeto_id: projetoId, acao_projeto: { pga: { unidade_id: active_context.id } } }),
         include: { pessoa: true, tipo_vinculo_hae: true },
       });
     }
 
     if (active_context.tipo === 'regional') {
       const vinculos = await this.prisma.pessoaUnidade.findMany({
-        where: { pessoa_id: Number(active_context.id), ativo: true },
+        where: { pessoa_id: active_context.id, ativo: true },
         select: { unidade_id: true },
       });
       const unidadeIds = vinculos.map((v) => v.unidade_id);

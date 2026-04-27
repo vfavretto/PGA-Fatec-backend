@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsOptional, ValidateIf } from 'class-validator';
+﻿import { IsEnum, IsNotEmpty, IsOptional, ValidateIf } from 'class-validator';
 import { TipoUsuario } from '@prisma/client';
 
 export class ProcessAccessRequestDto {
@@ -19,5 +19,5 @@ export class ProcessAccessRequestDto {
 
   @ValidateIf((o) => o.tipo_usuario === 'Diretor')
   @IsNotEmpty({ message: 'A unidade é obrigatória para diretores' })
-  unidade_id: number;
+  unidade_id: string;
 }

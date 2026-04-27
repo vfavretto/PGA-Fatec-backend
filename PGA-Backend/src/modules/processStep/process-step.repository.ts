@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../config/prisma.service';
 import { BaseRepository } from '../../common/repositories/base.repository';
 import { EtapaProcesso } from '@prisma/client';
@@ -27,7 +27,7 @@ export class ProcessStepRepository extends BaseRepository<EtapaProcesso> {
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return this.prisma.etapaProcesso.findFirst({
       where: this.whereActive({ etapa_id: id }),
       include: {
@@ -37,21 +37,21 @@ export class ProcessStepRepository extends BaseRepository<EtapaProcesso> {
     });
   }
 
-  async update(id: number, data: UpdateProcessStepDto) {
+  async update(id: string, data: UpdateProcessStepDto) {
     return this.prisma.etapaProcesso.update({
       where: { etapa_id: id },
       data,
     });
   }
 
-  async softDelete(id: number) {
+  async softDelete(id: string) {
     return this.prisma.etapaProcesso.update({
       where: { etapa_id: id },
       data: { ativo: false },
     });
   }
 
-  async findByProjectId(projectId: number) {
+  async findByProjectId(projectId: string) {
     return this.prisma.etapaProcesso.findMany({
       where: this.whereActive({ acao_projeto_id: projectId }),
       include: {
@@ -63,7 +63,7 @@ export class ProcessStepRepository extends BaseRepository<EtapaProcesso> {
     });
   }
 
-  async findAllByUnit(unidadeId: number) {
+  async findAllByUnit(unidadeId: string) {
     return this.prisma.etapaProcesso.findMany({
       where: this.whereActive({ unidade_id: unidadeId }),
       include: { entregavel_link_sei: true },
@@ -71,7 +71,7 @@ export class ProcessStepRepository extends BaseRepository<EtapaProcesso> {
     });
   }
 
-  async findAllByRegional(regionalId: number) {
+  async findAllByRegional(regionalId: string) {
     return this.prisma.etapaProcesso.findMany({
       where: this.whereActive({ regional_id: regionalId }),
       include: { entregavel_link_sei: true },
@@ -79,7 +79,7 @@ export class ProcessStepRepository extends BaseRepository<EtapaProcesso> {
     });
   }
 
-  async findOneWithContext(id: number, active_context?: any) {
+  async findOneWithContext(id: string, active_context?: any) {
     if (active_context && active_context.tipo === 'unidade') {
       return this.prisma.etapaProcesso.findFirst({
         where: this.whereActive({ etapa_id: id, unidade_id: active_context.id }),
@@ -97,7 +97,7 @@ export class ProcessStepRepository extends BaseRepository<EtapaProcesso> {
     return this.findOne(id);
   }
 
-  async findByProjectIdWithContext(projectId: number, active_context?: any) {
+  async findByProjectIdWithContext(projectId: string, active_context?: any) {
     if (active_context && active_context.tipo === 'unidade') {
       return this.prisma.etapaProcesso.findMany({
         where: this.whereActive({ acao_projeto_id: projectId, unidade_id: active_context.id }),

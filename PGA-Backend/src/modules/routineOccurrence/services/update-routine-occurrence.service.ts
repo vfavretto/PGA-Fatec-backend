@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+﻿import { Injectable, NotFoundException } from '@nestjs/common';
 import { RoutineOccurrenceRepository } from '../routine-occurrence.repository';
 import { UpdateRoutineOccurrenceDto } from '../dto/update-routine-occurrence.dto';
 import { RoutineOccurrence } from '../entities/routine-occurrence.entity';
@@ -8,7 +8,7 @@ export class UpdateRoutineOccurrenceService {
   constructor(private readonly repository: RoutineOccurrenceRepository) {}
 
   async execute(
-    id: number,
+    id: string,
     data: UpdateRoutineOccurrenceDto,
   ): Promise<RoutineOccurrence> {
     const ocorrencia = await this.repository.findOne(id);

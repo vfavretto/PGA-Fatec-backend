@@ -1,4 +1,4 @@
-import {
+﻿import {
   BadRequestException,
   Injectable,
   NotFoundException,
@@ -11,7 +11,7 @@ import { StatusPGA } from '@prisma/client';
 export class ReviewRegionalPgaService {
   constructor(private readonly repository: RegionalRepository) {}
 
-  async execute(regionalId: number, pgaId: number, data: ReviewPgaDto) {
+  async execute(regionalId: string, pgaId: string, data: ReviewPgaDto) {
     if (
       data.status !== StatusPGA.Aprovado &&
       data.status !== StatusPGA.Reprovado

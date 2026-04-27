@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Put, Delete, ParseIntPipe, Request, UseGuards } from '@nestjs/common';
+﻿import { Controller, Post, Body, Get, Param, Put, Delete, ParseUUIDPipe, Request, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
 import { CreateProcessStepDto } from './dto/create-process-step.dto';
 import { UpdateProcessStepDto } from './dto/update-process-step.dto';
@@ -43,7 +43,7 @@ export class ProcessStepController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID da etapa de processo' })
   @ApiResponse({ status: 200, description: 'Etapa de processo encontrada com sucesso' })
   @ApiResponse({ status: 404, description: 'Etapa de processo não encontrada' })
-  findOne(@Request() req: any, @Param('id', ParseIntPipe) id: number) {
+  findOne(@Request() req: any, @Param('id', ParseUUIDPipe) id: string) {
     return this.findOneService.execute(id, req.user);
   }
 
@@ -53,7 +53,7 @@ export class ProcessStepController {
   @ApiBody({ type: UpdateProcessStepDto })
   @ApiResponse({ status: 200, description: 'Etapa de processo atualizada com sucesso' })
   @ApiResponse({ status: 404, description: 'Etapa de processo não encontrada' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateProcessStepDto) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateProcessStepDto) {
     return this.updateService.execute(id, dto);
   }
 
@@ -62,7 +62,7 @@ export class ProcessStepController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID da etapa de processo' })
   @ApiResponse({ status: 200, description: 'Etapa de processo excluída com sucesso' })
   @ApiResponse({ status: 404, description: 'Etapa de processo não encontrada' })
-  delete(@Param('id', ParseIntPipe) id: number) {
+  delete(@Param('id', ParseUUIDPipe) id: string) {
     return this.deleteService.execute(id);
   }
 }

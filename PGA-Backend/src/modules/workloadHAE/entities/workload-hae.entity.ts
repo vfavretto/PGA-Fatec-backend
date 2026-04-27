@@ -1,5 +1,5 @@
-export class WorkloadHae {
-  id: number;
+﻿export class WorkloadHae {
+  id: string;
   sigla: string;
   descricao: string;
   detalhes?: string;

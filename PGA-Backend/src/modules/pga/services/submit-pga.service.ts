@@ -1,4 +1,4 @@
-import {
+﻿import {
   BadRequestException,
   ForbiddenException,
   Injectable,
@@ -15,13 +15,14 @@ export class SubmitPgaService {
     private readonly prisma: PrismaService,
   ) {}
 
-  async execute(pgaId: number, pessoaId: number) {
+  async execute(pgaId: string, pessoaId: string) {
     const pga = await this.repository.findOne(pgaId);
     if (!pga) {
       throw new NotFoundException('PGA não encontrado');
     }
 
-    if (pga.status !== StatusPGA.EmElaboracao) {
+    const statusPermitidos: StatusPGA[] = [StatusPGA.EmElaboracao, StatusPGA.Reprovado];
+    if (!statusPermitidos.includes(pga.status)) {
       throw new BadRequestException(
         `PGA não pode ser submetido pois está com status "${pga.status}".`,
       );
@@ -54,8 +55,8 @@ export class SubmitPgaService {
       }
     }
 
-    return this.repository.update(pgaId, {
+    return this.repository.updateWorkflow(pgaId, {
       status: StatusPGA.Submetido,
-    } as any);
+    });
   }
 }

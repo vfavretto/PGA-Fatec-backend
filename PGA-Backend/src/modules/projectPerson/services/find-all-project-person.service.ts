@@ -9,11 +9,11 @@ export class FindAllProjectPersonService {
   async execute(user?: any): Promise<ProjectPerson[]> {
     const active = user?.active_context ?? null;
     if (active && active.tipo === 'unidade') {
-      return this.repository.findAllByUnit(Number(active.id));
+      return this.repository.findAllByUnit(active.id);
     }
 
     if (active && active.tipo === 'regional') {
-      return this.repository.findAllByRegional(Number(active.id));
+      return this.repository.findAllByRegional(active.id);
     }
 
     return this.repository.findAll();

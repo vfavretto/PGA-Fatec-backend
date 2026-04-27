@@ -1,4 +1,4 @@
-import {
+﻿import {
   Controller,
   Post,
   Get,
@@ -6,7 +6,7 @@ import {
   Delete,
   Param,
   Body,
-  ParseIntPipe,
+  ParseUUIDPipe,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -58,7 +58,7 @@ export class DeliverableController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID do entregável' })
   @ApiResponse({ status: 200, description: 'Entregável encontrado com sucesso' })
   @ApiResponse({ status: 404, description: 'Entregável não encontrado' })
-  findOne(@Request() req: any, @Param('id', ParseIntPipe) id: number) {
+  findOne(@Request() req: any, @Param('id', ParseUUIDPipe) id: string) {
     return this.findOneService.execute(id, req.user);
   }
 
@@ -70,7 +70,7 @@ export class DeliverableController {
   @ApiBody({ type: UpdateDeliverableDto })
   @ApiResponse({ status: 200, description: 'Entregável atualizado com sucesso' })
   @ApiResponse({ status: 404, description: 'Entregável não encontrado' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateDeliverableDto) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateDeliverableDto) {
     return this.updateService.execute(id, dto);
   }
 
@@ -81,7 +81,7 @@ export class DeliverableController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID do entregável' })
   @ApiResponse({ status: 200, description: 'Entregável excluído com sucesso' })
   @ApiResponse({ status: 404, description: 'Entregável não encontrado' })
-  remove(@Param('id', ParseIntPipe) id: number) {
+  remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.deleteService.execute(id);
   }
 }

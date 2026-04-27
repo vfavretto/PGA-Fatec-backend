@@ -1,4 +1,4 @@
-import {
+﻿import {
   Injectable,
   NotFoundException,
   ConflictException,
@@ -13,7 +13,7 @@ export class DeletePgaService {
     private readonly prisma: PrismaService,
   ) {}
 
-  async execute(id: number, usuarioLogadoId?: number, motivo?: string) {
+  async execute(id: string, usuarioLogadoId?: string, motivo?: string) {
     const pga = await this.pgaRepository.findOne(id);
     if (!pga) throw new NotFoundException('PGA não encontrado');
 

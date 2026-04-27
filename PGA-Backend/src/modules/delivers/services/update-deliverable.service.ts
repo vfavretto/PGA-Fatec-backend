@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+﻿import { Injectable, NotFoundException } from '@nestjs/common';
 import { DeliverableRepository } from '../deliverable.repository';
 import { UpdateDeliverableDto } from '../dto/update-deliverable.dto';
 import { EntregavelLinkSei } from '@prisma/client';
@@ -8,7 +8,7 @@ export class UpdateDeliverableService {
   constructor(private readonly repository: DeliverableRepository) {}
 
   async execute(
-    entregavel_id: number,
+    entregavel_id: string,
     dto: UpdateDeliverableDto,
   ): Promise<EntregavelLinkSei> {
     const exists = await this.repository.findOne(entregavel_id);

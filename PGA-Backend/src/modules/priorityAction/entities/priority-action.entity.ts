@@ -1,5 +1,5 @@
-export class PriorityAction {
-  prioridade_id: number;
+﻿export class PriorityAction {
+  prioridade_id: string;
   grau: number;
   descricao: string;
   tipo_gestao: string;

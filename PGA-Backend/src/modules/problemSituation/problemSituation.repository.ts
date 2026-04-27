@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../config/prisma.service';
 import { CreateProblemSituationDto } from './dto/create-problemSituation.dto';
 import { UpdateProblemSituationDto } from './dto/update-problemSituation.dto';
@@ -24,20 +24,20 @@ export class ProblemSituationRepository extends BaseRepository<SituacaoProblema>
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return this.prisma.situacaoProblema.findFirst({
       where: this.whereActive({ situacao_id: id }),
     });
   }
 
-  async update(id: number, data: UpdateProblemSituationDto) {
+  async update(id: string, data: UpdateProblemSituationDto) {
     return this.prisma.situacaoProblema.update({
       where: { situacao_id: id },
       data,
     });
   }
 
-  async softDelete(id: number) {
+  async softDelete(id: string) {
     return this.prisma.situacaoProblema.update({
       where: { situacao_id: id },
       data: { ativo: false },

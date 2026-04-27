@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../config/prisma.service';
 import { BaseRepository } from '../../common/repositories/base.repository';
 import { AcaoCPA } from '@prisma/client';
@@ -26,7 +26,7 @@ export class CpaActionRepository extends BaseRepository<AcaoCPA> {
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return this.prisma.acaoCPA.findFirst({
       where: this.whereActive({ acao_cpa_id: id }),
       include: {
@@ -35,39 +35,39 @@ export class CpaActionRepository extends BaseRepository<AcaoCPA> {
     });
   }
 
-  async update(id: number, data: UpdateCpaActionDto) {
+  async update(id: string, data: UpdateCpaActionDto) {
     return this.prisma.acaoCPA.update({
       where: { acao_cpa_id: id },
       data,
     });
   }
 
-  async softDelete(id: number) {
+  async softDelete(id: string) {
     return this.prisma.acaoCPA.update({
       where: { acao_cpa_id: id },
       data: { ativo: false },
     });
   }
 
-  async findByPgaId(pgaId: number) {
+  async findByPgaId(pgaId: string) {
     return this.prisma.acaoCPA.findMany({
       where: this.whereActive({ pga_id: pgaId }),
     });
   }
 
-  async findAllByUnit(unidadeId: number) {
+  async findAllByUnit(unidadeId: string) {
     return this.prisma.acaoCPA.findMany({
       where: this.whereActive({ unidade_id: unidadeId }),
     });
   }
 
-  async findAllByRegional(regionalId: number) {
+  async findAllByRegional(regionalId: string) {
     return this.prisma.acaoCPA.findMany({
       where: this.whereActive({ regional_id: regionalId }),
     });
   }
 
-  async findOneWithContext(id: number, active_context?: any) {
+  async findOneWithContext(id: string, active_context?: any) {
     if (active_context && active_context.tipo === 'unidade') {
       return this.prisma.acaoCPA.findFirst({
         where: this.whereActive({ acao_cpa_id: id, unidade_id: active_context.id }),
@@ -83,7 +83,7 @@ export class CpaActionRepository extends BaseRepository<AcaoCPA> {
     return this.findOne(id);
   }
 
-  async findByPgaIdWithContext(pgaId: number, active_context?: any) {
+  async findByPgaIdWithContext(pgaId: string, active_context?: any) {
     if (active_context && active_context.tipo === 'unidade') {
       return this.prisma.acaoCPA.findMany({
         where: this.whereActive({ pga_id: pgaId, unidade_id: active_context.id }),

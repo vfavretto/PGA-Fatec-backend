@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/config/prisma.service';
 
 @Injectable()
@@ -6,13 +6,13 @@ export class VersionRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async createSituacaoProblemaVersion(data: {
-    situacao_base_id: number;
+    situacao_base_id: string;
     ano: number;
     codigo_categoria: string;
     descricao: string;
     fonte?: string | null;
     ordem?: number | null;
-    criado_por?: number | null;
+    criado_por?: string | null;
     motivo_alteracao?: string | null;
   }) {
     return this.prisma.situacaoProblemaVersao.create({
@@ -52,12 +52,12 @@ export class VersionRepository {
   }
 
   async createEixoTematicoVersion(data: {
-    eixo_base_id: number;
+    eixo_base_id: string;
     ano: number;
     numero: number;
     nome: string;
     descricao?: string | null;
-    criado_por?: number | null;
+    criado_por?: string | null;
     motivo_alteracao?: string | null;
   }) {
     return this.prisma.eixoTematicoVersao.create({
@@ -95,13 +95,13 @@ export class VersionRepository {
   }
 
   async createPrioridadeAcaoVersion(data: {
-    prioridade_base_id: number;
+    prioridade_base_id: string;
     ano: number;
     grau: number;
     descricao: string;
     tipo_gestao: string;
     detalhes?: string | null;
-    criado_por?: number | null;
+    criado_por?: string | null;
     motivo_alteracao?: string | null;
   }) {
     return this.prisma.prioridadeAcaoVersao.create({
@@ -140,12 +140,12 @@ export class VersionRepository {
   }
 
   async createTemaVersion(data: {
-    tema_base_id: number;
+    tema_base_id: string;
     ano: number;
     tema_num: number;
-    eixo_id: number;
+    eixo_id: string;
     descricao: string;
-    criado_por?: number | null;
+    criado_por?: string | null;
     motivo_alteracao?: string | null;
   }) {
     return this.prisma.temaVersao.create({
@@ -187,12 +187,12 @@ export class VersionRepository {
   }
 
   async createEntregavelVersion(data: {
-    entregavel_base_id: number;
+    entregavel_base_id: string;
     ano: number;
     entregavel_numero: string;
     descricao: string;
     detalhes?: string | null;
-    criado_por?: number | null;
+    criado_por?: string | null;
     motivo_alteracao?: string | null;
   }) {
     return this.prisma.entregavelVersao.create({
@@ -230,12 +230,12 @@ export class VersionRepository {
   }
 
   async createPessoaVersion(data: {
-    pessoa_base_id: number;
+    pessoa_base_id: string;
     ano: number;
     nome: string;
     email?: string | null;
     tipo_usuario: any;
-    criado_por?: number | null;
+    criado_por?: string | null;
     motivo_alteracao?: string | null;
   }) {
     return this.prisma.pessoaVersao.create({

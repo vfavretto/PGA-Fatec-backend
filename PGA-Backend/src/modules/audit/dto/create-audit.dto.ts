@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+﻿import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { TipoOperacaoAuditoria } from '@prisma/client';
 
 export class CreateAuditDto {
@@ -13,7 +13,7 @@ export class CreateAuditDto {
     example: 1,
     type: 'integer'
   })
-  registro_id: number;
+  registro_id: string;
 
   @ApiProperty({
     description: 'Ano de referência da auditoria',
@@ -46,7 +46,7 @@ export class CreateAuditDto {
     example: 5,
     type: 'integer'
   })
-  usuario_id?: number;
+  usuario_id?: string;
 
   @ApiPropertyOptional({
     description: 'Motivo da operação',

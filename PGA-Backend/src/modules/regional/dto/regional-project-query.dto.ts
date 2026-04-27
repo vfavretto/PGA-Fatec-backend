@@ -1,7 +1,6 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
+﻿import { ApiPropertyOptional } from '@nestjs/swagger';
 import { StatusProjetoRegional } from '@prisma/client';
-import { IsEnum, IsInt, IsOptional } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsEnum, IsString, IsOptional } from 'class-validator';
 
 export class RegionalProjectQueryDto {
   @ApiPropertyOptional({
@@ -15,21 +14,19 @@ export class RegionalProjectQueryDto {
 
   @ApiPropertyOptional({
     description: 'Filtra os projetos de um PGA específico',
-    type: Number,
-    example: 12,
+    type: String,
+    example: '00000000-0000-0000-0000-000000000001',
   })
   @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  pgaId?: number;
+  @IsString()
+  pgaId?: string;
 
   @ApiPropertyOptional({
     description: 'Filtra os projetos vinculados a uma unidade específica',
-    type: Number,
-    example: 3,
+    type: String,
+    example: '00000000-0000-0000-0000-000000000003',
   })
   @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  unidadeId?: number;
+  @IsString()
+  unidadeId?: string;
 }

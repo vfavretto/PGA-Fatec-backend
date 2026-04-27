@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsOptional, IsString, IsDateString, IsEnum, MaxLength } from 'class-validator';
+﻿import { IsUUID, IsNotEmpty, IsOptional, IsString, IsDateString, IsEnum, MaxLength } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { StatusOcorrencia } from '@prisma/client';
 
@@ -9,8 +9,8 @@ export class CreateRoutineOccurrenceDto {
     type: 'integer'
   })
   @IsNotEmpty()
-  @IsInt()
-  rotina_id: number;
+  @IsUUID('4')
+  rotina_id: string;
 
   @ApiProperty({
     description: 'Data de realização da ocorrência',

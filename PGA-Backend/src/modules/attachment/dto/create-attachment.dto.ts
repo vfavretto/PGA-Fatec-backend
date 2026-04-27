@@ -1,9 +1,10 @@
-import {
+﻿import {
   IsNotEmpty,
   IsNumber,
   IsString,
   Min,
   IsOptional,
+  IsUUID,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -14,8 +15,8 @@ export class CreateAttachmentDto {
     type: 'integer'
   })
   @IsOptional()
-  @IsNumber({}, { message: 'O ID da etapa de processo deve ser um número' })
-  etapa_processo_id?: number;
+  @IsUUID('4', { message: 'O campo deve ser um UUID válido' })
+  etapa_processo_id?: string;
 
   @ApiProperty({
     description: 'ID do entregável relacionado',
@@ -23,8 +24,8 @@ export class CreateAttachmentDto {
     type: 'integer'
   })
   @IsNotEmpty({ message: 'O ID do entregável é obrigatório' })
-  @IsNumber({}, { message: 'O ID do entregável deve ser um número' })
-  entregavel_id: number;
+  @IsUUID('4', { message: 'O campo deve ser um UUID válido' })
+  entregavel_id: string;
 
   @ApiProperty({
     description: 'Nome do item do anexo',

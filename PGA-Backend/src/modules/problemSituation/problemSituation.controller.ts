@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Put, Delete, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
+﻿import { Controller, Post, Get, Put, Delete, Body, Param, ParseUUIDPipe, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -45,7 +45,7 @@ export class ProblemSituationController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID da situação problema' })
   @ApiResponse({ status: 200, description: 'Situação problema encontrada com sucesso' })
   @ApiResponse({ status: 404, description: 'Situação problema não encontrada' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.findOneService.execute(id);
   }
 
@@ -57,7 +57,7 @@ export class ProblemSituationController {
   @ApiBody({ type: UpdateProblemSituationDto })
   @ApiResponse({ status: 200, description: 'Situação problema atualizada com sucesso' })
   @ApiResponse({ status: 404, description: 'Situação problema não encontrada' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateProblemSituationDto) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateProblemSituationDto) {
     return this.updateService.execute(id, dto);
   }
 
@@ -68,7 +68,7 @@ export class ProblemSituationController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID da situação problema' })
   @ApiResponse({ status: 200, description: 'Situação problema excluída com sucesso' })
   @ApiResponse({ status: 404, description: 'Situação problema não encontrada' })
-  remove(@Param('id', ParseIntPipe) id: number) {
+  remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.deleteService.execute(id);
   }
 }

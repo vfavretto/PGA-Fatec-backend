@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../config/prisma.service';
 import { BaseRepository } from '../../common/repositories/base.repository';
 import { TipoVinculoHAE } from '@prisma/client';
@@ -26,20 +26,20 @@ export class WorkloadHaeRepository extends BaseRepository<TipoVinculoHAE> {
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return this.prisma.tipoVinculoHAE.findFirst({
       where: this.whereActive({ id }),
     });
   }
 
-  async update(id: number, data: UpdateWorkloadHaeDto) {
+  async update(id: string, data: UpdateWorkloadHaeDto) {
     return this.prisma.tipoVinculoHAE.update({
       where: { id },
       data,
     });
   }
 
-  async softDelete(id: number) {
+  async softDelete(id: string) {
     return this.prisma.tipoVinculoHAE.update({
       where: { id },
       data: { ativo: false },
