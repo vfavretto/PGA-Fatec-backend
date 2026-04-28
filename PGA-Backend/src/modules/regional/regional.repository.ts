@@ -189,6 +189,14 @@ export class RegionalRepository {
       },
     };
 
+    if (filters.unidadeId) {
+      const existingPga = (where.pga ?? {}) as Prisma.AcaoProjetoWhereInput;
+      where.pga = {
+        ...existingPga,
+        unidade_id: { equals: filters.unidadeId },
+      };
+    }
+
     if (filters.pgaId) {
       where.pga_id = filters.pgaId;
     }
