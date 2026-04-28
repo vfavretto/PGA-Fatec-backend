@@ -7,13 +7,10 @@ import { PgaRepository } from '../pga.repository';
 import { UpdatePgaDto } from '../dto/update-pga.dto';
 import { PGA } from '../entities/pga.entity';
 import { StatusPGA } from '@prisma/client';
-import { PrismaService } from '../../../config/prisma.service';
-
 @Injectable()
 export class UpdatePgaService {
   constructor(
     private readonly repository: PgaRepository,
-    private readonly prisma: PrismaService,
   ) {}
 
   async execute(id: string, data: UpdatePgaDto, user?: any): Promise<PGA> {

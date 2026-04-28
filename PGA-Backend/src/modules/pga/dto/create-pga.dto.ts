@@ -47,7 +47,7 @@ export class CreatePgaDto {
   })
   @IsOptional()
   @IsDateString()
-  data_elaboracao?: Date;
+  data_elaboracao?: string;
 
   @ApiPropertyOptional({
     description: 'Data do parecer GPR',
@@ -57,7 +57,7 @@ export class CreatePgaDto {
   })
   @IsOptional()
   @IsDateString()
-  data_parecer_gpr?: Date;
+  data_parecer_gpr?: string;
 
   @ApiPropertyOptional({
     description: 'Status atual do PGA',
@@ -84,5 +84,5 @@ export class CreatePgaDto {
   })
   @IsOptional()
   @IsDateString()
-  data_limite_submissao?: Date;
+  data_limite_submissao?: string;
 }

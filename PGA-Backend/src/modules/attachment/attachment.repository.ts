@@ -52,11 +52,7 @@ export class AttachmentRepository extends BaseRepository<Anexo> {
     }
 
     if (active_context?.tipo === 'regional') {
-      const vinculos = await this.prisma.pessoaUnidade.findMany({
-        where: { pessoa_id: active_context.id, ativo: true },
-        select: { unidade_id: true },
-      });
-      const unidadeIds = vinculos.map((v) => v.unidade_id);
+      const unidadeIds = await this.getUnidadeIdsByPessoaRegional(active_context.id);
       if (!unidadeIds.length) return [];
       return this.prisma.anexo.findMany({
         where: {
@@ -96,11 +92,7 @@ export class AttachmentRepository extends BaseRepository<Anexo> {
     }
 
     if (active_context?.tipo === 'regional') {
-      const vinculos = await this.prisma.pessoaUnidade.findMany({
-        where: { pessoa_id: active_context.id, ativo: true },
-        select: { unidade_id: true },
-      });
-      const unidadeIds = vinculos.map((v) => v.unidade_id);
+      const unidadeIds = await this.getUnidadeIdsByPessoaRegional(active_context.id);
       if (!unidadeIds.length) return [];
       return this.prisma.anexo.findMany({
         where: {
@@ -139,11 +131,7 @@ export class AttachmentRepository extends BaseRepository<Anexo> {
     }
 
     if (active_context.tipo === 'regional') {
-      const vinculos = await this.prisma.pessoaUnidade.findMany({
-        where: { pessoa_id: active_context.id, ativo: true },
-        select: { unidade_id: true },
-      });
-      const ids = vinculos.map((v) => v.unidade_id);
+      const ids = await this.getUnidadeIdsByPessoaRegional(active_context.id);
       if (!ids.length) return null;
       return this.prisma.anexo.findFirst({
         where: {
@@ -168,11 +156,7 @@ export class AttachmentRepository extends BaseRepository<Anexo> {
   }
 
   async findAllByRegional(regionalId: string) {
-    const vinculos = await this.prisma.pessoaUnidade.findMany({
-      where: { pessoa_id: regionalId, ativo: true },
-      select: { unidade_id: true },
-    });
-    const unidadeIds = vinculos.map((v) => v.unidade_id);
+    const unidadeIds = await this.getUnidadeIdsByPessoaRegional(regionalId);
     if (!unidadeIds.length) return [];
     return this.prisma.anexo.findMany({
       where: {
@@ -181,6 +165,21 @@ export class AttachmentRepository extends BaseRepository<Anexo> {
       },
       include: { entregavel: true, etapaProcesso: true },
     });
+  }
+
+  /** Resolves the unit IDs accessible to a regional user via PessoaRegional → Regional → Unidade */
+  private async getUnidadeIdsByPessoaRegional(pessoaId: string): Promise<string[]> {
+    const vinculos = await this.prisma.pessoaRegional.findMany({
+      where: { pessoa_id: pessoaId, ativo: true },
+      include: {
+        regional: {
+          select: {
+            unidades: { where: { ativo: true }, select: { unidade_id: true } },
+          },
+        },
+      },
+    });
+    return vinculos.flatMap((v) => v.regional.unidades.map((u) => u.unidade_id));
   }
 
   async update(id: string, data: UpdateAttachmentDto) {

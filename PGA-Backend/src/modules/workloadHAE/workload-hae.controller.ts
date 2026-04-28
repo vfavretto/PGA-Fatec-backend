@@ -42,7 +42,7 @@ export class WorkloadHaeController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Buscar carga horária HAE por ID', description: 'Retorna dados de uma carga horária HAE específica' })
-  @ApiParam({ name: 'id', type: 'number', description: 'ID da carga horária HAE' })
+  @ApiParam({ name: 'id', type: 'string', description: 'UUID da carga horária HAE' })
   @ApiResponse({ status: 200, description: 'Carga horária HAE encontrada com sucesso' })
   @ApiResponse({ status: 404, description: 'Carga horária HAE não encontrada' })
   findOne(@Param('id', ParseUUIDPipe) id: string) {
@@ -53,7 +53,7 @@ export class WorkloadHaeController {
   @UseGuards(RolesGuard)
   @Roles('Administrador', 'CPS')
   @ApiOperation({ summary: 'Atualizar carga horária HAE', description: 'Atualiza dados de uma carga horária HAE específica' })
-  @ApiParam({ name: 'id', type: 'number', description: 'ID da carga horária HAE' })
+  @ApiParam({ name: 'id', type: 'string', description: 'UUID da carga horária HAE' })
   @ApiBody({ type: UpdateWorkloadHaeDto })
   @ApiResponse({ status: 200, description: 'Carga horária HAE atualizada com sucesso' })
   @ApiResponse({ status: 404, description: 'Carga horária HAE não encontrada' })
@@ -65,7 +65,7 @@ export class WorkloadHaeController {
   @UseGuards(RolesGuard)
   @Roles('Administrador', 'CPS')
   @ApiOperation({ summary: 'Excluir carga horária HAE', description: 'Remove uma carga horária HAE do sistema' })
-  @ApiParam({ name: 'id', type: 'number', description: 'ID da carga horária HAE' })
+  @ApiParam({ name: 'id', type: 'string', description: 'UUID da carga horária HAE' })
   @ApiResponse({ status: 200, description: 'Carga horária HAE excluída com sucesso' })
   @ApiResponse({ status: 404, description: 'Carga horária HAE não encontrada' })
   remove(@Param('id', ParseUUIDPipe) id: string) {

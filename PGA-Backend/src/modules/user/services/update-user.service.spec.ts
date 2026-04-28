@@ -11,12 +11,13 @@ describe('UpdateUserService', () => {
   });
 
   it('deve atualizar e retornar o usuário', async () => {
-    const updated = { pessoa_id: 1, nome: 'Novo Nome' };
+    const id = 'cc000000-0000-4000-a000-000000000001';
+    const updated = { pessoa_id: id, nome: 'Novo Nome' };
     mockRepo.update.mockResolvedValue(updated);
 
-    const result = await service.execute(1, { nome: 'Novo Nome' });
+    const result = await service.execute(id, { nome: 'Novo Nome' });
 
-    expect(mockRepo.update).toHaveBeenCalledWith(1, { nome: 'Novo Nome' });
+    expect(mockRepo.update).toHaveBeenCalledWith(id, { nome: 'Novo Nome' });
     expect(result).toBe(updated);
   });
 });

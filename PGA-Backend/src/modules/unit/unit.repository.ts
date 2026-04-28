@@ -55,11 +55,7 @@ export class UnitRepository extends BaseRepository<Unidade> {
     }
 
     if (active_context && active_context.tipo === 'regional') {
-      const vinculos = await this.prisma.pessoaUnidade.findMany({
-        where: { pessoa_id: active_context.id, ativo: true },
-        select: { unidade_id: true },
-      });
-      const unidadeIds = vinculos.map((v) => v.unidade_id);
+      const unidadeIds = await this.getUnidadeIdsByPessoaRegional(active_context.id);
       if (!unidadeIds.length) return null;
 
       return this.prisma.unidade.findFirst({
@@ -86,11 +82,7 @@ export class UnitRepository extends BaseRepository<Unidade> {
   }
 
   async findAllByRegional(regionalId: string) {
-    const vinculos = await this.prisma.pessoaUnidade.findMany({
-      where: { pessoa_id: regionalId, ativo: true },
-      select: { unidade_id: true },
-    });
-    const unidadeIds = vinculos.map((v) => v.unidade_id);
+    const unidadeIds = await this.getUnidadeIdsByPessoaRegional(regionalId);
     if (!unidadeIds.length) return [];
 
     return this.prisma.unidade.findMany({
@@ -98,5 +90,20 @@ export class UnitRepository extends BaseRepository<Unidade> {
       include: { cursos: { where: this.whereActive() } },
       orderBy: { nome_unidade: 'asc' },
     });
+  }
+
+  /** Resolves the unit IDs accessible to a regional user via PessoaRegional → Regional → Unidade */
+  private async getUnidadeIdsByPessoaRegional(pessoaId: string): Promise<string[]> {
+    const vinculos = await this.prisma.pessoaRegional.findMany({
+      where: { pessoa_id: pessoaId, ativo: true },
+      include: {
+        regional: {
+          select: {
+            unidades: { where: { ativo: true }, select: { unidade_id: true } },
+          },
+        },
+      },
+    });
+    return vinculos.flatMap((v) => v.regional.unidades.map((u) => u.unidade_id));
   }
 }

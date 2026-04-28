@@ -58,6 +58,10 @@ export class PublishPgaService {
     }
 
     // Usa transação: marca template como Publicado e cria todas as cópias
+    // TODO: implementar cópia profunda das relações do template (rotinas, acoesCPA,
+    //       acoesProjetos) para cada cópia de unidade, caso o template possua dados
+    //       pré-configurados. Requer decisão arquitetural sobre quais relações devem
+    //       ser propagadas e a inclusão dessas relações no findOne() acima.
     return this.prisma.$transaction(async (tx) => {
       await tx.pGA.update({
         where: { pga_id: pgaId },
