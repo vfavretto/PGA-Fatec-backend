@@ -1,5 +1,7 @@
-import { Controller, Post, Get, Put, Delete, Param, Body, ParseIntPipe } from '@nestjs/common';
+﻿import { Controller, Post, Get, Put, Delete, Param, Body, ParseUUIDPipe, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { RolesGuard } from '../auth/guards/roles.guard';
 import { CreatePriorityActionService } from './services/create-priority-action.service';
 import { FindAllPriorityActionService } from './services/find-all-priority-action.service';
 import { FindOnePriorityActionService } from './services/find-one-priority-action.service';
@@ -21,6 +23,8 @@ export class PriorityActionController {
   ) {}
 
   @Post()
+  @UseGuards(RolesGuard)
+  @Roles('Administrador', 'CPS')
   @ApiOperation({ summary: 'Criar prioridade de ação', description: 'Cria uma nova prioridade de ação no sistema' })
   @ApiBody({ type: CreatePriorityActionDto })
   @ApiResponse({ status: 201, description: 'Prioridade criada com sucesso' })
@@ -41,26 +45,30 @@ export class PriorityActionController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID da prioridade' })
   @ApiResponse({ status: 200, description: 'Prioridade encontrada com sucesso' })
   @ApiResponse({ status: 404, description: 'Prioridade não encontrada' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.findOneService.execute(id);
   }
 
   @Put(':id')
+  @UseGuards(RolesGuard)
+  @Roles('Administrador', 'CPS')
   @ApiOperation({ summary: 'Atualizar prioridade', description: 'Atualiza dados de uma prioridade específica' })
   @ApiParam({ name: 'id', type: 'number', description: 'ID da prioridade' })
   @ApiBody({ type: UpdatePriorityActionDto })
   @ApiResponse({ status: 200, description: 'Prioridade atualizada com sucesso' })
   @ApiResponse({ status: 404, description: 'Prioridade não encontrada' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdatePriorityActionDto) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdatePriorityActionDto) {
     return this.updateService.execute(id, dto);
   }
 
   @Delete(':id')
+  @UseGuards(RolesGuard)
+  @Roles('Administrador', 'CPS')
   @ApiOperation({ summary: 'Excluir prioridade', description: 'Remove uma prioridade do sistema' })
   @ApiParam({ name: 'id', type: 'number', description: 'ID da prioridade' })
   @ApiResponse({ status: 200, description: 'Prioridade excluída com sucesso' })
   @ApiResponse({ status: 404, description: 'Prioridade não encontrada' })
-  remove(@Param('id', ParseIntPipe) id: number) {
+  remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.deleteService.execute(id);
   }
 }

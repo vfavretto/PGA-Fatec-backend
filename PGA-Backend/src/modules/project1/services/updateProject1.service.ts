@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { Project1Repository } from '../project1.repository';
 import { UpdateProject1Dto } from '../dto/update-project1.dto';
@@ -11,7 +11,7 @@ export class UpdateProject1Service {
     private readonly prisma: PrismaService,
   ) {}
 
-  async execute(id: number, data: UpdateProject1Dto) {
+  async execute(id: string, data: UpdateProject1Dto) {
     try {
       const {
         situacoes_problema_ids,
@@ -44,12 +44,12 @@ export class UpdateProject1Service {
         });
 
         
-        const idsValidos = situacoes_problema_ids.filter((sid) => sid && Number(sid) > 0);
+        const idsValidos = situacoes_problema_ids.filter((sid) => Boolean(sid));
         if (idsValidos.length > 0) {
           console.log('[UpdateProject1Service] Criando situações-problema válidas:', { idsValidos });
           const createData = idsValidos.map((situacao_id) => ({
             acao_projeto_id: id,
-            situacao_problema_id: Number(situacao_id),
+            situacao_problema_id: situacao_id,
             ativo: true,
           }));
           
@@ -64,11 +64,11 @@ export class UpdateProject1Service {
       if (pessoas !== undefined && Array.isArray(pessoas)) {
         console.log('[UpdateProject1Service] Atualizando pessoas:', { id, pessoas_count: pessoas.length });
         
-        const pessoasValidas = pessoas.filter((p) => p && p.pessoa_id && Number(p.pessoa_id) > 0);
+        const pessoasValidas = pessoas.filter((p) => p && p.pessoa_id);
         console.log('[UpdateProject1Service] Pessoas válidas:', { count: pessoasValidas.length });
         
-        const pessoasComId = pessoasValidas.filter((p) => p.projeto_pessoa_id && Number(p.projeto_pessoa_id) > 0);
-        const idsExistentes = pessoasComId.map((p) => Number(p.projeto_pessoa_id!));
+        const pessoasComId = pessoasValidas.filter((p) => p.projeto_pessoa_id);
+        const idsExistentes = pessoasComId.map((p) => p.projeto_pessoa_id!);
 
         if (idsExistentes.length === 0) {
           await this.prisma.projetoPessoa.deleteMany({
@@ -84,14 +84,14 @@ export class UpdateProject1Service {
         }
 
         for (const pessoa of pessoasValidas) {
-          const pessoaId = Number(pessoa.pessoa_id);
-          const tipoVinculoId = pessoa.tipo_vinculo_hae_id ? Number(pessoa.tipo_vinculo_hae_id) : null;
+          const pessoaId = pessoa.pessoa_id;
+          const tipoVinculoId = pessoa.tipo_vinculo_hae_id ?? null;
           const cargaHoraria = pessoa.carga_horaria_semanal ? Number(pessoa.carga_horaria_semanal) : null;
 
-          if (pessoa.projeto_pessoa_id && Number(pessoa.projeto_pessoa_id) > 0) {
+          if (pessoa.projeto_pessoa_id) {
             console.log('[UpdateProject1Service] Atualizando pessoa existente:', { projeto_pessoa_id: pessoa.projeto_pessoa_id });
             await this.prisma.projetoPessoa.update({
-              where: { projeto_pessoa_id: Number(pessoa.projeto_pessoa_id) },
+              where: { projeto_pessoa_id: pessoa.projeto_pessoa_id },
               data: {
                 pessoa_id: pessoaId,
                 papel: pessoa.papel || 'Colaborador',
@@ -121,8 +121,8 @@ export class UpdateProject1Service {
         console.log('[UpdateProject1Service] Atualizando etapas:', { id, etapas_count: etapas.length });
         
         const etapasValidas = etapas.filter((e) => e && e.descricao && typeof e.descricao === 'string' && e.descricao.trim().length > 0);
-        const etapasComId = etapasValidas.filter((e) => e.etapa_id && Number(e.etapa_id) > 0);
-        const idsExistentes = etapasComId.map((e) => Number(e.etapa_id!));
+        const etapasComId = etapasValidas.filter((e) => e.etapa_id);
+        const idsExistentes = etapasComId.map((e) => e.etapa_id!);
 
         if (idsExistentes.length === 0) {
           await this.prisma.etapaProcesso.deleteMany({
@@ -149,13 +149,13 @@ export class UpdateProject1Service {
           const dataPrevista = parseDate(etapa.data_verificacao_prevista);
           const dataRealizada = parseDate(etapa.data_verificacao_realizada);
 
-          if (etapa.etapa_id && Number(etapa.etapa_id) > 0) {
+          if (etapa.etapa_id) {
             console.log('[UpdateProject1Service] Atualizando etapa existente:', { etapa_id: etapa.etapa_id });
             await this.prisma.etapaProcesso.update({
-              where: { etapa_id: Number(etapa.etapa_id) },
+              where: { etapa_id: etapa.etapa_id },
               data: {
                 descricao: etapa.descricao?.trim() || '',
-                entregavel_id: etapa.entregavel_id ? Number(etapa.entregavel_id) : null,
+                entregavel_id: etapa.entregavel_id ?? null,
                 numero_ref: etapa.numero_ref || null,
                 status_verificacao: etapa.status_verificacao as any || undefined,
                 data_verificacao_prevista: dataPrevista,
@@ -168,7 +168,7 @@ export class UpdateProject1Service {
               data: {
                 acao_projeto_id: id,
                 descricao: etapa.descricao?.trim() || '',
-                entregavel_id: etapa.entregavel_id ? Number(etapa.entregavel_id) : null,
+                entregavel_id: etapa.entregavel_id ?? null,
                 numero_ref: etapa.numero_ref || null,
                 status_verificacao: etapa.status_verificacao as any || undefined,
                 data_verificacao_prevista: dataPrevista,

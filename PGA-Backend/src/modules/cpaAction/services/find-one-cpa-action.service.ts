@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+﻿import { Injectable, NotFoundException } from '@nestjs/common';
 import { CpaActionRepository } from '../cpa-action.repository';
 import { CpaAction } from '../entities/cpa-action.entity';
 
@@ -6,7 +6,7 @@ import { CpaAction } from '../entities/cpa-action.entity';
 export class FindOneCpaActionService {
   constructor(private readonly repository: CpaActionRepository) {}
 
-  async execute(id: number, user?: any): Promise<CpaAction> {
+  async execute(id: string, user?: any): Promise<CpaAction> {
     const action = await this.repository.findOneWithContext(id, user?.active_context);
     if (!action) throw new NotFoundException('AcaoCPA não encontrada');
     return action;

@@ -1,4 +1,4 @@
-import {
+﻿import {
   Injectable,
   NotFoundException,
   ConflictException,
@@ -13,7 +13,7 @@ export class DeleteUnitService {
     private readonly prisma: PrismaService,
   ) {}
 
-  async execute(id: number, usuarioLogadoId?: number, motivo?: string) {
+  async execute(id: string, usuarioLogadoId?: string, motivo?: string) {
     const unit = await this.unitRepository.findOne(id);
     if (!unit) throw new NotFoundException('Unidade não encontrada');
 

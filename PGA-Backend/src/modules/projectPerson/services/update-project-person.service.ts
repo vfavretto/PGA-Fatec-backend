@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+﻿import { Injectable, NotFoundException } from '@nestjs/common';
 import { ProjectPersonRepository } from '../project-person.repository';
 import { UpdateProjectPersonDto } from '../dto/update-project-person.dto';
 import { ProjectPerson } from '../entities/project-person.entity';
@@ -8,7 +8,7 @@ export class UpdateProjectPersonService {
   constructor(private readonly repository: ProjectPersonRepository) {}
 
   async execute(
-    id: number,
+    id: string,
     data: UpdateProjectPersonDto,
   ): Promise<ProjectPerson> {
     const projectPerson = await this.repository.findOne(id);

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../config/prisma.service';
 import { BaseRepository } from '../../common/repositories/base.repository';
 import { RotinaInstitucional } from '@prisma/client';
@@ -37,7 +37,7 @@ export class InstitutionalRoutineRepository extends BaseRepository<RotinaInstitu
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return this.prisma.rotinaInstitucional.findFirst({
       where: this.whereActive({ rotina_id: id }),
       include: {
@@ -57,21 +57,21 @@ export class InstitutionalRoutineRepository extends BaseRepository<RotinaInstitu
     });
   }
 
-  async update(id: number, data: UpdateInstitutionalRoutineDto) {
+  async update(id: string, data: UpdateInstitutionalRoutineDto) {
     return this.prisma.rotinaInstitucional.update({
       where: { rotina_id: id },
       data,
     });
   }
 
-  async softDelete(id: number) {
+  async softDelete(id: string) {
     return this.prisma.rotinaInstitucional.update({
       where: { rotina_id: id },
       data: { ativo: false },
     });
   }
 
-  async findByPgaId(pgaId: number) {
+  async findByPgaId(pgaId: string) {
     return this.prisma.rotinaInstitucional.findMany({
       where: this.whereActive({ pga_id: pgaId }),
       include: {
@@ -81,7 +81,7 @@ export class InstitutionalRoutineRepository extends BaseRepository<RotinaInstitu
     });
   }
 
-  async findAllByUnit(unidadeId: number) {
+  async findAllByUnit(unidadeId: string) {
     return this.prisma.rotinaInstitucional.findMany({
       where: this.whereActive({ unidade_id: unidadeId }),
       include: {
@@ -91,7 +91,7 @@ export class InstitutionalRoutineRepository extends BaseRepository<RotinaInstitu
     });
   }
 
-  async findAllByRegional(regionalId: number) {
+  async findAllByRegional(regionalId: string) {
     return this.prisma.rotinaInstitucional.findMany({
       where: this.whereActive({ regional_id: regionalId }),
       include: {
@@ -101,7 +101,7 @@ export class InstitutionalRoutineRepository extends BaseRepository<RotinaInstitu
     });
   }
 
-  async findOneWithContext(id: number, active_context?: any) {
+  async findOneWithContext(id: string, active_context?: any) {
     if (active_context && active_context.tipo === 'unidade') {
       return this.prisma.rotinaInstitucional.findFirst({
         where: this.whereActive({ rotina_id: id, unidade_id: active_context.id }),
@@ -119,7 +119,7 @@ export class InstitutionalRoutineRepository extends BaseRepository<RotinaInstitu
     return this.findOne(id);
   }
 
-  async findByPgaIdWithContext(pgaId: number, active_context?: any) {
+  async findByPgaIdWithContext(pgaId: string, active_context?: any) {
     if (active_context && active_context.tipo === 'unidade') {
       return this.prisma.rotinaInstitucional.findMany({
         where: this.whereActive({ pga_id: pgaId, unidade_id: active_context.id }),

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Put, Delete, ParseIntPipe, Request, UseGuards } from '@nestjs/common';
+﻿import { Controller, Post, Body, Get, Param, Put, Delete, ParseUUIDPipe, Request, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
 import { CreateInstitutionalRoutineDto } from './dto/create-institutional-routine.dto';
 import { UpdateInstitutionalRoutineDto } from './dto/update-institutional-routine.dto';
@@ -43,7 +43,7 @@ export class InstitutionalRoutineController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID da rotina institucional' })
   @ApiResponse({ status: 200, description: 'Rotina institucional encontrada com sucesso' })
   @ApiResponse({ status: 404, description: 'Rotina institucional não encontrada' })
-  findOne(@Request() req: any, @Param('id', ParseIntPipe) id: number) {
+  findOne(@Request() req: any, @Param('id', ParseUUIDPipe) id: string) {
     return this.findOneService.execute(id, req.user);
   }
 
@@ -53,7 +53,7 @@ export class InstitutionalRoutineController {
   @ApiBody({ type: UpdateInstitutionalRoutineDto })
   @ApiResponse({ status: 200, description: 'Rotina institucional atualizada com sucesso' })
   @ApiResponse({ status: 404, description: 'Rotina institucional não encontrada' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateInstitutionalRoutineDto) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateInstitutionalRoutineDto) {
     return this.updateService.execute(id, dto);
   }
 
@@ -62,7 +62,7 @@ export class InstitutionalRoutineController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID da rotina institucional' })
   @ApiResponse({ status: 200, description: 'Rotina institucional excluída com sucesso' })
   @ApiResponse({ status: 404, description: 'Rotina institucional não encontrada' })
-  delete(@Param('id', ParseIntPipe) id: number) {
+  delete(@Param('id', ParseUUIDPipe) id: string) {
     return this.deleteService.execute(id);
   }
 }

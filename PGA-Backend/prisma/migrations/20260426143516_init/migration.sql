@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "StatusPGA" AS ENUM ('EmElaboracao', 'Submetido', 'Aprovado', 'Reprovado');
+CREATE TYPE "StatusPGA" AS ENUM ('EmElaboracao', 'Submetido', 'Aprovado', 'AguardandoCPS', 'AprovadoCPS', 'Reprovado');
 
 -- CreateEnum
 CREATE TYPE "TipoUsuario" AS ENUM ('Administrador', 'CPS', 'Regional', 'Diretor', 'Coordenador', 'Administrativo', 'Docente');
@@ -45,12 +45,12 @@ CREATE TYPE "StatusSolicitacao" AS ENUM ('Pendente', 'Aprovada', 'Rejeitada');
 
 -- CreateTable
 CREATE TABLE "Unidade" (
-    "unidade_id" SERIAL NOT NULL,
+    "unidade_id" TEXT NOT NULL,
     "codigo_fnnn" VARCHAR(10) NOT NULL,
     "nome_unidade" VARCHAR(255) NOT NULL,
-    "regional_id" INTEGER NOT NULL,
+    "regional_id" TEXT NOT NULL,
     "ativo" BOOLEAN NOT NULL DEFAULT true,
-    "diretor_id" INTEGER,
+    "diretor_id" TEXT,
     "endereco" VARCHAR(255),
     "complemento" VARCHAR(255),
     "bairro" VARCHAR(100),
@@ -61,16 +61,17 @@ CREATE TABLE "Unidade" (
     "site" VARCHAR(255),
     "criado_em" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "atualizado_em" TIMESTAMP(3) NOT NULL,
-    "criado_por" INTEGER,
-    "atualizado_por" INTEGER,
+    "criado_por" TEXT,
+    "atualizado_por" TEXT,
 
     CONSTRAINT "Unidade_pkey" PRIMARY KEY ("unidade_id")
 );
 
 -- CreateTable
 CREATE TABLE "PGA" (
-    "pga_id" SERIAL NOT NULL,
-    "unidade_id" INTEGER NOT NULL,
+    "pga_id" TEXT NOT NULL,
+    "numero" SERIAL NOT NULL,
+    "unidade_id" TEXT NOT NULL,
     "ano" INTEGER NOT NULL,
     "versao" VARCHAR(10),
     "analise_cenario" TEXT,
@@ -79,10 +80,11 @@ CREATE TABLE "PGA" (
     "status" "StatusPGA" NOT NULL DEFAULT 'EmElaboracao',
     "configuracoes_snapshot" JSONB,
     "data_snapshot_criado" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "usuario_criacao_id" INTEGER,
-    "regional_responsavel_id" INTEGER,
+    "usuario_criacao_id" TEXT,
+    "regional_responsavel_id" TEXT,
     "parecer_regional" TEXT,
     "data_parecer_regional" TIMESTAMP(3),
+    "parecer_cps" TEXT,
     "ativo" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "PGA_pkey" PRIMARY KEY ("pga_id")
@@ -90,75 +92,75 @@ CREATE TABLE "PGA" (
 
 -- CreateTable
 CREATE TABLE "SituacaoProblema" (
-    "situacao_id" SERIAL NOT NULL,
+    "situacao_id" TEXT NOT NULL,
     "codigo_categoria" VARCHAR(20) NOT NULL,
     "descricao" TEXT NOT NULL,
     "fonte" VARCHAR(255),
     "ativo" BOOLEAN NOT NULL DEFAULT true,
     "ordem" INTEGER,
     "criado_em" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "criado_por" INTEGER,
+    "criado_por" TEXT,
     "atualizado_em" TIMESTAMP(3) NOT NULL,
-    "atualizado_por" INTEGER,
+    "atualizado_por" TEXT,
 
     CONSTRAINT "SituacaoProblema_pkey" PRIMARY KEY ("situacao_id")
 );
 
 -- CreateTable
 CREATE TABLE "EixoTematico" (
-    "eixo_id" SERIAL NOT NULL,
+    "eixo_id" TEXT NOT NULL,
     "numero" INTEGER NOT NULL,
     "nome_eixo" VARCHAR(255) NOT NULL,
     "descricao" TEXT,
     "ativo" BOOLEAN NOT NULL DEFAULT true,
     "criado_em" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "criado_por" INTEGER,
+    "criado_por" TEXT,
     "atualizado_em" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "atualizado_por" INTEGER,
+    "atualizado_por" TEXT,
 
     CONSTRAINT "EixoTematico_pkey" PRIMARY KEY ("eixo_id")
 );
 
 -- CreateTable
 CREATE TABLE "PrioridadeAcao" (
-    "prioridade_id" SERIAL NOT NULL,
+    "prioridade_id" TEXT NOT NULL,
     "grau" INTEGER NOT NULL,
     "descricao" VARCHAR(255) NOT NULL,
     "tipo_gestao" VARCHAR(100) NOT NULL,
     "detalhes" TEXT,
     "ativo" BOOLEAN NOT NULL DEFAULT true,
     "criado_em" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "criado_por" INTEGER,
+    "criado_por" TEXT,
     "atualizado_em" TIMESTAMP(3) NOT NULL,
-    "atualizado_por" INTEGER,
+    "atualizado_por" TEXT,
 
     CONSTRAINT "PrioridadeAcao_pkey" PRIMARY KEY ("prioridade_id")
 );
 
 -- CreateTable
 CREATE TABLE "Tema" (
-    "tema_id" SERIAL NOT NULL,
+    "tema_id" TEXT NOT NULL,
     "tema_num" INTEGER NOT NULL,
-    "eixo_id" INTEGER NOT NULL,
+    "eixo_id" TEXT NOT NULL,
     "descricao" VARCHAR(255) NOT NULL,
     "ativo" BOOLEAN NOT NULL DEFAULT true,
     "criado_em" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "criado_por" INTEGER,
+    "criado_por" TEXT,
     "atualizado_em" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "atualizado_por" INTEGER,
+    "atualizado_por" TEXT,
 
     CONSTRAINT "Tema_pkey" PRIMARY KEY ("tema_id")
 );
 
 -- CreateTable
 CREATE TABLE "AcaoProjeto" (
-    "acao_projeto_id" SERIAL NOT NULL,
+    "acao_projeto_id" TEXT NOT NULL,
     "codigo_projeto" VARCHAR(20) NOT NULL,
     "nome_projeto" VARCHAR(255),
-    "pga_id" INTEGER NOT NULL,
-    "eixo_id" INTEGER NOT NULL,
-    "prioridade_id" INTEGER NOT NULL,
-    "tema_id" INTEGER NOT NULL,
+    "pga_id" TEXT NOT NULL,
+    "eixo_id" TEXT NOT NULL,
+    "prioridade_id" TEXT NOT NULL,
+    "tema_id" TEXT NOT NULL,
     "o_que_sera_feito" TEXT NOT NULL,
     "por_que_sera_feito" TEXT NOT NULL,
     "data_inicio" DATE,
@@ -172,14 +174,14 @@ CREATE TABLE "AcaoProjeto" (
     "status_regional" "StatusProjetoRegional" NOT NULL DEFAULT 'EmAnalise',
     "parecer_regional" TEXT,
     "data_parecer_regional" TIMESTAMP(3),
-    "regional_responsavel_id" INTEGER,
+    "regional_responsavel_id" TEXT,
 
     CONSTRAINT "AcaoProjeto_pkey" PRIMARY KEY ("acao_projeto_id")
 );
 
 -- CreateTable
 CREATE TABLE "Pessoa" (
-    "pessoa_id" SERIAL NOT NULL,
+    "pessoa_id" TEXT NOT NULL,
     "nome" VARCHAR(255) NOT NULL,
     "email" VARCHAR(255),
     "nome_usuario" VARCHAR(30),
@@ -191,20 +193,20 @@ CREATE TABLE "Pessoa" (
     "ativo" BOOLEAN NOT NULL DEFAULT true,
     "criado_em" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "atualizado_em" TIMESTAMP(3) NOT NULL,
-    "criado_por" INTEGER,
-    "atualizado_por" INTEGER,
+    "criado_por" TEXT,
+    "atualizado_por" TEXT,
 
     CONSTRAINT "Pessoa_pkey" PRIMARY KEY ("pessoa_id")
 );
 
 -- CreateTable
 CREATE TABLE "ProjetoPessoa" (
-    "projeto_pessoa_id" SERIAL NOT NULL,
-    "acao_projeto_id" INTEGER NOT NULL,
-    "pessoa_id" INTEGER NOT NULL,
+    "projeto_pessoa_id" TEXT NOT NULL,
+    "acao_projeto_id" TEXT NOT NULL,
+    "pessoa_id" TEXT NOT NULL,
     "papel" "PapelProjeto" NOT NULL,
     "carga_horaria_semanal" INTEGER,
-    "tipo_vinculo_hae_id" INTEGER,
+    "tipo_vinculo_hae_id" TEXT,
     "ativo" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "ProjetoPessoa_pkey" PRIMARY KEY ("projeto_pessoa_id")
@@ -212,10 +214,10 @@ CREATE TABLE "ProjetoPessoa" (
 
 -- CreateTable
 CREATE TABLE "EtapaProcesso" (
-    "etapa_id" SERIAL NOT NULL,
-    "acao_projeto_id" INTEGER NOT NULL,
+    "etapa_id" TEXT NOT NULL,
+    "acao_projeto_id" TEXT NOT NULL,
     "descricao" TEXT NOT NULL,
-    "entregavel_id" INTEGER,
+    "entregavel_id" TEXT,
     "numero_ref" VARCHAR(50),
     "data_verificacao_prevista" DATE,
     "data_verificacao_realizada" DATE,
@@ -227,9 +229,9 @@ CREATE TABLE "EtapaProcesso" (
 
 -- CreateTable
 CREATE TABLE "Anexo" (
-    "anexo_id" SERIAL NOT NULL,
-    "etapa_processo_id" INTEGER,
-    "entregavel_id" INTEGER NOT NULL,
+    "anexo_id" TEXT NOT NULL,
+    "etapa_processo_id" TEXT,
+    "entregavel_id" TEXT NOT NULL,
     "item" VARCHAR(100) NOT NULL,
     "descricao" VARCHAR(255) NOT NULL,
     "quantidade" INTEGER NOT NULL,
@@ -244,24 +246,24 @@ CREATE TABLE "Anexo" (
 
 -- CreateTable
 CREATE TABLE "EntregavelLinkSei" (
-    "entregavel_id" SERIAL NOT NULL,
+    "entregavel_id" TEXT NOT NULL,
     "entregavel_numero" VARCHAR(50) NOT NULL,
     "descricao" VARCHAR(255) NOT NULL,
     "detalhes" VARCHAR(500),
     "requer_anexo" BOOLEAN NOT NULL DEFAULT false,
     "ativo" BOOLEAN NOT NULL DEFAULT true,
     "criado_em" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "criado_por" INTEGER,
+    "criado_por" TEXT,
     "atualizado_em" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "atualizado_por" INTEGER,
+    "atualizado_por" TEXT,
 
     CONSTRAINT "EntregavelLinkSei_pkey" PRIMARY KEY ("entregavel_id")
 );
 
 -- CreateTable
 CREATE TABLE "AcaoCPA" (
-    "acao_cpa_id" SERIAL NOT NULL,
-    "pga_id" INTEGER NOT NULL,
+    "acao_cpa_id" TEXT NOT NULL,
+    "pga_id" TEXT NOT NULL,
     "descricao" TEXT NOT NULL,
     "justificativa" TEXT,
     "ativo" BOOLEAN NOT NULL DEFAULT true,
@@ -271,16 +273,16 @@ CREATE TABLE "AcaoCPA" (
 
 -- CreateTable
 CREATE TABLE "RotinaInstitucional" (
-    "rotina_id" SERIAL NOT NULL,
-    "pga_id" INTEGER NOT NULL,
-    "curso_id" INTEGER,
+    "rotina_id" TEXT NOT NULL,
+    "pga_id" TEXT NOT NULL,
+    "curso_id" TEXT,
     "tipo_rotina" "TipoRotina" NOT NULL,
     "titulo" VARCHAR(255) NOT NULL,
     "descricao" TEXT NOT NULL,
     "periodicidade" "PeriodicidadeRotina" NOT NULL,
     "data_inicio" DATE,
     "data_fim" DATE,
-    "responsavel_id" INTEGER NOT NULL,
+    "responsavel_id" TEXT NOT NULL,
     "entregavel_esperado" TEXT,
     "status" "StatusRotina" NOT NULL DEFAULT 'Planejada',
     "ativo" BOOLEAN NOT NULL DEFAULT true,
@@ -290,9 +292,9 @@ CREATE TABLE "RotinaInstitucional" (
 
 -- CreateTable
 CREATE TABLE "RotinaParticipante" (
-    "rotina_participante_id" SERIAL NOT NULL,
-    "rotina_id" INTEGER NOT NULL,
-    "pessoa_id" INTEGER NOT NULL,
+    "rotina_participante_id" TEXT NOT NULL,
+    "rotina_id" TEXT NOT NULL,
+    "pessoa_id" TEXT NOT NULL,
     "papel" VARCHAR(100),
     "ativo" BOOLEAN NOT NULL DEFAULT true,
 
@@ -301,8 +303,8 @@ CREATE TABLE "RotinaParticipante" (
 
 -- CreateTable
 CREATE TABLE "RotinaOcorrencia" (
-    "ocorrencia_id" SERIAL NOT NULL,
-    "rotina_id" INTEGER NOT NULL,
+    "ocorrencia_id" TEXT NOT NULL,
+    "rotina_id" TEXT NOT NULL,
     "data_realizacao" DATE NOT NULL,
     "hora_inicio" TIME(6),
     "hora_fim" TIME(6),
@@ -318,12 +320,12 @@ CREATE TABLE "RotinaOcorrencia" (
 
 -- CreateTable
 CREATE TABLE "Curso" (
-    "curso_id" SERIAL NOT NULL,
-    "unidade_id" INTEGER NOT NULL,
+    "curso_id" TEXT NOT NULL,
+    "unidade_id" TEXT NOT NULL,
     "nome" VARCHAR(255) NOT NULL,
     "tipo" "TipoCurso" NOT NULL,
     "status" "StatusCurso" NOT NULL,
-    "coordenador_id" INTEGER,
+    "coordenador_id" TEXT,
     "ativo" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "Curso_pkey" PRIMARY KEY ("curso_id")
@@ -331,7 +333,7 @@ CREATE TABLE "Curso" (
 
 -- CreateTable
 CREATE TABLE "TipoVinculoHAE" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "sigla" VARCHAR(10) NOT NULL,
     "descricao" VARCHAR(255) NOT NULL,
     "detalhes" TEXT,
@@ -342,8 +344,8 @@ CREATE TABLE "TipoVinculoHAE" (
 
 -- CreateTable
 CREATE TABLE "PGASituacaoProblema" (
-    "pga_id" INTEGER NOT NULL,
-    "situacao_problema_id" INTEGER NOT NULL,
+    "pga_id" TEXT NOT NULL,
+    "situacao_problema_id" TEXT NOT NULL,
     "ativo" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "PGASituacaoProblema_pkey" PRIMARY KEY ("pga_id","situacao_problema_id")
@@ -351,8 +353,8 @@ CREATE TABLE "PGASituacaoProblema" (
 
 -- CreateTable
 CREATE TABLE "AcaoProjetoSituacaoProblema" (
-    "acao_projeto_id" INTEGER NOT NULL,
-    "situacao_problema_id" INTEGER NOT NULL,
+    "acao_projeto_id" TEXT NOT NULL,
+    "situacao_problema_id" TEXT NOT NULL,
     "ativo" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "AcaoProjetoSituacaoProblema_pkey" PRIMARY KEY ("acao_projeto_id","situacao_problema_id")
@@ -360,14 +362,14 @@ CREATE TABLE "AcaoProjetoSituacaoProblema" (
 
 -- CreateTable
 CREATE TABLE "ConfiguracaoAuditoria" (
-    "auditoria_id" SERIAL NOT NULL,
+    "auditoria_id" TEXT NOT NULL,
     "tabela" VARCHAR(50) NOT NULL,
-    "registro_id" INTEGER NOT NULL,
+    "registro_id" TEXT NOT NULL,
     "ano" INTEGER NOT NULL,
     "operacao" "TipoOperacaoAuditoria" NOT NULL,
     "dados_antes" JSONB,
     "dados_depois" JSONB,
-    "usuario_id" INTEGER,
+    "usuario_id" TEXT,
     "data_operacao" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "motivo" TEXT,
 
@@ -376,15 +378,15 @@ CREATE TABLE "ConfiguracaoAuditoria" (
 
 -- CreateTable
 CREATE TABLE "SituacaoProblemaVersao" (
-    "versao_id" SERIAL NOT NULL,
-    "situacao_base_id" INTEGER NOT NULL,
+    "versao_id" TEXT NOT NULL,
+    "situacao_base_id" TEXT NOT NULL,
     "ano" INTEGER NOT NULL,
     "codigo_categoria" VARCHAR(20) NOT NULL,
     "descricao" TEXT NOT NULL,
     "fonte" VARCHAR(255),
     "ativo_no_ano" BOOLEAN NOT NULL DEFAULT true,
     "ordem" INTEGER,
-    "criado_por" INTEGER,
+    "criado_por" TEXT,
     "criado_em" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "motivo_alteracao" TEXT,
 
@@ -393,14 +395,14 @@ CREATE TABLE "SituacaoProblemaVersao" (
 
 -- CreateTable
 CREATE TABLE "EixoTematicoVersao" (
-    "versao_id" SERIAL NOT NULL,
-    "eixo_base_id" INTEGER NOT NULL,
+    "versao_id" TEXT NOT NULL,
+    "eixo_base_id" TEXT NOT NULL,
     "ano" INTEGER NOT NULL,
     "numero" INTEGER NOT NULL,
     "nome" VARCHAR(255) NOT NULL,
     "descricao" TEXT,
     "ativo_no_ano" BOOLEAN NOT NULL DEFAULT true,
-    "criado_por" INTEGER,
+    "criado_por" TEXT,
     "criado_em" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "motivo_alteracao" TEXT,
 
@@ -409,15 +411,15 @@ CREATE TABLE "EixoTematicoVersao" (
 
 -- CreateTable
 CREATE TABLE "PrioridadeAcaoVersao" (
-    "versao_id" SERIAL NOT NULL,
-    "prioridade_base_id" INTEGER NOT NULL,
+    "versao_id" TEXT NOT NULL,
+    "prioridade_base_id" TEXT NOT NULL,
     "ano" INTEGER NOT NULL,
     "grau" INTEGER NOT NULL,
     "descricao" VARCHAR(255) NOT NULL,
     "tipo_gestao" VARCHAR(100) NOT NULL,
     "detalhes" TEXT,
     "ativo_no_ano" BOOLEAN NOT NULL DEFAULT true,
-    "criado_por" INTEGER,
+    "criado_por" TEXT,
     "criado_em" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "motivo_alteracao" TEXT,
 
@@ -426,14 +428,14 @@ CREATE TABLE "PrioridadeAcaoVersao" (
 
 -- CreateTable
 CREATE TABLE "TemaVersao" (
-    "versao_id" SERIAL NOT NULL,
-    "tema_base_id" INTEGER NOT NULL,
+    "versao_id" TEXT NOT NULL,
+    "tema_base_id" TEXT NOT NULL,
     "ano" INTEGER NOT NULL,
     "tema_num" INTEGER NOT NULL,
-    "eixo_id" INTEGER NOT NULL,
+    "eixo_id" TEXT NOT NULL,
     "descricao" VARCHAR(255) NOT NULL,
     "ativo_no_ano" BOOLEAN NOT NULL DEFAULT true,
-    "criado_por" INTEGER,
+    "criado_por" TEXT,
     "criado_em" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "motivo_alteracao" TEXT,
 
@@ -442,14 +444,14 @@ CREATE TABLE "TemaVersao" (
 
 -- CreateTable
 CREATE TABLE "EntregavelVersao" (
-    "versao_id" SERIAL NOT NULL,
-    "entregavel_base_id" INTEGER NOT NULL,
+    "versao_id" TEXT NOT NULL,
+    "entregavel_base_id" TEXT NOT NULL,
     "ano" INTEGER NOT NULL,
     "entregavel_numero" VARCHAR(50) NOT NULL,
     "descricao" VARCHAR(255) NOT NULL,
     "detalhes" VARCHAR(500),
     "ativo_no_ano" BOOLEAN NOT NULL DEFAULT true,
-    "criado_por" INTEGER,
+    "criado_por" TEXT,
     "criado_em" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "motivo_alteracao" TEXT,
 
@@ -458,14 +460,14 @@ CREATE TABLE "EntregavelVersao" (
 
 -- CreateTable
 CREATE TABLE "PessoaVersao" (
-    "versao_id" SERIAL NOT NULL,
-    "pessoa_base_id" INTEGER NOT NULL,
+    "versao_id" TEXT NOT NULL,
+    "pessoa_base_id" TEXT NOT NULL,
     "ano" INTEGER NOT NULL,
     "nome" VARCHAR(255) NOT NULL,
     "email" VARCHAR(255),
     "tipo_usuario" "TipoUsuario" NOT NULL,
     "ativo_no_ano" BOOLEAN NOT NULL DEFAULT true,
-    "criado_por" INTEGER,
+    "criado_por" TEXT,
     "criado_em" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "motivo_alteracao" TEXT,
 
@@ -474,14 +476,14 @@ CREATE TABLE "PessoaVersao" (
 
 -- CreateTable
 CREATE TABLE "SolicitacaoAcesso" (
-    "solicitacao_id" SERIAL NOT NULL,
+    "solicitacao_id" TEXT NOT NULL,
     "nome" VARCHAR(255) NOT NULL,
     "email" VARCHAR(255) NOT NULL,
-    "unidade_id" INTEGER NOT NULL,
+    "unidade_id" TEXT NOT NULL,
     "status" "StatusSolicitacao" NOT NULL DEFAULT 'Pendente',
     "data_solicitacao" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "data_processamento" TIMESTAMP(3),
-    "processado_por" INTEGER,
+    "processado_por" TEXT,
     "tipo_usuario_concedido" "TipoUsuario",
 
     CONSTRAINT "SolicitacaoAcesso_pkey" PRIMARY KEY ("solicitacao_id")
@@ -489,8 +491,8 @@ CREATE TABLE "SolicitacaoAcesso" (
 
 -- CreateTable
 CREATE TABLE "PessoaUnidade" (
-    "pessoa_id" INTEGER NOT NULL,
-    "unidade_id" INTEGER NOT NULL,
+    "pessoa_id" TEXT NOT NULL,
+    "unidade_id" TEXT NOT NULL,
     "data_vinculo" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "ativo" BOOLEAN NOT NULL DEFAULT true,
 
@@ -499,8 +501,8 @@ CREATE TABLE "PessoaUnidade" (
 
 -- CreateTable
 CREATE TABLE "PessoaRegional" (
-    "pessoa_id" INTEGER NOT NULL,
-    "regional_id" INTEGER NOT NULL,
+    "pessoa_id" TEXT NOT NULL,
+    "regional_id" TEXT NOT NULL,
     "data_vinculo" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "ativo" BOOLEAN NOT NULL DEFAULT true,
 
@@ -509,15 +511,15 @@ CREATE TABLE "PessoaRegional" (
 
 -- CreateTable
 CREATE TABLE "Regional" (
-    "regional_id" SERIAL NOT NULL,
+    "regional_id" TEXT NOT NULL,
     "nome_regional" VARCHAR(255) NOT NULL,
     "codigo_regional" VARCHAR(10),
-    "responsavel_id" INTEGER,
+    "responsavel_id" TEXT,
     "ativo" BOOLEAN NOT NULL DEFAULT true,
     "criado_em" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "atualizado_em" TIMESTAMP(3) NOT NULL,
-    "criado_por" INTEGER,
-    "atualizado_por" INTEGER,
+    "criado_por" TEXT,
+    "atualizado_por" TEXT,
 
     CONSTRAINT "Regional_pkey" PRIMARY KEY ("regional_id")
 );
@@ -541,13 +543,13 @@ CREATE INDEX "SituacaoProblema_ativo_idx" ON "SituacaoProblema"("ativo");
 CREATE INDEX "SituacaoProblema_criado_em_idx" ON "SituacaoProblema"("criado_em");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "EixoTematico_numero_key" ON "EixoTematico"("numero");
+CREATE INDEX "EixoTematico_numero_idx" ON "EixoTematico"("numero");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "PrioridadeAcao_grau_key" ON "PrioridadeAcao"("grau");
+CREATE INDEX "PrioridadeAcao_grau_idx" ON "PrioridadeAcao"("grau");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Tema_tema_num_eixo_id_key" ON "Tema"("tema_num", "eixo_id");
+CREATE INDEX "Tema_tema_num_eixo_id_idx" ON "Tema"("tema_num", "eixo_id");
 
 -- CreateIndex
 CREATE INDEX "AcaoProjeto_codigo_projeto_idx" ON "AcaoProjeto"("codigo_projeto");
@@ -577,10 +579,10 @@ CREATE INDEX "Anexo_etapa_processo_id_idx" ON "Anexo"("etapa_processo_id");
 CREATE INDEX "Anexo_entregavel_id_idx" ON "Anexo"("entregavel_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "EntregavelLinkSei_entregavel_numero_key" ON "EntregavelLinkSei"("entregavel_numero");
+CREATE INDEX "EntregavelLinkSei_entregavel_numero_idx" ON "EntregavelLinkSei"("entregavel_numero");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "TipoVinculoHAE_sigla_key" ON "TipoVinculoHAE"("sigla");
+CREATE INDEX "TipoVinculoHAE_sigla_idx" ON "TipoVinculoHAE"("sigla");
 
 -- CreateIndex
 CREATE INDEX "ConfiguracaoAuditoria_tabela_registro_id_idx" ON "ConfiguracaoAuditoria"("tabela", "registro_id");

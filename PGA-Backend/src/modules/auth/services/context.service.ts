@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
+﻿import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../../config/prisma.service';
 
@@ -44,7 +44,7 @@ export class ContextService {
     }
 
     const pessoa = await this.prisma.pessoa.findUnique({
-      where: { pessoa_id: Number(user.pessoa_id) },
+      where: { pessoa_id: user.pessoa_id },
       include: { unidades: { where: { ativo: true }, include: { unidade: true } } },
     });
 
@@ -60,29 +60,29 @@ export class ContextService {
     return { unidades };
   }
 
-  async selectContext(user: any, tipo: string, id?: number) {
+  async selectContext(user: any, tipo: string, id?: string) {
     const userTipo = user.tipo_usuario;
 
     if (userTipo === 'Administrador' || userTipo === 'CPS') {
       if (tipo === 'unidade') {
-        const unidade = await this.prisma.unidade.findFirst({ where: { unidade_id: Number(id), ativo: true } });
+        const unidade = await this.prisma.unidade.findFirst({ where: { unidade_id: id, ativo: true } });
         if (!unidade) throw new BadRequestException('Unidade inválida');
       }
 
       if (tipo === 'regional') {
-        const regional = await this.prisma.pessoa.findFirst({ where: { pessoa_id: Number(id), ativo: true, tipo_usuario: 'Regional' } });
+        const regional = await this.prisma.pessoa.findFirst({ where: { pessoa_id: id, ativo: true, tipo_usuario: 'Regional' } });
         if (!regional) throw new BadRequestException('Regional inválida');
       }
     } else {
       if (tipo === 'unidade') {
         const vinculo = await this.prisma.pessoaUnidade.findFirst({
-          where: { pessoa_id: user.pessoa_id, unidade_id: Number(id), ativo: true },
+          where: { pessoa_id: user.pessoa_id, unidade_id: id, ativo: true },
         });
         if (!vinculo) throw new BadRequestException('Usuário não possui vínculo com a unidade informada');
       }
 
       if (tipo === 'regional') {
-        if (Number(id) !== Number(user.pessoa_id)) {
+        if (id !== user.pessoa_id) {
           throw new BadRequestException('Usuário não autorizado a acessar essa regional');
         }
       }

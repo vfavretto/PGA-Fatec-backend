@@ -3,20 +3,25 @@ import {
   Inject,
   ForbiddenException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
-import { Logger } from '@nestjs/common';
 import { TipoUsuario } from '@prisma/client';
 import { UserRepository } from '../user.repository';
 import { Prisma, Pessoa } from '@prisma/client';
 import { CreateUserDto } from '../dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
+import { PrismaService } from '../../../config/prisma.service';
 import { ForgotPasswordService } from './forgot-password.service';
+
+const TIPOS_AUTORIZADOS_CRIACAO = ['Administrador', 'CPS', 'Diretor'] as const;
 
 @Injectable()
 export class CreateUserService {
   private readonly logger = new Logger(CreateUserService.name);
+
   constructor(
     private readonly userRepository: UserRepository,
+    private readonly prisma: PrismaService,
     @Inject(ForgotPasswordService)
     private readonly forgotPasswordService: ForgotPasswordService,
   ) {}
@@ -28,57 +33,50 @@ export class CreateUserService {
     const total = await this.userRepository.countActiveUsers();
 
     if (total > 0) {
-      if (!reqUser) {
+      const tipo = reqUser?.tipo_usuario as string | undefined;
+      if (
+        !reqUser ||
+        !tipo ||
+        !TIPOS_AUTORIZADOS_CRIACAO.includes(tipo as any)
+      ) {
         throw new ForbiddenException(
-          'Apenas usuários autenticados podem criar novos usuários diretamente',
+          'Apenas Administrador, CPS ou Diretor podem criar novos usuários diretamente',
         );
       }
 
-      const creatorType = (reqUser as any).tipo_usuario;
+      if (tipo === 'Diretor') {
+        if (!data.unidade_id) {
+          throw new BadRequestException(
+            'Diretor precisa informar a unidade_id ao criar um usuário',
+          );
+        }
 
-      if (creatorType === 'Administrador' || creatorType === 'CPS') {
-      } else if (creatorType === 'Regional') {
-        const allowed = ['Diretor', 'Coordenador', 'Administrativo', 'Docente'];
-        if (!allowed.includes(String(data.tipo_usuario))) {
+        const diretorUnidades = await this.prisma.pessoaUnidade.findMany({
+          where: {
+            pessoa_id: reqUser!.pessoa_id as string,
+            ativo: true,
+          },
+          select: { unidade_id: true },
+        });
+
+        const unidadesPermitidas = diretorUnidades.map((u) => u.unidade_id);
+
+        if (!unidadesPermitidas.includes(data.unidade_id as string)) {
           throw new ForbiddenException(
-            'Regional só pode criar usuários do tipo Diretor ou inferiores',
+            'Diretor só pode criar usuários da sua própria unidade',
           );
         }
-      } else if (creatorType === 'Diretor') {
-        const allowed = ['Coordenador', 'Administrativo', 'Docente'];
-        if (!allowed.includes(String(data.tipo_usuario))) {
+
+        const tipoAlvo = data.tipo_usuario as string;
+        if (
+          tipoAlvo === 'Administrador' ||
+          tipoAlvo === 'CPS' ||
+          tipoAlvo === 'Regional'
+        ) {
           throw new ForbiddenException(
-            'Diretor só pode criar Coordenador, Administrativo ou Docente',
+            'Diretor só pode criar usuários dos tipos Diretor, Coordenador, Administrativo ou Docente',
           );
         }
-        let creatorUnidades = (reqUser as any)?.unidades || [];
-        if (!creatorUnidades || creatorUnidades.length === 0) {
-          try {
-            const full = await this.userRepository.findById(
-              (reqUser as any).pessoa_id,
-            );
-            creatorUnidades = (full as any)?.unidades || [];
-          } catch (err) {
-            creatorUnidades = [];
-          }
-        }
-        const creatorUnitIds = creatorUnidades
-          .map((u: any) => u.unidade_id ?? u.unidade?.unidade_id)
-          .filter(Boolean);
-        if (!creatorUnitIds.length) {
-          throw new ForbiddenException(
-            'Diretor não tem unidade associada para criação de usuários',
-          );
-        }
-        if (!data.unidade_id || !creatorUnitIds.includes(data.unidade_id)) {
-          throw new ForbiddenException(
-            'Diretor só pode criar usuários na sua própria unidade',
-          );
-        }
-      } else {
-        throw new ForbiddenException(
-          'Apenas administradores, CPS, regionais ou diretores podem criar usuários diretamente',
-        );
       }
     } else {
       data.tipo_usuario = 'Administrador';
@@ -107,7 +105,8 @@ export class CreateUserService {
       const user = await this.userRepository.create(
         data as Prisma.PessoaCreateInput,
       );
-      return { user, email_sent: false };
+      const { senha: _s, ...userSafe } = user;
+      return { user: userSafe as Pessoa, email_sent: false };
     }
 
     const createData = { ...data } as Prisma.PessoaCreateInput;
@@ -126,6 +125,7 @@ export class CreateUserService {
       }
     } catch (err) {}
 
-    return { user, email_sent: emailSent };
+    const { senha: _senha, ...userSafe } = user;
+    return { user: userSafe as Pessoa, email_sent: emailSent };
   }
 }

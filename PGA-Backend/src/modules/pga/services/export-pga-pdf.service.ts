@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+﻿import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { PgaRepository } from '../pga.repository';
 import * as puppeteer from 'puppeteer';
 
@@ -24,7 +24,7 @@ export class ExportPgaPdfService {
     }
 
     const situacoesOrdenadas = Object.keys(situacaoCountMap)
-      .map((k) => ({ situacao_id: Number(k), descricao: situacaoCountMap[Number(k)].descricao, count: situacaoCountMap[Number(k)].count }))
+      .map((k) => ({ situacao_id: k, descricao: situacaoCountMap[k].descricao, count: situacaoCountMap[k].count }))
       .sort((a, b) => b.count - a.count);
 
     let situacoesHtml = '';
@@ -41,29 +41,53 @@ export class ExportPgaPdfService {
         <head>
           <meta charset="utf-8" />
           <style>
-            body { font-family: Arial, sans-serif; padding: 20px; color:#222 }
-            h1 { background:#2b6a3b; color:white; padding:10px }
-            .meta { margin:10px 0 }
-            table { width:100%; border-collapse:collapse; margin-top:10px }
-            th, td { border:1px solid #ccc; padding:8px; text-align:left }
+            body { font-family: Arial, sans-serif; padding: 20px; color:#222; font-size:12px }
+            h1 { background:#2b6a3b; color:white; padding:10px; font-size:16px; margin:0 0 10px 0 }
+            h2 { background:#4a8c5c; color:white; padding:6px 10px; font-size:13px; margin:20px 0 6px 0; page-break-before: auto }
+            h3 { background:#d6e8dc; color:#1a4a2a; padding:5px 8px; font-size:12px; margin:14px 0 4px 0 }
+            .meta { margin:8px 0 }
+            .meta-grid { display:grid; grid-template-columns:1fr 1fr; gap:4px; margin:8px 0 }
+            table { width:100%; border-collapse:collapse; margin-top:6px; font-size:11px }
+            th { background:#e8f4ea; border:1px solid #ccc; padding:5px 6px; text-align:left; font-size:11px }
+            td { border:1px solid #ccc; padding:5px 6px }
+            .cenario { white-space:pre-wrap; line-height:1.5; margin:6px 0 }
+            .tag-urgente { background:#c0392b; color:#fff; padding:1px 5px; border-radius:3px; font-size:10px }
+            .tag-alta { background:#e67e22; color:#fff; padding:1px 5px; border-radius:3px; font-size:10px }
+            .tag-media { background:#3498db; color:#fff; padding:1px 5px; border-radius:3px; font-size:10px }
+            .tag-regular { background:#7f8c8d; color:#fff; padding:1px 5px; border-radius:3px; font-size:10px }
+            .page-break { page-break-before: always }
           </style>
         </head>
         <body>
-          <h1>Plano de Gestão Anual - PGA ${this.escapeHtml(String(pga.ano ?? ''))}</h1>
-          <div class="meta">
-            <strong>Unidade:</strong> ${this.escapeHtml(unidadeNome)}<br/>
-            <strong>Versão:</strong> ${this.escapeHtml(String(pga.versao ?? ''))}
+          <h1>Plano de Gestão Anual – PGA ${this.escapeHtml(String(pga.ano ?? ''))}</h1>
+
+          <div class="meta-grid">
+            <div><strong>Unidade:</strong> ${this.escapeHtml(unidadeNome)}</div>
+            <div><strong>Versão:</strong> ${this.escapeHtml(String(pga.versao ?? ''))}</div>
+            <div><strong>Status:</strong> ${this.escapeHtml(String(pga.status ?? ''))}</div>
+            <div><strong>Código:</strong> ${this.escapeHtml((pga as any).unidade?.codigo_fnnn ?? '')}</div>
           </div>
 
-          <h2>Análise do cenário</h2>
-          <div>${this.escapeHtml(String(pga.analise_cenario ?? ''))}</div>
+          <h2>Análise do Cenário</h2>
+          <div class="cenario">${this.escapeHtml(String(pga.analise_cenario ?? ''))}</div>
 
-          <h2>Situações-problema mais relevantes</h2>
+          <h2>Apontamento de Situações-Problema Mais Relevantes</h2>
           ${situacoesHtml}
 
           <h2>Estruturação das Ações/Projetos</h2>
-          <!-- Group projects by eixo and list projects ordered by codigo -->
           ${this.buildProjetosHtml(projetos)}
+
+          <div class="page-break"></div>
+          <h2>Rotinas Institucionais</h2>
+          ${this.buildRotinasHtml(pga.rotinas ?? [])}
+
+          <div class="page-break"></div>
+          <h2>Anexo 6 – Lista de Ações/Projetos referentes à CPA</h2>
+          ${this.buildAcoesCpaHtml(pga.acoesCPA ?? [])}
+
+          <div class="page-break"></div>
+          <h2>Anexos 1–5 – Lista de Aquisições Necessárias aos Projetos</h2>
+          ${this.buildAnexosHtml(projetos)}
         </body>
       </html>
     `;
@@ -196,6 +220,162 @@ export class ExportPgaPdfService {
     return html;
   }
 
+  private buildRotinasHtml(rotinas: any[]): string {
+    if (!rotinas || !rotinas.length) return '<p>Nenhuma rotina institucional cadastrada neste PGA.</p>';
+
+    const tipoLabel: Record<string, string> = {
+      CPA: 'CPA – Comissão Própria de Avaliação',
+      CEPE: 'CEPE – Conselho de Ensino, Pesquisa e Extensão',
+      NDE: 'NDE – Núcleo Docente Estruturante',
+      ReuniaoPedagogica: 'Reunião Pedagógica',
+      Planejamento: 'Planejamento',
+      AvaliacaoInstitucional: 'Avaliação Institucional',
+      AcompanhamentoAcademico: 'Acompanhamento Acadêmico',
+      Outro: 'Outro',
+    };
+
+    const formatDate = (d: any) => {
+      if (!d) return '';
+      const dt = d instanceof Date ? d : new Date(d);
+      if (isNaN(dt.getTime())) return '';
+      return dt.toISOString().split('T')[0];
+    };
+
+    const formatTime = (d: any) => {
+      if (!d) return '';
+      const dt = d instanceof Date ? d : new Date(d);
+      if (isNaN(dt.getTime())) return '';
+      return dt.toTimeString().slice(0, 5);
+    };
+
+    let html = '';
+    for (const rotina of rotinas) {
+      const tipo = tipoLabel[rotina.tipo_rotina] ?? rotina.tipo_rotina ?? '';
+      const titulo = this.escapeHtml(String(rotina.titulo ?? ''));
+      const curso = rotina.curso?.nome ? ` (${this.escapeHtml(String(rotina.curso.nome))})` : '';
+      const responsavel = this.escapeHtml(String(rotina.responsavel?.nome ?? ''));
+      const periodicidade = this.escapeHtml(String(rotina.periodicidade ?? ''));
+      const status = this.escapeHtml(String(rotina.status ?? ''));
+      const dataInicio = formatDate(rotina.data_inicio);
+      const dataFim = formatDate(rotina.data_fim);
+      const entregavel = this.escapeHtml(String(rotina.entregavel_esperado ?? ''));
+      const participantes = (rotina.participantes ?? [])
+        .map((p: any) => `${this.escapeHtml(String(p.pessoa?.nome ?? ''))}${p.papel ? ` (${this.escapeHtml(String(p.papel))})` : ''}`)
+        .join(', ');
+
+      html += `<table style="width:100%;border:1px solid #bbb;margin-top:10px;border-collapse:collapse"><tbody>`;
+      html += `<tr style="background:#d6e8dc"><th colspan="4" style="padding:6px;border:1px solid #ccc;text-align:left">${tipo}${curso} – ${titulo}</th></tr>`;
+      html += `<tr><th style="width:20%;padding:5px;border:1px solid #ccc">Responsável</th><td style="padding:5px;border:1px solid #ccc">${responsavel}</td><th style="width:20%;padding:5px;border:1px solid #ccc">Periodicidade</th><td style="padding:5px;border:1px solid #ccc">${periodicidade}</td></tr>`;
+      html += `<tr><th style="padding:5px;border:1px solid #ccc">Período</th><td style="padding:5px;border:1px solid #ccc">${dataInicio} a ${dataFim}</td><th style="padding:5px;border:1px solid #ccc">Status</th><td style="padding:5px;border:1px solid #ccc">${status}</td></tr>`;
+      if (entregavel) html += `<tr><th style="padding:5px;border:1px solid #ccc">Entregável Esperado</th><td colspan="3" style="padding:5px;border:1px solid #ccc">${entregavel}</td></tr>`;
+      if (participantes) html += `<tr><th style="padding:5px;border:1px solid #ccc">Participantes</th><td colspan="3" style="padding:5px;border:1px solid #ccc">${participantes}</td></tr>`;
+
+      const ocorrencias = rotina.ocorrencias ?? [];
+      if (ocorrencias.length) {
+        html += `<tr><td colspan="4" style="padding:5px;border:1px solid #ccc">`;
+        html += `<table style="width:100%;border-collapse:collapse"><thead><tr style="background:#f0f0f0">`;
+        html += `<th style="border:1px solid #ddd;padding:4px;width:14%">Data</th>`;
+        html += `<th style="border:1px solid #ddd;padding:4px;width:10%">Início</th>`;
+        html += `<th style="border:1px solid #ddd;padding:4px;width:10%">Fim</th>`;
+        html += `<th style="border:1px solid #ddd;padding:4px;width:20%">Local</th>`;
+        html += `<th style="border:1px solid #ddd;padding:4px">Pauta</th>`;
+        html += `<th style="border:1px solid #ddd;padding:4px;width:12%">Status</th>`;
+        html += `</tr></thead><tbody>`;
+        for (const oc of ocorrencias) {
+          html += `<tr>`;
+          html += `<td style="border:1px solid #eee;padding:4px;text-align:center">${formatDate(oc.data_realizacao)}</td>`;
+          html += `<td style="border:1px solid #eee;padding:4px;text-align:center">${formatTime(oc.hora_inicio)}</td>`;
+          html += `<td style="border:1px solid #eee;padding:4px;text-align:center">${formatTime(oc.hora_fim)}</td>`;
+          html += `<td style="border:1px solid #eee;padding:4px">${this.escapeHtml(String(oc.local ?? ''))}</td>`;
+          html += `<td style="border:1px solid #eee;padding:4px">${this.escapeHtml(String(oc.pauta ?? ''))}</td>`;
+          html += `<td style="border:1px solid #eee;padding:4px;text-align:center">${this.escapeHtml(String(oc.status ?? ''))}</td>`;
+          html += `</tr>`;
+        }
+        html += `</tbody></table></td></tr>`;
+      }
+      html += `</tbody></table>`;
+    }
+    return html;
+  }
+
+  private buildAcoesCpaHtml(acoesCPA: any[]): string {
+    if (!acoesCPA || !acoesCPA.length) return '<p>Nenhuma ação CPA cadastrada neste PGA.</p>';
+
+    let html = `<table style="width:100%;border-collapse:collapse;margin-top:8px">`;
+    html += `<thead><tr style="background:#e8f4ea">`;
+    html += `<th style="border:1px solid #ccc;padding:6px;width:5%">Item</th>`;
+    html += `<th style="border:1px solid #ccc;padding:6px;width:60%">Denominação (O que será feito)</th>`;
+    html += `<th style="border:1px solid #ccc;padding:6px">Justificativa</th>`;
+    html += `</tr></thead><tbody>`;
+
+    acoesCPA.forEach((acao, idx) => {
+      const rowBg = idx % 2 === 0 ? '' : 'style="background:#f9f9f9"';
+      html += `<tr ${rowBg}>`;
+      html += `<td style="border:1px solid #ccc;padding:6px;text-align:center">${String(idx + 1).padStart(2, '0')}</td>`;
+      html += `<td style="border:1px solid #ccc;padding:6px">${this.escapeHtml(String(acao.descricao ?? ''))}</td>`;
+      html += `<td style="border:1px solid #ccc;padding:6px">${this.escapeHtml(String(acao.justificativa ?? ''))}</td>`;
+      html += `</tr>`;
+    });
+
+    html += `</tbody></table>`;
+    return html;
+  }
+
+  private buildAnexosHtml(projetos: any[]): string {
+    const allAnexos: { codigo: string; item: string; descricao: string; quantidade: number; precoUnit: string; precoTotal: string }[] = [];
+
+    for (const proj of projetos) {
+      const codigo = proj.codigo_projeto ?? '';
+      for (const etapa of proj.etapas ?? []) {
+        for (const anexo of etapa.anexos ?? []) {
+          allAnexos.push({
+            codigo,
+            item: String(anexo.item ?? ''),
+            descricao: String(anexo.descricao ?? ''),
+            quantidade: Number(anexo.quantidade ?? 0),
+            precoUnit: anexo.preco_unitario_estimado != null ? Number(anexo.preco_unitario_estimado).toFixed(2) : '0,00',
+            precoTotal: anexo.preco_total_estimado != null ? Number(anexo.preco_total_estimado).toFixed(2) : '0,00',
+          });
+        }
+      }
+    }
+
+    if (!allAnexos.length) return '<p>Nenhum item de aquisição cadastrado neste PGA.</p>';
+
+    const total = allAnexos.reduce((sum, a) => sum + Number(a.precoTotal.replace(',', '.')), 0);
+
+    let html = `<table style="width:100%;border-collapse:collapse;margin-top:8px">`;
+    html += `<thead><tr style="background:#e8f4ea">`;
+    html += `<th style="border:1px solid #ccc;padding:6px;width:5%">Item</th>`;
+    html += `<th style="border:1px solid #ccc;padding:6px;width:8%">Projeto</th>`;
+    html += `<th style="border:1px solid #ccc;padding:6px;width:20%">Denominação / Especificação</th>`;
+    html += `<th style="border:1px solid #ccc;padding:6px;width:35%">Descrição</th>`;
+    html += `<th style="border:1px solid #ccc;padding:6px;width:7%">Qtd.</th>`;
+    html += `<th style="border:1px solid #ccc;padding:6px;width:12%">Preço Unit. (R$)</th>`;
+    html += `<th style="border:1px solid #ccc;padding:6px;width:13%">Preço Total (R$)</th>`;
+    html += `</tr></thead><tbody>`;
+
+    allAnexos.forEach((a, idx) => {
+      const rowBg = idx % 2 === 0 ? '' : 'style="background:#f9f9f9"';
+      html += `<tr ${rowBg}>`;
+      html += `<td style="border:1px solid #ccc;padding:6px;text-align:center">${String(idx + 1).padStart(2, '0')}</td>`;
+      html += `<td style="border:1px solid #ccc;padding:6px;text-align:center">${this.escapeHtml(a.codigo)}</td>`;
+      html += `<td style="border:1px solid #ccc;padding:6px">${this.escapeHtml(a.item)}</td>`;
+      html += `<td style="border:1px solid #ccc;padding:6px">${this.escapeHtml(a.descricao)}</td>`;
+      html += `<td style="border:1px solid #ccc;padding:6px;text-align:center">${a.quantidade}</td>`;
+      html += `<td style="border:1px solid #ccc;padding:6px;text-align:right">${a.precoUnit}</td>`;
+      html += `<td style="border:1px solid #ccc;padding:6px;text-align:right">${a.precoTotal}</td>`;
+      html += `</tr>`;
+    });
+
+    html += `<tr style="background:#e8f4ea;font-weight:bold">`;
+    html += `<td colspan="6" style="border:1px solid #ccc;padding:6px;text-align:right">Total Geral (R$)</td>`;
+    html += `<td style="border:1px solid #ccc;padding:6px;text-align:right">${total.toFixed(2)}</td>`;
+    html += `</tr>`;
+    html += `</tbody></table>`;
+    return html;
+  }
+
   private escapeHtml(input: string) {
     return input
       .replace(/&/g, '&amp;')
@@ -205,7 +385,7 @@ export class ExportPgaPdfService {
       .replace(/'/g, '&#39;');
   }
 
-  async execute(id: number, user?: any): Promise<Buffer> {
+  async execute(id: string, user?: any): Promise<Buffer> {
     const active = user?.active_context ?? null;
     const hasAccess = await this.repository.findOneWithContext(id, active);
     if (!hasAccess) throw new NotFoundException('PGA não encontrada ou sem acesso');

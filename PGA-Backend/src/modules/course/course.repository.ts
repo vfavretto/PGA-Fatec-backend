@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../config/prisma.service';
 import { BaseRepository } from '../../common/repositories/base.repository';
 import { Curso } from '@prisma/client';
@@ -30,7 +30,7 @@ export class CourseRepository extends BaseRepository<Curso> {
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return this.prisma.curso.findFirst({
       where: this.whereActive({ curso_id: id }),
       include: {
@@ -40,7 +40,7 @@ export class CourseRepository extends BaseRepository<Curso> {
     });
   }
 
-  async findOneWithContext(id: number, active_context?: any) {
+  async findOneWithContext(id: string, active_context?: any) {
     if (active_context && active_context.tipo === 'unidade') {
       return this.prisma.curso.findFirst({
         where: this.whereActive({ curso_id: id, unidade_id: active_context.id }),
@@ -58,21 +58,21 @@ export class CourseRepository extends BaseRepository<Curso> {
     return this.findOne(id);
   }
 
-  async update(id: number, data: UpdateCourseDto) {
+  async update(id: string, data: UpdateCourseDto) {
     return this.prisma.curso.update({
       where: { curso_id: id },
       data,
     });
   }
 
-  async softDelete(id: number) {
+  async softDelete(id: string) {
     return this.prisma.curso.update({
       where: { curso_id: id },
       data: { ativo: false },
     });
   }
 
-  async findByUnitId(unitId: number) {
+  async findByUnitId(unitId: string) {
     return this.prisma.curso.findMany({
       where: this.whereActive({ unidade_id: unitId }),
       include: {
@@ -84,7 +84,7 @@ export class CourseRepository extends BaseRepository<Curso> {
     });
   }
 
-  async findAllByRegional(regionalId: number) {
+  async findAllByRegional(regionalId: string) {
     return this.prisma.curso.findMany({
       where: this.whereActive({ regional_id: regionalId }),
       include: {

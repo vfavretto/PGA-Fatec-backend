@@ -1,13 +1,13 @@
-import { IsNumber, IsOptional, IsString, Min } from 'class-validator';
+﻿import { IsNumber, IsOptional, IsString, Min, IsUUID } from 'class-validator';
 
 export class UpdateAttachmentDto {
   @IsOptional()
-  @IsNumber({}, { message: 'O ID da etapa de processo deve ser um número' })
-  etapa_processo_id?: number;
+  @IsUUID('4', { message: 'O campo deve ser um UUID válido' })
+  etapa_processo_id?: string;
 
   @IsOptional()
-  @IsNumber({}, { message: 'O ID do entregável deve ser um número' })
-  entregavel_id?: number;
+  @IsUUID('4', { message: 'O campo deve ser um UUID válido' })
+  entregavel_id?: string;
 
   @IsOptional()
   @IsString({ message: 'O item deve ser uma string' })

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Put, Delete, ParseIntPipe } from '@nestjs/common';
+﻿import { Controller, Post, Body, Get, Param, Put, Delete, ParseUUIDPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
 import { CreateRoutineOccurrenceDto } from './dto/create-routine-occurrence.dto';
 import { UpdateRoutineOccurrenceDto } from './dto/update-routine-occurrence.dto';
@@ -41,7 +41,7 @@ export class RoutineOccurrenceController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID da ocorrência de rotina' })
   @ApiResponse({ status: 200, description: 'Ocorrência de rotina encontrada com sucesso' })
   @ApiResponse({ status: 404, description: 'Ocorrência de rotina não encontrada' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.findOneService.execute(id);
   }
 
@@ -51,7 +51,7 @@ export class RoutineOccurrenceController {
   @ApiBody({ type: UpdateRoutineOccurrenceDto })
   @ApiResponse({ status: 200, description: 'Ocorrência de rotina atualizada com sucesso' })
   @ApiResponse({ status: 404, description: 'Ocorrência de rotina não encontrada' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateRoutineOccurrenceDto) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateRoutineOccurrenceDto) {
     return this.updateService.execute(id, dto);
   }
 
@@ -60,7 +60,7 @@ export class RoutineOccurrenceController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID da ocorrência de rotina' })
   @ApiResponse({ status: 200, description: 'Ocorrência de rotina excluída com sucesso' })
   @ApiResponse({ status: 404, description: 'Ocorrência de rotina não encontrada' })
-  delete(@Param('id', ParseIntPipe) id: number) {
+  delete(@Param('id', ParseUUIDPipe) id: string) {
     return this.deleteService.execute(id);
   }
 }

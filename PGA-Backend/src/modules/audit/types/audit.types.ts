@@ -1,9 +1,9 @@
-export interface ReportEntry {
+﻿export interface ReportEntry {
   tabela: string;
   operacao: string;
   count: number;
   registros: Array<{
-    registro_id: number;
+    registro_id: string;
     data_operacao: Date;
     usuario: string;
     motivo: string | null;

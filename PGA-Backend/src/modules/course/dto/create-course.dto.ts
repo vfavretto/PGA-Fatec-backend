@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsOptional, IsString, IsEnum, MaxLength } from 'class-validator';
+﻿import { IsUUID, IsNotEmpty, IsOptional, IsString, IsEnum, MaxLength } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { TipoCurso, StatusCurso } from '@prisma/client';
 
@@ -9,8 +9,8 @@ export class CreateCourseDto {
     type: 'integer'
   })
   @IsNotEmpty()
-  @IsInt()
-  unidade_id: number;
+  @IsUUID('4')
+  unidade_id: string;
 
   @ApiProperty({
     description: 'Nome do curso',
@@ -46,6 +46,6 @@ export class CreateCourseDto {
     type: 'integer'
   })
   @IsOptional()
-  @IsInt()
-  coordenador_id?: number;
+  @IsUUID('4')
+  coordenador_id?: string;
 }

@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+﻿import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from 'src/config/prisma.service';
 import { Pessoa, Prisma } from '@prisma/client';
 import { BaseRepository } from '@/common/repositories/base.repository';
@@ -72,7 +72,7 @@ export class UserRepository extends BaseRepository<Pessoa> {
     });
   }
 
-  async findById(id: number): Promise<Pessoa | null> {
+  async findById(id: string): Promise<Pessoa | null> {
     return this.prisma.pessoa.findFirst({
       where: this.whereActive({ pessoa_id: id }),
       include: {
@@ -111,7 +111,7 @@ export class UserRepository extends BaseRepository<Pessoa> {
   }
 
   async update(
-    pessoa_id: number,
+    pessoa_id: string,
     data: Prisma.PessoaUpdateInput,
   ): Promise<Pessoa> {
     return this.prisma.pessoa.update({
@@ -120,14 +120,14 @@ export class UserRepository extends BaseRepository<Pessoa> {
     });
   }
 
-  async delete(id: number): Promise<Pessoa> {
+  async delete(id: string): Promise<Pessoa> {
     return this.prisma.pessoa.update({
       where: { pessoa_id: id },
       data: { ativo: false },
     });
   }
 
-  async findByUnidadeId(unidadeId: number): Promise<Pessoa[]> {
+  async findByUnidadeId(unidadeId: string): Promise<Pessoa[]> {
     return this.prisma.pessoa.findMany({
       where: this.whereActive({
         unidades: {

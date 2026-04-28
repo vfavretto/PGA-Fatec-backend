@@ -1,11 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+﻿import { Injectable, NotFoundException } from '@nestjs/common';
 import { PgaRepository } from '../pga.repository';
 
 @Injectable()
 export class ExportPgaCsvService {
   constructor(private readonly repository: PgaRepository) {}
 
-  async execute(id: number, user?: any): Promise<string> {
+  async execute(id: string, user?: any): Promise<string> {
     const active = user?.active_context ?? null;
     const activeContext = user?.active_context ?? null;
     const hasAccess = await this.repository.findOneWithContext(id, activeContext);
@@ -45,7 +45,7 @@ export class ExportPgaCsvService {
     }
 
     const situacoesOrdenadas = Object.keys(situacaoCountMap)
-      .map((k) => ({ situacao_id: Number(k), descricao: situacaoCountMap[Number(k)].descricao, count: situacaoCountMap[Number(k)].count }))
+      .map((k) => ({ situacao_id: k, descricao: situacaoCountMap[k].descricao, count: situacaoCountMap[k].count }))
       .sort((a, b) => b.count - a.count);
 
     if (situacoesOrdenadas.length) {

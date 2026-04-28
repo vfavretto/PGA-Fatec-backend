@@ -9,12 +9,12 @@ export class FindAllUnitsService {
   async execute(user?: any): Promise<Unit[]> {
     const active = user?.active_context;
     if (active && active.tipo === 'unidade') {
-      const item = await this.repository.findOne(Number(active.id));
+      const item = await this.repository.findOne(active.id);
       return item ? [item] : [];
     }
 
     if (active && active.tipo === 'regional') {
-      return this.repository.findAllByRegional(Number(active.id));
+      return this.repository.findAllByRegional(active.id);
     }
 
     return this.repository.findAll();

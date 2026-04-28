@@ -1,4 +1,5 @@
-import { Controller, Post, Body, UseGuards, HttpCode, HttpStatus, Request, Get } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, HttpCode, HttpStatus, Request, Get, Res } from '@nestjs/common';
+import { Response } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { LoginService } from './services/login.service';
 import { JwtService } from '@nestjs/jwt';
@@ -9,6 +10,25 @@ import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { ContextService } from './services/context.service';
 import { SelectContextDto } from './dto/select-context.dto';
+
+const COOKIE_BASE = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax' as const,
+  path: '/',
+};
+
+function setAuthCookies(res: Response, access_token: string, refresh_token?: string) {
+  res.cookie('access_token', access_token, { ...COOKIE_BASE, maxAge: 24 * 60 * 60 * 1000 });
+  if (refresh_token) {
+    res.cookie('refresh_token', refresh_token, { ...COOKIE_BASE, maxAge: 30 * 24 * 60 * 60 * 1000 });
+  }
+}
+
+function clearAuthCookies(res: Response) {
+  res.clearCookie('access_token', { ...COOKIE_BASE });
+  res.clearCookie('refresh_token', { ...COOKIE_BASE });
+}
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -24,51 +44,16 @@ export class AuthController {
   @Post('login')
   @ApiOperation({
     summary: 'Realizar login no sistema',
-    description:
-      'Autentica o usuário e retorna um token JWT para acesso às rotas protegidas',
+    description: 'Autentica o usuário e seta cookies HttpOnly com os tokens JWT',
   })
-  @ApiBody({
-    type: LoginDto,
-    description: 'Credenciais de login do usuário',
-    examples: {
-      exemplo1: {
-        summary: 'Login de exemplo',
-        value: {
-          email: 'usuario@fatec.sp.gov.br',
-          senha: 'senha123',
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Login realizado com sucesso',
-    schema: {
-      type: 'object',
-      properties: {
-        access_token: {
-          type: 'string',
-          description: 'Token JWT para autenticação',
-          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Credenciais inválidas',
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: { type: 'number', example: 401 },
-        message: { type: 'string', example: 'Credenciais inválidas' },
-        error: { type: 'string', example: 'Unauthorized' },
-      },
-    },
-  })
+  @ApiBody({ type: LoginDto })
+  @ApiResponse({ status: 200, description: 'Login realizado com sucesso' })
+  @ApiResponse({ status: 401, description: 'Credenciais inválidas' })
   @HttpCode(HttpStatus.OK)
-  async login(@Request() req: any) {
-    return this.loginService.execute(req.user);
+  async login(@Request() req: any, @Res({ passthrough: true }) res: Response) {
+    const tokens = await this.loginService.execute(req.user);
+    setAuthCookies(res, tokens.access_token, tokens.refresh_token);
+    return { user: req.user };
   }
 
   @Get('contexts')
@@ -79,18 +64,22 @@ export class AuthController {
 
   @Post('select-context')
   @UseGuards(JwtAuthGuard)
-  async selectContext(@Request() req: any, @Body() body: SelectContextDto) {
+  @HttpCode(HttpStatus.OK)
+  async selectContext(
+    @Request() req: any,
+    @Body() body: SelectContextDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const { tipo, id } = body;
-    return this.contextService.selectContext(req.user, tipo, id);
+    const tokens = await this.contextService.selectContext(req.user, tipo, id);
+    setAuthCookies(res, tokens.access_token, tokens.refresh_token);
+    return { ok: true };
   }
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  @ApiOperation({
-    summary: 'Validar token e retornar usuário autenticado',
-    description: 'Retorna os dados básicos do usuário associado ao token JWT enviado',
-  })
-  @ApiResponse({ status: 200, description: 'Token válido - retorna usuário' })
+  @ApiOperation({ summary: 'Retorna dados do usuário autenticado pelo token/cookie atual' })
+  @ApiResponse({ status: 200, description: 'Usuário autenticado' })
   @ApiResponse({ status: 401, description: 'Token inválido ou ausente' })
   me(@CurrentUser() user: any) {
     return user;
@@ -98,19 +87,35 @@ export class AuthController {
 
   @Public()
   @Post('refresh')
-  @ApiOperation({ summary: 'Trocar refresh token por novo access token' })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Renova o access token usando o refresh token (cookie)' })
   @ApiResponse({ status: 200, description: 'Novo access token emitido' })
-  @ApiResponse({ status: 400, description: 'Refresh token inválido' })
-  refresh(@Body('refresh_token') refreshToken: string) {
+  @ApiResponse({ status: 401, description: 'Refresh token inválido ou ausente' })
+  refresh(@Request() req: any, @Res({ passthrough: true }) res: Response) {
+    const refreshToken = req.cookies?.refresh_token;
     if (!refreshToken) {
-      return { error: 'refresh_token é obrigatório' };
+      res.status(401);
+      return { error: 'Refresh token ausente' };
     }
     try {
       const payload: any = this.jwtService.verify(refreshToken);
-      const access = this.jwtService.sign(payload, { expiresIn: '24h' });
-      return { access_token: access };
-    } catch (e) {
-      return { error: 'refresh_token inválido' };
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { iat, exp, ...cleanPayload } = payload;
+      const access = this.jwtService.sign(cleanPayload, { expiresIn: '24h' });
+      setAuthCookies(res, access);
+      return { ok: true };
+    } catch {
+      res.status(401);
+      return { error: 'Refresh token inválido' };
     }
+  }
+
+  @Post('logout')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Logout — remove cookies de autenticação' })
+  logout(@Res({ passthrough: true }) res: Response) {
+    clearAuthCookies(res);
+    return { ok: true };
   }
 }

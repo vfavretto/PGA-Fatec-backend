@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../config/prisma.service';
 import { BaseRepository } from '../../common/repositories/base.repository';
 import { PrioridadeAcao } from '@prisma/client';
@@ -24,20 +24,20 @@ export class PriorityActionRepository extends BaseRepository<PrioridadeAcao> {
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return this.prisma.prioridadeAcao.findFirst({
       where: this.whereActive({ prioridade_id: id }),
     });
   }
 
-  async update(id: number, data: UpdatePriorityActionDto) {
+  async update(id: string, data: UpdatePriorityActionDto) {
     return this.prisma.prioridadeAcao.update({
       where: { prioridade_id: id },
       data,
     });
   }
 
-  async delete(id: number) {
+  async delete(id: string) {
     return this.prisma.prioridadeAcao.update({
       where: { prioridade_id: id },
       data: { ativo: false },

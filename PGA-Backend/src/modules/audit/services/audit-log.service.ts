@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+﻿import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '@/config/prisma.service';
 import { CreateAuditDto } from '../dto/create-audit.dto';
 import {
@@ -567,7 +567,7 @@ export class AuditLogService {
     });
   }
 
-  async getAuditHistory(tabela: string, registroId: number) {
+  async getAuditHistory(tabela: string, registroId: string) {
     return this.prisma.configuracaoAuditoria.findMany({
       where: { tabela, registro_id: registroId },
       include: {

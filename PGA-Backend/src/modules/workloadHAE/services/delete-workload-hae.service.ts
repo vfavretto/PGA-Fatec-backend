@@ -1,4 +1,4 @@
-import {
+﻿import {
   Injectable,
   NotFoundException,
   ConflictException,
@@ -13,7 +13,7 @@ export class DeleteWorkloadHaeService {
     private readonly prisma: PrismaService,
   ) {}
 
-  async execute(id: number, usuarioLogadoId?: number, motivo?: string) {
+  async execute(id: string, usuarioLogadoId?: string, motivo?: string) {
     const workloadHae = await this.repository.findOne(id);
     if (!workloadHae)
       throw new NotFoundException('Tipo de vínculo HAE não encontrado');

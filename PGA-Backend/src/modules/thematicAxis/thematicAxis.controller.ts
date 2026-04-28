@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -15,6 +16,8 @@ import {
   ApiParam,
   ApiBody,
 } from '@nestjs/swagger';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { RolesGuard } from '../auth/guards/roles.guard';
 import { CreateThematicAxisDto } from './dto/create-thematicAxis.dto';
 import { UpdateThematicAxisDto } from './dto/update-thematicAxis.dto';
 import { CreateThematicAxisService } from './services/create-thematicAxis.service';
@@ -36,6 +39,8 @@ export class ThematicAxisController {
   ) {}
 
   @Post()
+  @UseGuards(RolesGuard)
+  @Roles('Administrador', 'CPS')
   @ApiOperation({
     summary: 'Criar eixo temático',
     description: 'Cria um novo eixo temático no sistema',
@@ -66,10 +71,12 @@ export class ThematicAxisController {
   @ApiResponse({ status: 200, description: 'Eixo temático encontrado' })
   @ApiResponse({ status: 404, description: 'Eixo temático não encontrado' })
   findOne(@Param('id') id: string) {
-    return this.findOneService.execute(Number(id));
+    return this.findOneService.execute(id);
   }
 
   @Put(':id')
+  @UseGuards(RolesGuard)
+  @Roles('Administrador', 'CPS')
   @ApiOperation({
     summary: 'Atualizar eixo temático',
     description: 'Atualiza dados de um eixo temático específico',
@@ -82,10 +89,12 @@ export class ThematicAxisController {
   })
   @ApiResponse({ status: 404, description: 'Eixo temático não encontrado' })
   update(@Param('id') id: string, @Body() dto: UpdateThematicAxisDto) {
-    return this.updateService.execute(Number(id), dto);
+    return this.updateService.execute(id, dto);
   }
 
   @Delete(':id')
+  @UseGuards(RolesGuard)
+  @Roles('Administrador', 'CPS')
   @ApiOperation({
     summary: 'Excluir eixo temático',
     description: 'Remove um eixo temático do sistema',
@@ -97,6 +106,6 @@ export class ThematicAxisController {
   })
   @ApiResponse({ status: 404, description: 'Eixo temático não encontrado' })
   remove(@Param('id') id: string) {
-    return this.deleteService.execute(Number(id));
+    return this.deleteService.execute(id);
   }
 }

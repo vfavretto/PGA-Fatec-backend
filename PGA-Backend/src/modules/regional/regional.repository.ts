@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { Prisma, StatusPGA, StatusProjetoRegional } from '@prisma/client';
 import { PrismaService } from '../../config/prisma.service';
 
@@ -6,19 +6,27 @@ import { PrismaService } from '../../config/prisma.service';
 export class RegionalRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  private async getRegionalUnitIds(regionalId: number): Promise<number[]> {
-    const vinculos = await this.prisma.pessoaUnidade.findMany({
-      where: {
-        pessoa_id: regionalId,
-        ativo: true,
+  private async getRegionalUnitIds(pessoaId: string): Promise<string[]> {
+    // pessoaId = pessoa_id do usuário Regional (active_context.id quando tipo='regional')
+    // Busca via pessoaRegional: pessoa -> regionais -> unidades
+    const vinculos = await this.prisma.pessoaRegional.findMany({
+      where: { pessoa_id: pessoaId, ativo: true },
+      include: {
+        regional: {
+          select: {
+            unidades: {
+              where: { ativo: true },
+              select: { unidade_id: true },
+            },
+          },
+        },
       },
-      select: { unidade_id: true },
     });
 
-    return vinculos.map((vinculo) => vinculo.unidade_id);
+    return vinculos.flatMap((v) => v.regional.unidades.map((u) => u.unidade_id));
   }
 
-  async findUnitsByRegional(regionalId: number) {
+  async findUnitsByRegional(regionalId: string) {
     return this.prisma.unidade.findMany({
       where: {
         regional_id: regionalId,
@@ -29,8 +37,8 @@ export class RegionalRepository {
   }
 
   async findPgasByRegional(
-    regionalId: number,
-    filters: { status?: StatusPGA; unidadeId?: number } = {},
+    regionalId: string,
+    filters: { status?: StatusPGA; unidadeId?: string } = {},
   ) {
     const unidadeIds = await this.getRegionalUnitIds(regionalId);
 
@@ -59,7 +67,7 @@ export class RegionalRepository {
       return [];
     }
 
-    const unidadeFilter: number | { in: number[] } = { in: unidadeIds };
+    const unidadeFilter: string | { in: string[] } = { in: unidadeIds };
 
     const where: Prisma.PGAWhereInput = {
       ativo: true,
@@ -81,7 +89,7 @@ export class RegionalRepository {
     });
   }
 
-  async findPgaForRegional(regionalId: number, pgaId: number) {
+  async findPgaForRegional(regionalId: string, pgaId: string) {
     const unidadeIds = await this.getRegionalUnitIds(regionalId);
 
     if (!unidadeIds.length) {
@@ -109,8 +117,8 @@ export class RegionalRepository {
   }
 
   async updatePgaReview(
-    pgaId: number,
-    data: { status: StatusPGA; parecer?: string; regionalId: number },
+    pgaId: string,
+    data: { status: StatusPGA; parecer?: string; regionalId: string },
   ) {
     return this.prisma.pGA.update({
       where: { pga_id: pgaId },
@@ -129,11 +137,11 @@ export class RegionalRepository {
   }
 
   async findProjectsByRegional(
-    regionalId: number,
+    regionalId: string,
     filters: {
       status?: StatusProjetoRegional;
-      pgaId?: number;
-      unidadeId?: number;
+      pgaId?: string;
+      unidadeId?: string;
     } = {},
   ) {
     const unidadeIds = await this.getRegionalUnitIds(regionalId);
@@ -182,7 +190,7 @@ export class RegionalRepository {
     };
 
     if (filters.unidadeId) {
-      const existingPga = (where.pga ?? {}) as Prisma.PGAWhereInput;
+      const existingPga = (where.pga ?? {}) as Prisma.AcaoProjetoWhereInput;
       where.pga = {
         ...existingPga,
         unidade_id: { equals: filters.unidadeId },
@@ -214,7 +222,7 @@ export class RegionalRepository {
     });
   }
 
-  async findProjectForRegional(regionalId: number, projetoId: number) {
+  async findProjectForRegional(regionalId: string, projetoId: string) {
     const unidadeIds = await this.getRegionalUnitIds(regionalId);
 
     if (!unidadeIds.length) {
@@ -259,11 +267,11 @@ export class RegionalRepository {
   }
 
   async updateProjectReview(
-    projetoId: number,
+    projetoId: string,
     data: {
       status: StatusProjetoRegional;
       parecer?: string;
-      regionalId: number;
+      regionalId: string;
     },
   ) {
     return this.prisma.acaoProjeto.update({
@@ -314,7 +322,7 @@ export class RegionalRepository {
     }));
   }
 
-  async findRegionalByResponsavelId(pessoaId: number) {
+  async findRegionalByResponsavelId(pessoaId: string) {
     return this.prisma.regional.findFirst({
       where: {
         responsavel_id: pessoaId,
@@ -323,7 +331,7 @@ export class RegionalRepository {
     });
   }
 
-  async findById(regionalId: number) {
+  async findById(regionalId: string) {
     return this.prisma.regional.findUnique({
       where: { regional_id: regionalId },
     });

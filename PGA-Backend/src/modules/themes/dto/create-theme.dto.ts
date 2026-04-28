@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsString } from 'class-validator';
+﻿import { IsInt, IsNotEmpty, IsString, IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateThemeDto {
@@ -15,8 +15,8 @@ export class CreateThemeDto {
     example: 2,
     type: 'integer'
   })
-  @IsInt()
-  eixo_id: number;
+  @IsUUID('4')
+  eixo_id: string;
 
   @ApiProperty({
     description: 'Descrição do tema',

@@ -1,5 +1,7 @@
-import { Controller, Post, Get, Put, Delete, Body, Param, ParseIntPipe } from '@nestjs/common';
+﻿import { Controller, Post, Get, Put, Delete, Body, Param, ParseUUIDPipe, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { RolesGuard } from '../auth/guards/roles.guard';
 import { CreateThemeDto } from './dto/create-theme.dto';
 import { UpdateThemeDto } from './dto/update-theme.dto';
 import { CreateThemeService } from './services/create-theme.service';
@@ -21,6 +23,8 @@ export class ThemesController {
   ) {}
 
   @Post()
+  @UseGuards(RolesGuard)
+  @Roles('Administrador', 'CPS')
   @ApiOperation({ summary: 'Criar tema', description: 'Cria um novo tema no sistema' })
   @ApiBody({ type: CreateThemeDto })
   @ApiResponse({ status: 201, description: 'Tema criado com sucesso' })
@@ -41,26 +45,30 @@ export class ThemesController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID do tema' })
   @ApiResponse({ status: 200, description: 'Tema encontrado com sucesso' })
   @ApiResponse({ status: 404, description: 'Tema não encontrado' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.findOneService.execute(id);
   }
 
   @Put(':id')
+  @UseGuards(RolesGuard)
+  @Roles('Administrador', 'CPS')
   @ApiOperation({ summary: 'Atualizar tema', description: 'Atualiza dados de um tema específico' })
   @ApiParam({ name: 'id', type: 'number', description: 'ID do tema' })
   @ApiBody({ type: UpdateThemeDto })
   @ApiResponse({ status: 200, description: 'Tema atualizado com sucesso' })
   @ApiResponse({ status: 404, description: 'Tema não encontrado' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateThemeDto) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateThemeDto) {
     return this.updateService.execute(id, dto);
   }
 
   @Delete(':id')
+  @UseGuards(RolesGuard)
+  @Roles('Administrador', 'CPS')
   @ApiOperation({ summary: 'Excluir tema', description: 'Remove um tema do sistema' })
   @ApiParam({ name: 'id', type: 'number', description: 'ID do tema' })
   @ApiResponse({ status: 200, description: 'Tema excluído com sucesso' })
   @ApiResponse({ status: 404, description: 'Tema não encontrado' })
-  remove(@Param('id', ParseIntPipe) id: number) {
+  remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.deleteService.execute(id);
   }
 }

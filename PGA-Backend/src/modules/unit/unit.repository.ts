@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../config/prisma.service';
 import { BaseRepository } from '../../common/repositories/base.repository';
 import { Unidade } from '@prisma/client';
@@ -35,7 +35,7 @@ export class UnitRepository extends BaseRepository<Unidade> {
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return this.prisma.unidade.findFirst({
       where: this.whereActive({ unidade_id: id }),
       include: {
@@ -46,7 +46,7 @@ export class UnitRepository extends BaseRepository<Unidade> {
     });
   }
 
-  async findOneWithContext(id: number, active_context?: any) {
+  async findOneWithContext(id: string, active_context?: any) {
     if (active_context && active_context.tipo === 'unidade') {
       return this.prisma.unidade.findFirst({
         where: this.whereActive({ AND: [{ unidade_id: id }, { unidade_id: active_context.id }] }),
@@ -56,7 +56,7 @@ export class UnitRepository extends BaseRepository<Unidade> {
 
     if (active_context && active_context.tipo === 'regional') {
       const vinculos = await this.prisma.pessoaUnidade.findMany({
-        where: { pessoa_id: Number(active_context.id), ativo: true },
+        where: { pessoa_id: active_context.id, ativo: true },
         select: { unidade_id: true },
       });
       const unidadeIds = vinculos.map((v) => v.unidade_id);
@@ -71,21 +71,21 @@ export class UnitRepository extends BaseRepository<Unidade> {
     return this.findOne(id);
   }
 
-  async update(id: number, data: UpdateUnitDto) {
+  async update(id: string, data: UpdateUnitDto) {
     return this.prisma.unidade.update({
       where: { unidade_id: id },
       data,
     });
   }
 
-  async softDelete(id: number) {
+  async softDelete(id: string) {
     return this.prisma.unidade.update({
       where: { unidade_id: id },
       data: { ativo: false },
     });
   }
 
-  async findAllByRegional(regionalId: number) {
+  async findAllByRegional(regionalId: string) {
     const vinculos = await this.prisma.pessoaUnidade.findMany({
       where: { pessoa_id: regionalId, ativo: true },
       select: { unidade_id: true },

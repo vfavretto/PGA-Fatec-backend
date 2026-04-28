@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+﻿import { Injectable, NotFoundException } from '@nestjs/common';
 import { RoutineParticipantRepository } from '../routine-participant.repository';
 import { RoutineParticipant } from '../entities/routine-participant.entity';
 
@@ -6,7 +6,7 @@ import { RoutineParticipant } from '../entities/routine-participant.entity';
 export class FindOneRoutineParticipantService {
   constructor(private readonly repository: RoutineParticipantRepository) {}
 
-  async execute(id: number): Promise<RoutineParticipant> {
+  async execute(id: string): Promise<RoutineParticipant> {
     const participante = await this.repository.findOne(id);
     if (!participante)
       throw new NotFoundException('RotinaParticipante não encontrada');

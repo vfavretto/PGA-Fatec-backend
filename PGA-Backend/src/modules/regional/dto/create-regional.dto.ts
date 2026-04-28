@@ -1,8 +1,8 @@
-import { ApiProperty } from '@nestjs/swagger';
+﻿import { ApiProperty } from '@nestjs/swagger';
 import {
   IsOptional,
   IsString,
-  IsInt,
+  IsUUID,
   IsBoolean,
   IsNotEmpty,
   IsArray,
@@ -31,8 +31,8 @@ export class CreateRegionalDto {
   })
   @IsOptional()
   @Type(() => Number)
-  @IsInt()
-  responsavel_id?: number;
+  @IsUUID('4')
+  responsavel_id?: string;
 
   @ApiProperty({ description: 'Se a regional está ativa', required: false })
   @IsOptional()

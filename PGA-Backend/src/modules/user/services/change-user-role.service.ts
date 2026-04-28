@@ -1,4 +1,4 @@
-import {
+﻿import {
   Injectable,
   ForbiddenException,
   NotFoundException,
@@ -16,10 +16,10 @@ export class ChangeUserRoleService {
   ) {}
 
   async execute(
-    userId: number,
+    userId: string,
     novoTipo: TipoUsuario,
-    unidadeId?: number,
-    usuarioLogadoId?: number,
+    unidadeId?: string,
+    usuarioLogadoId?: string,
   ) {
     // 1. Verificar se o usuário existe
     const usuario = await this.userRepository.findById(userId);

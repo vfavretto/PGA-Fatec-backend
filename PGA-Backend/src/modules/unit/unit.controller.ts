@@ -73,7 +73,7 @@ export class UnitController {
   @ApiResponse({ status: 200, description: 'Unidade encontrada com sucesso' })
   @ApiResponse({ status: 404, description: 'Unidade não encontrada' })
   findOne(@Request() req: any, @Param('id') id: string) {
-    return this.findOneUnitService.execute(Number(id), req.user);
+    return this.findOneUnitService.execute(id, req.user);
   }
 
   @Put(':id')
@@ -86,7 +86,7 @@ export class UnitController {
   @ApiResponse({ status: 200, description: 'Unidade atualizada com sucesso' })
   @ApiResponse({ status: 404, description: 'Unidade não encontrada' })
   update(@Param('id') id: string, @Body() dto: UpdateUnitDto) {
-    return this.updateUnitService.execute(Number(id), dto);
+    return this.updateUnitService.execute(id, dto);
   }
 
   @Delete(':id')
@@ -98,6 +98,6 @@ export class UnitController {
   @ApiResponse({ status: 200, description: 'Unidade excluída com sucesso' })
   @ApiResponse({ status: 404, description: 'Unidade não encontrada' })
   remove(@Param('id') id: string) {
-    return this.deleteUnitService.execute(Number(id));
+    return this.deleteUnitService.execute(id);
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable, ForbiddenException } from '@nestjs/common';
+﻿import { Injectable, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../../../config/prisma.service';
 import { TipoUsuario } from '@prisma/client';
 
@@ -6,7 +6,7 @@ import { TipoUsuario } from '@prisma/client';
 export class ListAccessRequestsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async execute(usuarioId: number, tipoUsuario: TipoUsuario) {
+  async execute(usuarioId: string, tipoUsuario: TipoUsuario) {
     let solicitacoes: any[];
 
     if (tipoUsuario === 'Administrador') {

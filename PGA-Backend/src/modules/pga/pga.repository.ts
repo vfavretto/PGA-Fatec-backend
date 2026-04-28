@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../config/prisma.service';
 import { BaseRepository } from '../../common/repositories/base.repository';
-import { PGA } from '@prisma/client';
+import { PGA, Prisma } from '@prisma/client';
 import { CreatePgaDto } from './dto/create-pga.dto';
 import { UpdatePgaDto } from './dto/update-pga.dto';
 
@@ -11,48 +11,60 @@ export class PgaRepository extends BaseRepository<PGA> {
     super(prisma);
   }
 
-  async create(data: CreatePgaDto) {
+  async create(data: CreatePgaDto & { is_template?: boolean; usuario_criacao_id?: string | null }) {
     return this.prisma.pGA.create({
       data,
     });
   }
 
+  private readonly unidadeInclude = {
+    include: {
+      diretor: { select: { nome: true } },
+    },
+  };
+
+  // findAll inclui templates (para Admin/CPS sem contexto)
   async findAll() {
     return this.prisma.pGA.findMany({
       where: this.whereActive(),
       include: {
-        unidade: true,
+        unidade: this.unidadeInclude,
         regionalResponsavel: true,
       },
-      orderBy: [{ ano: 'desc' }, { unidade: { nome_unidade: 'asc' } }],
+      orderBy: [{ is_template: 'desc' }, { ano: 'desc' }, { unidade: { nome_unidade: 'asc' } }],
     });
   }
 
-  async findAllByUnit(unidadeId: number) {
+  async findAllByUnit(unidadeId: string, includeTemplates = false) {
     return this.prisma.pGA.findMany({
-      where: this.whereActive({ unidade_id: unidadeId }),
-      include: { unidade: true, regionalResponsavel: true },
+      where: this.whereActive({
+        unidade_id: unidadeId,
+        ...(includeTemplates ? {} : { is_template: false }),
+      }),
+      include: { unidade: this.unidadeInclude, regionalResponsavel: true },
       orderBy: [{ ano: 'desc' }, { unidade: { nome_unidade: 'asc' } }],
     });
   }
 
-  async findAllByRegional(regionalId: number) {
-    const vinculos = await this.prisma.pessoaUnidade.findMany({
+  async findAllByRegional(regionalId: string) {
+    const vinculos = await this.prisma.pessoaRegional.findMany({
       where: { pessoa_id: regionalId, ativo: true },
-      select: { unidade_id: true },
+      include: { regional: { select: { unidades: { where: { ativo: true }, select: { unidade_id: true } } } } },
     });
 
-    const unidadeIds = vinculos.map((v) => v.unidade_id);
+    const unidadeIds = vinculos.flatMap((v) =>
+      v.regional.unidades.map((u) => u.unidade_id),
+    );
     if (!unidadeIds.length) return [];
 
     return this.prisma.pGA.findMany({
-      where: this.whereActive({ unidade_id: { in: unidadeIds } }),
-      include: { unidade: true, regionalResponsavel: true },
+      where: this.whereActive({ unidade_id: { in: unidadeIds }, is_template: false }),
+      include: { unidade: this.unidadeInclude, regionalResponsavel: true },
       orderBy: [{ ano: 'desc' }, { unidade: { nome_unidade: 'asc' } }],
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return this.prisma.pGA.findFirst({
       where: this.whereActive({ pga_id: id }),
       include: {
@@ -68,7 +80,7 @@ export class PgaRepository extends BaseRepository<PGA> {
     });
   }
 
-  async findOneWithRelations(id: number) {
+  async findOneWithRelations(id: string) {
     return this.prisma.pGA.findFirst({
       where: this.whereActive({ pga_id: id }),
       include: {
@@ -85,30 +97,68 @@ export class PgaRepository extends BaseRepository<PGA> {
             tema: true,
             prioridade: true,
             situacoesProblemas: { include: { situacaoProblema: true } },
-            etapas: { include: { entregavel_link_sei: true, anexos: true } },
-            pessoas: { include: { pessoa: true } },
+            etapas: {
+              where: { ativo: true },
+              include: { entregavel_link_sei: true, anexos: { where: { ativo: true } } },
+            },
+            pessoas: {
+              where: { ativo: true },
+              include: { pessoa: true, tipo_vinculo_hae: true },
+            },
           },
           orderBy: [{ codigo_projeto: 'asc' }],
+        },
+        acoesCPA: {
+          where: { ativo: true },
+          orderBy: [{ acao_cpa_id: 'asc' }],
+        },
+        rotinas: {
+          where: { ativo: true },
+          include: {
+            curso: true,
+            responsavel: { select: { nome: true } },
+            ocorrencias: {
+              where: { ativo: true },
+              orderBy: [{ data_realizacao: 'asc' }],
+            },
+            participantes: {
+              where: { ativo: true },
+              include: { pessoa: { select: { nome: true } } },
+            },
+          },
+          orderBy: [{ tipo_rotina: 'asc' }, { titulo: 'asc' }],
         },
       },
     });
   }
 
-  async update(id: number, data: UpdatePgaDto) {
+  async update(id: string, data: UpdatePgaDto) {
     return this.prisma.pGA.update({
       where: { pga_id: id },
       data,
     });
   }
 
-  async delete(id: number) {
+  /**
+   * Método dedicado para atualizações internas de fluxo (status, pareceres,
+   * campos de auditoria) que não fazem parte do UpdatePgaDto público.
+   * Aceita diretamente o tipo Prisma para garantir type-safety sem `as any`.
+   */
+  async updateWorkflow(id: string, data: Prisma.PGAUpdateInput) {
+    return this.prisma.pGA.update({
+      where: { pga_id: id },
+      data,
+    });
+  }
+
+  async delete(id: string) {
     return this.prisma.pGA.update({
       where: { pga_id: id },
       data: { ativo: false } as any,
     });
   }
 
-  async findByAnoAndUnidade(ano: number, unidadeId: number) {
+  async findByAnoAndUnidade(ano: number, unidadeId: string) {
     return this.prisma.pGA.findFirst({
       where: this.whereActive({
         ano,
@@ -120,22 +170,22 @@ export class PgaRepository extends BaseRepository<PGA> {
     });
   }
 
-  async findOneWithContext(id: number, active_context?: { tipo: string; id?: number } | null) {
+  async findOneWithContext(id: string, active_context?: { tipo: string; id?: string } | null) {
     const pga = await this.findOne(id);
     if (!pga) return null;
 
     if (active_context) {
       if (active_context.tipo === 'unidade') {
-        if (pga.unidade_id !== Number(active_context.id)) return null;
+        if (pga.unidade_id !== active_context.id) return null;
       }
 
       if (active_context.tipo === 'regional') {
         const vinculos = await this.prisma.pessoaUnidade.findMany({
-          where: { pessoa_id: Number(active_context.id), ativo: true },
+          where: { pessoa_id: active_context.id, ativo: true },
           select: { unidade_id: true },
         });
         const unidadeIds = vinculos.map((v) => v.unidade_id);
-        if (!unidadeIds.includes(pga.unidade_id)) return null;
+        if (!pga.unidade_id || !unidadeIds.includes(pga.unidade_id)) return null;
       }
     }
 

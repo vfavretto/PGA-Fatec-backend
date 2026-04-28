@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+﻿import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserRepository } from '../user.repository';
 import { Pessoa } from '@prisma/client';
 
@@ -6,7 +6,7 @@ import { Pessoa } from '@prisma/client';
 export class GetUserService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  async execute(id: number): Promise<Pessoa> {
+  async execute(id: string): Promise<Pessoa> {
     const user = await this.userRepository.findById(id);
     if (!user) throw new NotFoundException('Usuário não encontrado');
     return user;

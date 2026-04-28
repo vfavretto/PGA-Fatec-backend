@@ -1,5 +1,18 @@
-import { Controller, Post, Get, Put, Delete, Param, Body, ParseIntPipe, Request, UseGuards } from '@nestjs/common';
+﻿import {
+  Controller,
+  Post,
+  Get,
+  Put,
+  Delete,
+  Param,
+  Body,
+  ParseUUIDPipe,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { RolesGuard } from '../auth/guards/roles.guard';
 import { CreateDeliverableService } from './services/create-deliverable.service';
 import { FindAllDeliverableService } from './services/find-all-deliverable.service';
 import { FindOneDeliverableService } from './services/find-one-deliverable.service';
@@ -23,6 +36,8 @@ export class DeliverableController {
   ) {}
 
   @Post()
+  @UseGuards(RolesGuard)
+  @Roles('Administrador', 'CPS')
   @ApiOperation({ summary: 'Criar entregável', description: 'Cria um novo entregável no sistema' })
   @ApiBody({ type: CreateDeliverableDto })
   @ApiResponse({ status: 201, description: 'Entregável criado com sucesso' })
@@ -43,26 +58,30 @@ export class DeliverableController {
   @ApiParam({ name: 'id', type: 'number', description: 'ID do entregável' })
   @ApiResponse({ status: 200, description: 'Entregável encontrado com sucesso' })
   @ApiResponse({ status: 404, description: 'Entregável não encontrado' })
-  findOne(@Request() req: any, @Param('id', ParseIntPipe) id: number) {
+  findOne(@Request() req: any, @Param('id', ParseUUIDPipe) id: string) {
     return this.findOneService.execute(id, req.user);
   }
 
   @Put(':id')
+  @UseGuards(RolesGuard)
+  @Roles('Administrador', 'CPS')
   @ApiOperation({ summary: 'Atualizar entregável', description: 'Atualiza dados de um entregável específico' })
   @ApiParam({ name: 'id', type: 'number', description: 'ID do entregável' })
   @ApiBody({ type: UpdateDeliverableDto })
   @ApiResponse({ status: 200, description: 'Entregável atualizado com sucesso' })
   @ApiResponse({ status: 404, description: 'Entregável não encontrado' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateDeliverableDto) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateDeliverableDto) {
     return this.updateService.execute(id, dto);
   }
 
   @Delete(':id')
+  @UseGuards(RolesGuard)
+  @Roles('Administrador', 'CPS')
   @ApiOperation({ summary: 'Excluir entregável', description: 'Remove um entregável do sistema' })
   @ApiParam({ name: 'id', type: 'number', description: 'ID do entregável' })
   @ApiResponse({ status: 200, description: 'Entregável excluído com sucesso' })
   @ApiResponse({ status: 404, description: 'Entregável não encontrado' })
-  remove(@Param('id', ParseIntPipe) id: number) {
+  remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.deleteService.execute(id);
   }
 }

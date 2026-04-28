@@ -1,11 +1,11 @@
-import { IsString, IsInt, IsOptional, IsBoolean } from 'class-validator';
+﻿import { IsString, IsInt, IsOptional, IsBoolean, IsUUID } from 'class-validator';
 
 export class CreateVersionDto {
   @IsString()
   tabela: string;
 
-  @IsInt()
-  registro_base_id: number;
+  @IsUUID('4')
+  registro_base_id: string;
 
   @IsInt()
   ano: number;
@@ -15,8 +15,8 @@ export class CreateVersionDto {
   motivo_alteracao?: string;
 
   @IsOptional()
-  @IsInt()
-  criado_por?: number;
+  @IsUUID('4')
+  criado_por?: string;
 
   dados: Record<string, any>;
 }

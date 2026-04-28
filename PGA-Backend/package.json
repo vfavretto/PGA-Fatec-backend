@@ -5,6 +5,9 @@
   "author": "",
   "private": true,
   "license": "UNLICENSED",
+  "prisma": {
+    "seed": "ts-node --project tsconfig.json prisma/seed.ts"
+  },
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -14,13 +17,14 @@
     "start:prod": "node dist/main",
     "postinstall": "prisma generate",
     "migrate": "prisma migrate dev",
+    "seed": "ts-node --project tsconfig.json prisma/seed.ts",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "docker:build": "docker-compose build",
+    "docker:build": "docker-compose build --no-cache",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:logs": "docker-compose logs -f",
@@ -40,6 +44,7 @@
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
+    "cookie-parser": "^1.4.7",
     "helmet": "^8.1.0",
     "nodemailer": "^7.0.3",
     "passport-jwt": "^4.0.1",
@@ -58,6 +63,7 @@
     "@swc/cli": "^0.6.0",
     "@swc/core": "^1.10.7",
     "@types/bcrypt": "^5.0.2",
+    "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.10.7",
@@ -92,10 +98,34 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "**/*.service.ts",
+      "!**/*.spec.ts",
+      "!**/node_modules/**",
+      "!**/audit/services/audit-log.service.ts",
+      "!**/audit/services/configuration-snapshot.service.ts",
+      "!**/pga/services/export-pga-csv.service.ts",
+      "!**/pga/services/export-pga-pdf.service.ts",
+      "!**/mail/services/sendAccessApproved.service.ts",
+      "!**/mail/services/sendPasswordReset.service.ts",
+      "!**/config/prisma.service.ts",
+      "!**/project1/services/delete-project1.service.ts",
+      "!**/auth/services/context.service.ts",
+      "!**/audit/services/version-manager.service.ts"
     ],
+    "coverageThreshold": {
+      "global": {
+        "statements": 80,
+        "branches": 80,
+        "functions": 80,
+        "lines": 80
+      }
+    },
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/$1",
+      "^src/(.*)$": "<rootDir>/$1"
+    }
   },
   "overrides": {
     "jsonwebtoken": "^9.0.2",

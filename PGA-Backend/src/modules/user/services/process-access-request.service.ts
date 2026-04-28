@@ -1,4 +1,4 @@
-import {
+﻿import {
   Injectable,
   BadRequestException,
   UnauthorizedException,
@@ -17,8 +17,8 @@ export class ProcessAccessRequestService {
   ) {}
 
   async execute(
-    solicitacaoId: number,
-    usuarioId: number,
+    solicitacaoId: string,
+    usuarioId: string,
     status: string,
     tipoUsuario?: TipoUsuario,
   ) {

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../config/prisma.service';
 import { BaseRepository } from '../../common/repositories/base.repository';
 import { Anexo } from '@prisma/client';
@@ -27,7 +27,7 @@ export class AttachmentRepository extends BaseRepository<Anexo> {
     });
   }
 
-  async findByEtapaProcesso(etapaProcessoId: number) {
+  async findByEtapaProcesso(etapaProcessoId: string) {
     return this.prisma.anexo.findMany({
       where: {
         ...this.whereActive(),
@@ -39,24 +39,30 @@ export class AttachmentRepository extends BaseRepository<Anexo> {
     });
   }
 
-  async findByEtapaProcessoWithContext(etapaProcessoId: number, active_context?: any) {
+  async findByEtapaProcessoWithContext(etapaProcessoId: string, active_context?: any) {
     if (active_context?.tipo === 'unidade') {
       return this.prisma.anexo.findMany({
         where: {
           ...this.whereActive(),
           etapa_processo_id: etapaProcessoId,
-          etapaProcesso: { unidade_id: active_context.id },
+          etapaProcesso: { acaoProjeto: { pga: { unidade_id: active_context.id } } },
         },
         include: { entregavel: true, etapaProcesso: true },
       });
     }
 
     if (active_context?.tipo === 'regional') {
+      const vinculos = await this.prisma.pessoaUnidade.findMany({
+        where: { pessoa_id: active_context.id, ativo: true },
+        select: { unidade_id: true },
+      });
+      const unidadeIds = vinculos.map((v) => v.unidade_id);
+      if (!unidadeIds.length) return [];
       return this.prisma.anexo.findMany({
         where: {
           ...this.whereActive(),
           etapa_processo_id: etapaProcessoId,
-          etapaProcesso: { regional_id: active_context.id },
+          etapaProcesso: { acaoProjeto: { pga: { unidade_id: { in: unidadeIds } } } },
         },
         include: { entregavel: true, etapaProcesso: true },
       });
@@ -65,7 +71,7 @@ export class AttachmentRepository extends BaseRepository<Anexo> {
     return this.findByEtapaProcesso(etapaProcessoId);
   }
 
-  async findByEntregavel(entregavelId: number) {
+  async findByEntregavel(entregavelId: string) {
     return this.prisma.anexo.findMany({
       where: {
         ...this.whereActive(),
@@ -77,24 +83,30 @@ export class AttachmentRepository extends BaseRepository<Anexo> {
     });
   }
 
-  async findByEntregavelWithContext(entregavelId: number, active_context?: any) {
+  async findByEntregavelWithContext(entregavelId: string, active_context?: any) {
     if (active_context?.tipo === 'unidade') {
       return this.prisma.anexo.findMany({
         where: {
           ...this.whereActive(),
           entregavel_id: entregavelId,
-          entregavel: { unidade_id: active_context.id },
+          etapaProcesso: { acaoProjeto: { pga: { unidade_id: active_context.id } } },
         },
         include: { etapaProcesso: true, entregavel: true },
       });
     }
 
     if (active_context?.tipo === 'regional') {
+      const vinculos = await this.prisma.pessoaUnidade.findMany({
+        where: { pessoa_id: active_context.id, ativo: true },
+        select: { unidade_id: true },
+      });
+      const unidadeIds = vinculos.map((v) => v.unidade_id);
+      if (!unidadeIds.length) return [];
       return this.prisma.anexo.findMany({
         where: {
           ...this.whereActive(),
           entregavel_id: entregavelId,
-          entregavel: { regional_id: active_context.id },
+          etapaProcesso: { acaoProjeto: { pga: { unidade_id: { in: unidadeIds } } } },
         },
         include: { etapaProcesso: true, entregavel: true },
       });
@@ -103,7 +115,7 @@ export class AttachmentRepository extends BaseRepository<Anexo> {
     return this.findByEntregavel(entregavelId);
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return this.prisma.anexo.findFirst({
       where: this.whereActive({ attachment_id: id }),
       include: {
@@ -113,30 +125,30 @@ export class AttachmentRepository extends BaseRepository<Anexo> {
     });
   }
 
-  async findOneWithContext(id: number, active_context?: any) {
+  async findOneWithContext(id: string, active_context?: any) {
     if (!active_context) return this.findOne(id);
 
     if (active_context.tipo === 'unidade') {
       return this.prisma.anexo.findFirst({
         where: {
           ...this.whereActive({ attachment_id: id }),
-          OR: [
-            { etapaProcesso: { unidade_id: active_context.id } },
-            { entregavel: { unidade_id: active_context.id } },
-          ],
+          etapaProcesso: { acaoProjeto: { pga: { unidade_id: active_context.id } } },
         },
         include: { etapaProcesso: true, entregavel: true },
       });
     }
 
     if (active_context.tipo === 'regional') {
+      const vinculos = await this.prisma.pessoaUnidade.findMany({
+        where: { pessoa_id: active_context.id, ativo: true },
+        select: { unidade_id: true },
+      });
+      const ids = vinculos.map((v) => v.unidade_id);
+      if (!ids.length) return null;
       return this.prisma.anexo.findFirst({
         where: {
           ...this.whereActive({ attachment_id: id }),
-          OR: [
-            { etapaProcesso: { regional_id: active_context.id } },
-            { entregavel: { regional_id: active_context.id } },
-          ],
+          etapaProcesso: { acaoProjeto: { pga: { unidade_id: { in: ids } } } },
         },
         include: { etapaProcesso: true, entregavel: true },
       });
@@ -145,40 +157,40 @@ export class AttachmentRepository extends BaseRepository<Anexo> {
     return this.findOne(id);
   }
 
-  async findAllByUnit(unidadeId: number) {
+  async findAllByUnit(unidadeId: string) {
     return this.prisma.anexo.findMany({
       where: {
         ...this.whereActive(),
-        OR: [
-          { etapaProcesso: { unidade_id: unidadeId } },
-          { entregavel: { unidade_id: unidadeId } },
-        ],
+        etapaProcesso: { acaoProjeto: { pga: { unidade_id: unidadeId } } },
       },
       include: { entregavel: true, etapaProcesso: true },
     });
   }
 
-  async findAllByRegional(regionalId: number) {
+  async findAllByRegional(regionalId: string) {
+    const vinculos = await this.prisma.pessoaUnidade.findMany({
+      where: { pessoa_id: regionalId, ativo: true },
+      select: { unidade_id: true },
+    });
+    const unidadeIds = vinculos.map((v) => v.unidade_id);
+    if (!unidadeIds.length) return [];
     return this.prisma.anexo.findMany({
       where: {
         ...this.whereActive(),
-        OR: [
-          { etapaProcesso: { regional_id: regionalId } },
-          { entregavel: { regional_id: regionalId } },
-        ],
+        etapaProcesso: { acaoProjeto: { pga: { unidade_id: { in: unidadeIds } } } },
       },
       include: { entregavel: true, etapaProcesso: true },
     });
   }
 
-  async update(id: number, data: UpdateAttachmentDto) {
+  async update(id: string, data: UpdateAttachmentDto) {
     return this.prisma.anexo.update({
       where: { anexo_id: id },
       data: data,
     });
   }
 
-  async delete(id: number) {
+  async delete(id: string) {
     return this.prisma.anexo.update({
       where: { anexo_id: id },
       data: { ativo: false },

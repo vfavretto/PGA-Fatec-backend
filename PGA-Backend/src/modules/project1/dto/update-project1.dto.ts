@@ -1,4 +1,4 @@
-import { IsOptional, IsArray, IsNumber } from 'class-validator';
+﻿import { IsOptional, IsArray, IsNumber } from 'class-validator';
 import { Prisma, StatusProjetoRegional } from '@prisma/client';
 
 export class UpdateProject1Dto {
@@ -12,16 +12,16 @@ export class UpdateProject1Dto {
     | null;
 
   @IsOptional()
-  pga_id?: number | Prisma.IntFieldUpdateOperationsInput;
+  pga_id?: string | Prisma.IntFieldUpdateOperationsInput;
 
   @IsOptional()
-  eixo_id?: number | Prisma.IntFieldUpdateOperationsInput;
+  eixo_id?: string | Prisma.IntFieldUpdateOperationsInput;
 
   @IsOptional()
-  prioridade_id?: number | Prisma.IntFieldUpdateOperationsInput;
+  prioridade_id?: string | Prisma.IntFieldUpdateOperationsInput;
 
   @IsOptional()
-  tema_id?: number | Prisma.IntFieldUpdateOperationsInput;
+  tema_id?: string | Prisma.IntFieldUpdateOperationsInput;
 
   @IsOptional()
   o_que_sera_feito?: string | Prisma.StringFieldUpdateOperationsInput;
@@ -99,27 +99,27 @@ export class UpdateProject1Dto {
 
   @IsOptional()
   @IsArray()
-  situacoes_problema_ids?: number[];
+  situacoes_problema_ids?: string[];
 
   @IsOptional()
   @IsArray()
   pessoas?: Array<{
-    pessoa_id: number;
+    pessoa_id: string;
     papel: 'Responsavel' | 'Colaborador';
     carga_horaria_semanal?: number | null;
-    tipo_vinculo_hae_id?: number | null;
-    projeto_pessoa_id?: number;
+    tipo_vinculo_hae_id?: string | null;
+    projeto_pessoa_id?: string;
   }>;
 
   @IsOptional()
   @IsArray()
   etapas?: Array<{
     descricao: string;
-    entregavel_id?: number | null;
+    entregavel_id?: string | null;
     numero_ref?: string | null;
     status_verificacao?: string | null;
     data_verificacao_prevista?: string | null;
     data_verificacao_realizada?: string | null;
-    etapa_id?: number;
+    etapa_id?: string;
   }>;
 }

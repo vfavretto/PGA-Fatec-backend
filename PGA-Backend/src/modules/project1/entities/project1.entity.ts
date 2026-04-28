@@ -1,4 +1,4 @@
-import {
+﻿import {
   EixoTematico,
   EtapaProcesso,
   Pessoa,
@@ -11,13 +11,13 @@ import {
 } from '@prisma/client';
 
 export class AcaoProjeto {
-  acao_projeto_id: number;
+  acao_projeto_id: string;
   codigo_projeto: string;
   nome_projeto?: string;
-  pga_id: number;
-  eixo_id: number;
-  prioridade_id: number;
-  tema_id: number;
+  pga_id: string;
+  eixo_id: string;
+  prioridade_id: string;
+  tema_id: string;
   o_que_sera_feito: string;
   por_que_sera_feito: string;
   data_inicio?: Date | null;
@@ -29,7 +29,7 @@ export class AcaoProjeto {
   custo_total_estimado?: number | null;
   fonte_recursos?: string | null;
   status_regional: StatusProjetoRegional;
-  regional_responsavel_id?: number | null;
+  regional_responsavel_id?: string | null;
   parecer_regional?: string | null;
   data_parecer_regional?: Date | null;
 

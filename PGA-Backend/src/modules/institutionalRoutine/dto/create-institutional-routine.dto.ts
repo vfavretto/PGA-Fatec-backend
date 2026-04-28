@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsOptional, IsString, IsEnum, IsDateString, MaxLength } from 'class-validator';
+﻿import { IsUUID, IsNotEmpty, IsOptional, IsString, IsEnum, IsDateString, MaxLength } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { TipoRotina, PeriodicidadeRotina, StatusRotina } from '@prisma/client';
 
@@ -9,8 +9,8 @@ export class CreateInstitutionalRoutineDto {
     type: 'integer'
   })
   @IsNotEmpty()
-  @IsInt()
-  pga_id: number;
+  @IsUUID('4')
+  pga_id: string;
 
   @ApiPropertyOptional({
     description: 'ID do curso relacionado (opcional)',
@@ -18,8 +18,8 @@ export class CreateInstitutionalRoutineDto {
     type: 'integer'
   })
   @IsOptional()
-  @IsInt()
-  curso_id?: number;
+  @IsUUID('4')
+  curso_id?: string;
 
   @ApiProperty({
     description: 'Tipo da rotina institucional',
@@ -83,8 +83,8 @@ export class CreateInstitutionalRoutineDto {
     type: 'integer'
   })
   @IsNotEmpty()
-  @IsInt()
-  responsavel_id: number;
+  @IsUUID('4')
+  responsavel_id: string;
 
   @ApiPropertyOptional({
     description: 'Entregável esperado da rotina',

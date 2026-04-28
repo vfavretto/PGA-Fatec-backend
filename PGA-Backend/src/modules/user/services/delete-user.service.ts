@@ -1,4 +1,4 @@
-import {
+﻿import {
   Injectable,
   NotFoundException,
   ConflictException,
@@ -18,8 +18,8 @@ export class DeleteUserService {
   ) {}
 
   async execute(
-    id: number,
-    usuarioLogadoId?: number,
+    id: string,
+    usuarioLogadoId?: string,
     motivo?: string,
   ): Promise<Pessoa> {
     const user = await this.userRepository.findById(id);

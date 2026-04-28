@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/config/prisma.service';
 import { VersionRepository } from '../repositories/version.repository';
 import { AuditRepository } from '../repositories/audit.repository';
@@ -20,7 +20,7 @@ export class ConfigurationSnapshotService {
     private readonly auditRepository: AuditRepository,
   ) {}
 
-  async criarSnapshotParaPGA(pgaId: number, ano: number, usuarioId: number) {
+  async criarSnapshotParaPGA(pgaId: string, ano: number, usuarioId: string) {
     console.log(`Criando snapshot para PGA ${pgaId} do ano ${ano}`);
 
     const snapshot = {
@@ -61,7 +61,7 @@ export class ConfigurationSnapshotService {
 
   private async criarVersoesSituacoesProblema(
     ano: number,
-    usuarioId: number,
+    usuarioId: string,
   ): Promise<SituacaoProblemaVersao[]> {
     const situacoesAtivas = await this.prisma.situacaoProblema.findMany({
       where: { ativo: true },
@@ -119,7 +119,7 @@ export class ConfigurationSnapshotService {
 
   private async criarVersoesEixosTematicos(
     ano: number,
-    usuarioId: number,
+    usuarioId: string,
   ): Promise<EixoTematicoVersao[]> {
     const eixosAtivos = await this.prisma.eixoTematico.findMany({
       where: { ativo: true },
@@ -174,7 +174,7 @@ export class ConfigurationSnapshotService {
 
   private async criarVersoesPrioridades(
     ano: number,
-    usuarioId: number,
+    usuarioId: string,
   ): Promise<PrioridadeAcaoVersao[]> {
     const prioridadesAtivas = await this.prisma.prioridadeAcao.findMany({
       where: { ativo: true },
@@ -232,7 +232,7 @@ export class ConfigurationSnapshotService {
 
   private async criarVersoesTemas(
     ano: number,
-    usuarioId: number,
+    usuarioId: string,
   ): Promise<TemaVersao[]> {
     const temasAtivos = await this.prisma.tema.findMany({
       where: { ativo: true },
@@ -284,7 +284,7 @@ export class ConfigurationSnapshotService {
 
   private async criarVersoesEntregaveis(
     ano: number,
-    usuarioId: number,
+    usuarioId: string,
   ): Promise<EntregavelVersao[]> {
     const entregaveisAtivos = await this.prisma.entregavelLinkSei.findMany({
       where: { ativo: true },
@@ -340,7 +340,7 @@ export class ConfigurationSnapshotService {
 
   private async criarVersoesPessoas(
     ano: number,
-    usuarioId: number,
+    usuarioId: string,
   ): Promise<PessoaVersao[]> {
     const pessoasAtivas = await this.prisma.pessoa.findMany({
       where: { ativo: true },
