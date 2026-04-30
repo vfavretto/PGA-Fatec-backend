@@ -50,15 +50,15 @@ describe('FindAllAttachmentService', () => {
 
   it('deve filtrar por unidade', async () => {
     mockRepo.findAllByUnit.mockResolvedValue([{ attachment_id: 2 }]);
-    const result = await service.execute({ active_context: { tipo: 'unidade', id: 5 } });
-    expect(mockRepo.findAllByUnit).toHaveBeenCalledWith(5);
+    const result = await service.execute({ active_context: { tipo: 'unidade', id: 'uuid-5' } });
+    expect(mockRepo.findAllByUnit).toHaveBeenCalledWith('uuid-5');
     expect(result).toHaveLength(1);
   });
 
   it('deve filtrar por regional', async () => {
     mockRepo.findAllByRegional.mockResolvedValue([{ attachment_id: 3 }]);
-    const result = await service.execute({ active_context: { tipo: 'regional', id: 2 } });
-    expect(mockRepo.findAllByRegional).toHaveBeenCalledWith(2);
+    const result = await service.execute({ active_context: { tipo: 'regional', id: 'uuid-2' } });
+    expect(mockRepo.findAllByRegional).toHaveBeenCalledWith('uuid-2');
     expect(result).toHaveLength(1);
   });
 });
@@ -69,13 +69,13 @@ describe('FindOneAttachmentService', () => {
 
   it('deve retornar anexo encontrado', async () => {
     mockRepo.findOneWithContext.mockResolvedValue({ anexo_id: 1 });
-    const result = await service.execute(1);
+    const result = await service.execute('uuid-1');
     expect(result).toEqual({ anexo_id: 1 });
   });
 
   it('deve retornar null se não encontrado', async () => {
     mockRepo.findOneWithContext.mockResolvedValue(null);
-    const result = await service.execute(99);
+    const result = await service.execute('uuid-99');
     expect(result).toBeNull();
   });
 });
@@ -86,14 +86,14 @@ describe('UpdateAttachmentService', () => {
 
   it('deve atualizar o anexo', async () => {
     mockRepo.update.mockResolvedValue({ anexo_id: 1, item: 'Documento' });
-    const result = await service.execute(1, { item: 'Documento' } as any);
+    const result = await service.execute('uuid-1', { item: 'Documento' } as any);
     expect((result as any).item).toBe('Documento');
   });
 
   it('deve chamar update com os dados corretos', async () => {
-    mockRepo.update.mockResolvedValue({ anexo_id: 1 });
-    await service.execute(1, {} as any);
-    expect(mockRepo.update).toHaveBeenCalledWith(1, {});
+    mockRepo.update.mockResolvedValue({ anexo_id: 'uuid-1' });
+    await service.execute('uuid-1', {} as any);
+    expect(mockRepo.update).toHaveBeenCalledWith('uuid-1', {});
   });
 });
 
@@ -104,13 +104,13 @@ describe('DeleteAttachmentService', () => {
   it('deve deletar o anexo', async () => {
     mockRepo.findOne.mockResolvedValue({ attachment_id: 1 });
     mockRepo.delete.mockResolvedValue({ attachment_id: 1 });
-    await service.execute(1);
-    expect(mockRepo.delete).toHaveBeenCalledWith(1);
+    await service.execute('uuid-1');
+    expect(mockRepo.delete).toHaveBeenCalledWith('uuid-1');
   });
 
   it('deve lançar NotFoundException se não encontrado', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99')).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -120,14 +120,14 @@ describe('FindByDeliverableService', () => {
 
   it('deve retornar anexos do entregável', async () => {
     mockRepo.findByEntregavel.mockResolvedValue([{ attachment_id: 1 }]);
-    const result = await service.execute(5);
-    expect(mockRepo.findByEntregavel).toHaveBeenCalledWith(5);
+    const result = await service.execute('uuid-5');
+    expect(mockRepo.findByEntregavel).toHaveBeenCalledWith('uuid-5');
     expect(result).toHaveLength(1);
   });
 
   it('deve usar contexto ativo quando fornecido', async () => {
     mockRepo.findByEntregavelWithContext.mockResolvedValue([{ attachment_id: 2 }]);
-    const result = await service.execute(5, { active_context: { tipo: 'unidade', id: 1 } });
+    const result = await service.execute('uuid-5', { active_context: { tipo: 'unidade', id: 'uuid-1' } });
     expect(mockRepo.findByEntregavelWithContext).toHaveBeenCalled();
     expect(result).toHaveLength(1);
   });
@@ -139,14 +139,14 @@ describe('FindByProcessStepService', () => {
 
   it('deve retornar anexos da etapa de processo', async () => {
     mockRepo.findByEtapaProcesso.mockResolvedValue([{ attachment_id: 2 }]);
-    const result = await service.execute(3);
-    expect(mockRepo.findByEtapaProcesso).toHaveBeenCalledWith(3);
+    const result = await service.execute('uuid-3');
+    expect(mockRepo.findByEtapaProcesso).toHaveBeenCalledWith('uuid-3');
     expect(result).toHaveLength(1);
   });
 
   it('deve usar contexto ativo quando fornecido', async () => {
     mockRepo.findByEtapaProcessoWithContext.mockResolvedValue([{ attachment_id: 3 }]);
-    const result = await service.execute(3, { active_context: { tipo: 'regional', id: 1 } });
+    const result = await service.execute('uuid-3', { active_context: { tipo: 'regional', id: 'uuid-1' } });
     expect(mockRepo.findByEtapaProcessoWithContext).toHaveBeenCalled();
     expect(result).toHaveLength(1);
   });

@@ -6,7 +6,7 @@ import { EntregavelLinkSei } from '@prisma/client';
 export class FindAllDeliverableService {
   constructor(private readonly repository: DeliverableRepository) {}
 
-  async execute(user?: any): Promise<EntregavelLinkSei[]> {
+  async execute(_user?: any): Promise<EntregavelLinkSei[]> {
     return this.repository.findAll();
   }
 }

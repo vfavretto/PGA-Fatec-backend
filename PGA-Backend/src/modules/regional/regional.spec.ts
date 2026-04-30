@@ -68,13 +68,13 @@ describe('GetRegionalService', () => {
 
   it('deve retornar regional encontrada', async () => {
     mockRepo.findById.mockResolvedValue({ regional_id: 1 });
-    const result = await service.execute(1);
+    const result = await service.execute('uuid-1');
     expect(result).toEqual({ regional_id: 1 });
   });
 
   it('deve lançar NotFoundException se regional não encontrada', async () => {
     mockRepo.findById.mockResolvedValue(null);
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99')).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -88,14 +88,14 @@ describe('ReviewRegionalPgaService', () => {
 
   it('deve lançar BadRequestException para status inválido', async () => {
     await expect(
-      service.execute(1, 1, { status: 'EmElaboracao' as any, parecer: '' }),
+      service.execute('uuid-1', 'uuid-1', { status: 'EmElaboracao' as any, parecer: '' }),
     ).rejects.toThrow(BadRequestException);
   });
 
   it('deve lançar NotFoundException se PGA não encontrado para a regional', async () => {
     mockRepo.findPgaForRegional.mockResolvedValue(null);
     await expect(
-      service.execute(1, 99, { status: 'Aprovado' as any, parecer: '' }),
+      service.execute('uuid-1', 'uuid-99', { status: 'Aprovado' as any, parecer: '' }),
     ).rejects.toThrow(NotFoundException);
   });
 
@@ -103,7 +103,7 @@ describe('ReviewRegionalPgaService', () => {
     mockRepo.findPgaForRegional.mockResolvedValue({ pga_id: 1 });
     mockRepo.updatePgaReview.mockResolvedValue({ pga_id: 1, status: 'Aprovado' });
 
-    const result = await service.execute(1, 1, { status: 'Aprovado' as any, parecer: 'OK' });
+    const result = await service.execute('uuid-1', 'uuid-1', { status: 'Aprovado' as any, parecer: 'OK' });
     expect(mockRepo.updatePgaReview).toHaveBeenCalled();
     expect(result.status).toBe('Aprovado');
   });
@@ -112,7 +112,7 @@ describe('ReviewRegionalPgaService', () => {
     mockRepo.findPgaForRegional.mockResolvedValue({ pga_id: 1 });
     mockRepo.updatePgaReview.mockResolvedValue({ pga_id: 1, status: 'Reprovado' });
 
-    const result = await service.execute(1, 1, { status: 'Reprovado' as any, parecer: 'Não aprovado' });
+    const result = await service.execute('uuid-1', 'uuid-1', { status: 'Reprovado' as any, parecer: 'Não aprovado' });
     expect(result.status).toBe('Reprovado');
   });
 });
@@ -123,8 +123,8 @@ describe('FindRegionalByResponsavelService', () => {
 
   it('deve retornar regionais por responsável', async () => {
     mockRepo.findRegionalByResponsavelId.mockResolvedValue([{ regional_id: 1 }]);
-    const result = await service.execute(10);
-    expect(mockRepo.findRegionalByResponsavelId).toHaveBeenCalledWith(10);
+    const result = await service.execute('uuid-10');
+    expect(mockRepo.findRegionalByResponsavelId).toHaveBeenCalledWith('uuid-10');
     expect(result).toHaveLength(1);
   });
 });
@@ -135,13 +135,13 @@ describe('GetRegionalPgaService', () => {
 
   it('deve retornar PGA da regional', async () => {
     mockRepo.findPgaForRegional.mockResolvedValue({ pga_id: 5 });
-    const result = await service.execute(1, 5);
+    const result = await service.execute('uuid-1', 'uuid-5');
     expect(result).toEqual({ pga_id: 5 });
   });
 
   it('deve lançar NotFoundException se PGA não encontrado', async () => {
     mockRepo.findPgaForRegional.mockResolvedValue(null);
-    await expect(service.execute(1, 99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-1', 'uuid-99')).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -151,13 +151,13 @@ describe('GetRegionalProjectService', () => {
 
   it('deve retornar projeto da regional', async () => {
     mockRepo.findProjectForRegional.mockResolvedValue({ acao_projeto_id: 3 });
-    const result = await service.execute(1, 3);
+    const result = await service.execute('uuid-1', 'uuid-3');
     expect(result).toEqual({ acao_projeto_id: 3 });
   });
 
   it('deve lançar NotFoundException se projeto não encontrado', async () => {
     mockRepo.findProjectForRegional.mockResolvedValue(null);
-    await expect(service.execute(1, 99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-1', 'uuid-99')).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -167,8 +167,8 @@ describe('ListRegionalPgasService', () => {
 
   it('deve retornar PGAs da regional com filtros', async () => {
     mockRepo.findPgasByRegional.mockResolvedValue([{ pga_id: 1 }]);
-    const result = await service.execute(1, {} as any);
-    expect(mockRepo.findPgasByRegional).toHaveBeenCalledWith(1, {});
+    const result = await service.execute('uuid-1', {} as any);
+    expect(mockRepo.findPgasByRegional).toHaveBeenCalledWith('uuid-1', {});
     expect(result).toHaveLength(1);
   });
 });
@@ -179,8 +179,8 @@ describe('ListRegionalProjectsService', () => {
 
   it('deve retornar projetos da regional com filtros', async () => {
     mockRepo.findProjectsByRegional.mockResolvedValue([{ acao_projeto_id: 1 }]);
-    const result = await service.execute(1, {} as any);
-    expect(mockRepo.findProjectsByRegional).toHaveBeenCalledWith(1, {});
+    const result = await service.execute('uuid-1', {} as any);
+    expect(mockRepo.findProjectsByRegional).toHaveBeenCalledWith('uuid-1', {});
     expect(result).toHaveLength(1);
   });
 });
@@ -191,8 +191,8 @@ describe('ListRegionalUnitsService', () => {
 
   it('deve retornar unidades da regional', async () => {
     mockRepo.findUnitsByRegional.mockResolvedValue([{ unidade_id: 1 }]);
-    const result = await service.execute(1);
-    expect(mockRepo.findUnitsByRegional).toHaveBeenCalledWith(1);
+    const result = await service.execute('uuid-1');
+    expect(mockRepo.findUnitsByRegional).toHaveBeenCalledWith('uuid-1');
     expect(result).toHaveLength(1);
   });
 });
@@ -203,21 +203,21 @@ describe('ReviewRegionalProjectService', () => {
 
   it('deve lançar BadRequestException para status inválido', async () => {
     await expect(
-      service.execute(1, 1, { status: 'EmElaboracao' as any, parecer: '' }),
+      service.execute('uuid-1', 'uuid-1', { status: 'EmElaboracao' as any, parecer: '' }),
     ).rejects.toThrow(BadRequestException);
   });
 
   it('deve lançar NotFoundException se projeto não encontrado', async () => {
     mockRepo.findProjectForRegional.mockResolvedValue(null);
     await expect(
-      service.execute(1, 99, { status: 'Aprovado' as any, parecer: '' }),
+      service.execute('uuid-1', 'uuid-99', { status: 'Aprovado' as any, parecer: '' }),
     ).rejects.toThrow(NotFoundException);
   });
 
   it('deve aprovar projeto', async () => {
     mockRepo.findProjectForRegional.mockResolvedValue({ acao_projeto_id: 1 });
     mockRepo.updateProjectReview.mockResolvedValue({ acao_projeto_id: 1, status: 'Aprovado' });
-    const result = await service.execute(1, 1, { status: 'Aprovado' as any, parecer: 'OK' });
+    const result = await service.execute('uuid-1', 'uuid-1', { status: 'Aprovado' as any, parecer: 'OK' });
     expect(mockRepo.updateProjectReview).toHaveBeenCalled();
     expect((result as any).status).toBe('Aprovado');
   });
@@ -225,7 +225,7 @@ describe('ReviewRegionalProjectService', () => {
   it('deve reprovar projeto', async () => {
     mockRepo.findProjectForRegional.mockResolvedValue({ acao_projeto_id: 1 });
     mockRepo.updateProjectReview.mockResolvedValue({ acao_projeto_id: 1, status: 'Reprovado' });
-    const result = await service.execute(1, 1, { status: 'Reprovado' as any, parecer: 'Não aprovado' });
+    const result = await service.execute('uuid-1', 'uuid-1', { status: 'Reprovado' as any, parecer: 'Não aprovado' });
     expect((result as any).status).toBe('Reprovado');
   });
 });
