@@ -17,6 +17,7 @@ import { RequestAccessService } from './services/request-access.service';
 import { GetUsersByUnitService } from './services/get-users-by-unit.service';
 import { AuditModule } from '../audit/audit.module';
 import { ChangeUserRoleService } from './services/change-user-role.service';
+import { UpdateCargoUnidadeService } from './services/update-cargo-unidade.service';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { ChangeUserRoleService } from './services/change-user-role.service';
     RequestAccessService,
     GetUsersByUnitService,
     ChangeUserRoleService,
+    UpdateCargoUnidadeService,
   ],
   controllers: [UserController],
 })

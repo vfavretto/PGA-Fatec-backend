@@ -84,7 +84,24 @@ export class PgaRepository extends BaseRepository<PGA> {
     return this.prisma.pGA.findFirst({
       where: this.whereActive({ pga_id: id }),
       include: {
-        unidade: true,
+        unidade: {
+          include: {
+            diretor: { select: { nome: true, telefone: true, email: true } },
+            cursos: {
+              where: { ativo: true },
+              include: {
+                coordenador: { select: { nome: true, telefone: true, email: true } },
+              },
+              orderBy: [{ nome: 'asc' }],
+            },
+            pessoas: {
+              where: { ativo: true },
+              include: {
+                pessoa: { select: { nome: true, telefone: true, email: true } },
+              },
+            },
+          },
+        },
         regionalResponsavel: true,
         situacoesProblemas: {
           where: this.whereActive(),

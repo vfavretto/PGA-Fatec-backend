@@ -42,13 +42,13 @@ export class ExportPgaPdfService {
           <meta charset="utf-8" />
           <style>
             body { font-family: Arial, sans-serif; padding: 20px; color:#222; font-size:12px }
-            h1 { background:#2b6a3b; color:white; padding:10px; font-size:16px; margin:0 0 10px 0 }
-            h2 { background:#4a8c5c; color:white; padding:6px 10px; font-size:13px; margin:20px 0 6px 0; page-break-before: auto }
-            h3 { background:#d6e8dc; color:#1a4a2a; padding:5px 8px; font-size:12px; margin:14px 0 4px 0 }
+            h1 { background:#8B0000; color:white; padding:10px; font-size:16px; margin:0 0 10px 0 }
+            h2 { background:#B22222; color:white; padding:6px 10px; font-size:13px; margin:20px 0 6px 0; page-break-before: auto }
+            h3 { background:#fde8e8; color:#8B0000; padding:5px 8px; font-size:12px; margin:14px 0 4px 0 }
             .meta { margin:8px 0 }
             .meta-grid { display:grid; grid-template-columns:1fr 1fr; gap:4px; margin:8px 0 }
             table { width:100%; border-collapse:collapse; margin-top:6px; font-size:11px }
-            th { background:#e8f4ea; border:1px solid #ccc; padding:5px 6px; text-align:left; font-size:11px }
+            th { background:#fde8e8; border:1px solid #ccc; padding:5px 6px; text-align:left; font-size:11px }
             td { border:1px solid #ccc; padding:5px 6px }
             .cenario { white-space:pre-wrap; line-height:1.5; margin:6px 0 }
             .tag-urgente { background:#c0392b; color:#fff; padding:1px 5px; border-radius:3px; font-size:10px }
@@ -88,9 +88,92 @@ export class ExportPgaPdfService {
           <div class="page-break"></div>
           <h2>Anexos 1–5 – Lista de Aquisições Necessárias aos Projetos</h2>
           ${this.buildAnexosHtml(projetos)}
+
+          ${this.buildResponsaveisHtml(pga)}
         </body>
       </html>
     `;
+
+    return html;
+  }
+
+  private buildResponsaveisHtml(pga: any): string {
+    const unidade = pga.unidade;
+    const diretor = unidade?.diretor;
+    const cursos: any[] = unidade?.cursos ?? [];
+    const pessoasUnidade: any[] = unidade?.pessoas ?? [];
+
+    const byCargoRaw = (cargo: string) => {
+      const pu = pessoasUnidade.find((p: any) => p.cargo === cargo);
+      return pu?.pessoa ?? null;
+    };
+    const pessoaHtml = (p: any) => ({
+      nome: this.escapeHtml(p?.nome ?? ''),
+      telefone: this.escapeHtml(p?.telefone ?? ''),
+      email: this.escapeHtml(p?.email ?? ''),
+    });
+
+    const nomeUnidade = this.escapeHtml(unidade?.nome_unidade ?? '');
+    const codigoUnidade = this.escapeHtml(unidade?.codigo_fnnn ?? '');
+    const endParts = [unidade?.endereco, unidade?.complemento, unidade?.bairro, unidade?.cidade, unidade?.uf].filter(Boolean);
+    const endereco = endParts.map((s: string) => this.escapeHtml(String(s))).join(', ');
+    const cep = this.escapeHtml(unidade?.cep ?? '');
+    const teleUnidade = this.escapeHtml(unidade?.telefone ?? '');
+    const siteUnidade = this.escapeHtml(unidade?.site ?? '');
+
+    const d = pessoaHtml(diretor);
+    const equipeGestora = [
+      { cargo: 'COORDENADOR(A) DE FATEC', ...d },
+      { cargo: 'ASSESSOR IV – VICE-DIRETOR(A) (quando houver)', ...pessoaHtml(byCargoRaw('AssessorIV')) },
+      { cargo: 'CHEFE DE SERVIÇO ÁREA ADMINISTRATIVA', ...pessoaHtml(byCargoRaw('ChefeServicoAdministrativo')) },
+      { cargo: 'CHEFE DE SERVIÇO ÁREA ACADÊMICA', ...pessoaHtml(byCargoRaw('ChefeServicoAcademico')) },
+      { cargo: 'ASSISTENTE TÉCNICO – AT', ...pessoaHtml(byCargoRaw('AssistenteTecnico')) },
+      { cargo: 'PSICÓLOGO INSTITUCIONAL – PNE', ...pessoaHtml(byCargoRaw('PsicologoInstitucional')) },
+      { cargo: 'AGENTE FACILITADOR LOCAL DO INOVA CPS', ...pessoaHtml(byCargoRaw('AgenteFacilitadorInova')) },
+    ];
+
+    const cursosRegulares = cursos.filter((c: any) => c.tipo !== 'AMS');
+    const cursosAMS = cursos.filter((c: any) => c.tipo === 'AMS');
+
+    const cellStyle = 'padding:5px 6px;border:1px solid #ccc';
+    const thStyle = `${cellStyle};text-align:left;font-weight:bold`;
+
+    let html = '<div class="page-break"></div>';
+    html += '<h2>Identificação da Unidade Elaboradora</h2>';
+    html += `<table style="width:100%;border:1px solid #bbb;margin-bottom:12px;border-collapse:collapse"><tbody>`;
+    html += `<tr><th style="${thStyle};width:25%">Unidade</th><td style="${cellStyle}">${nomeUnidade}${codigoUnidade ? ` (${codigoUnidade})` : ''}</td><th style="${thStyle};width:20%">Telefone</th><td style="${cellStyle}">${teleUnidade}</td></tr>`;
+    if (endereco) html += `<tr><th style="${thStyle}">Endereço</th><td colspan="3" style="${cellStyle}">${endereco}${cep ? ` – CEP: ${cep}` : ''}</td></tr>`;
+    if (siteUnidade) html += `<tr><th style="${thStyle}">Site</th><td colspan="3" style="${cellStyle}">${siteUnidade}</td></tr>`;
+    html += '</tbody></table>';
+
+    html += '<h2>Identificação da Equipe Gestora</h2>';
+    html += `<table style="width:100%;border:1px solid #bbb;margin-bottom:12px;border-collapse:collapse"><thead>`;
+    html += `<tr style="background:#fde8e8"><th style="${thStyle};width:35%">Cargo</th><th style="${thStyle};width:25%">Nome</th><th style="${thStyle};width:15%">Telefone</th><th style="${thStyle}">E-mail Institucional Pessoal</th></tr>`;
+    html += '</thead><tbody>';
+    for (const m of equipeGestora) {
+      html += `<tr><td style="${cellStyle};font-size:10px;font-weight:bold">${this.escapeHtml(m.cargo)}</td><td style="${cellStyle}">${m.nome}</td><td style="${cellStyle}">${m.telefone}</td><td style="${cellStyle}">${m.email}</td></tr>`;
+    }
+    html += '</tbody></table>';
+
+    const coordHeader = `<tr style="background:#fde8e8"><th style="${thStyle};width:40%">Curso</th><th style="${thStyle}">Nome do Coordenador</th><th style="${thStyle};width:15%">Telefone</th><th style="${thStyle}">E-mail Institucional</th></tr>`;
+    const emptyCurso = `<tr><td colspan="4" style="${cellStyle};font-style:italic;color:#666">Nenhum curso cadastrado.</td></tr>`;
+
+    const buildCursoRows = (lista: any[]) => lista.map((c: any) =>
+      `<tr><td style="${cellStyle}">${this.escapeHtml(c.nome ?? '')}</td>` +
+      `<td style="${cellStyle}">${this.escapeHtml(c.coordenador?.nome ?? '')}</td>` +
+      `<td style="${cellStyle}">${this.escapeHtml(c.coordenador?.telefone ?? '')}</td>` +
+      `<td style="${cellStyle}">${this.escapeHtml(c.coordenador?.email ?? '')}</td></tr>`
+    ).join('');
+
+    html += '<h2>Identificação da Equipe de Coordenadores de Curso e Turno</h2>';
+    html += `<table style="width:100%;border:1px solid #bbb;margin-bottom:12px;border-collapse:collapse"><thead>${coordHeader}</thead><tbody>`;
+    html += cursosRegulares.length ? buildCursoRows(cursosRegulares) : emptyCurso;
+    html += '</tbody></table>';
+
+    html += '<h2>Identificação da Equipe de Coordenadores de Curso – Itinerário Formativo Verticalizado – IFV (AMS) e Turno</h2>';
+    html += `<table style="width:100%;border:1px solid #bbb;margin-bottom:12px;border-collapse:collapse"><thead>${coordHeader}</thead><tbody>`;
+    html += cursosAMS.length ? buildCursoRows(cursosAMS) : emptyCurso;
+    html += '</tbody></table>';
 
     return html;
   }
@@ -264,7 +347,7 @@ export class ExportPgaPdfService {
         .join(', ');
 
       html += `<table style="width:100%;border:1px solid #bbb;margin-top:10px;border-collapse:collapse"><tbody>`;
-      html += `<tr style="background:#d6e8dc"><th colspan="4" style="padding:6px;border:1px solid #ccc;text-align:left">${tipo}${curso} – ${titulo}</th></tr>`;
+      html += `<tr style="background:#fde8e8"><th colspan="4" style="padding:6px;border:1px solid #ccc;text-align:left">${tipo}${curso} – ${titulo}</th></tr>`;
       html += `<tr><th style="width:20%;padding:5px;border:1px solid #ccc">Responsável</th><td style="padding:5px;border:1px solid #ccc">${responsavel}</td><th style="width:20%;padding:5px;border:1px solid #ccc">Periodicidade</th><td style="padding:5px;border:1px solid #ccc">${periodicidade}</td></tr>`;
       html += `<tr><th style="padding:5px;border:1px solid #ccc">Período</th><td style="padding:5px;border:1px solid #ccc">${dataInicio} a ${dataFim}</td><th style="padding:5px;border:1px solid #ccc">Status</th><td style="padding:5px;border:1px solid #ccc">${status}</td></tr>`;
       if (entregavel) html += `<tr><th style="padding:5px;border:1px solid #ccc">Entregável Esperado</th><td colspan="3" style="padding:5px;border:1px solid #ccc">${entregavel}</td></tr>`;
@@ -302,7 +385,7 @@ export class ExportPgaPdfService {
     if (!acoesCPA || !acoesCPA.length) return '<p>Nenhuma ação CPA cadastrada neste PGA.</p>';
 
     let html = `<table style="width:100%;border-collapse:collapse;margin-top:8px">`;
-    html += `<thead><tr style="background:#e8f4ea">`;
+    html += `<thead><tr style="background:#fde8e8">`;
     html += `<th style="border:1px solid #ccc;padding:6px;width:5%">Item</th>`;
     html += `<th style="border:1px solid #ccc;padding:6px;width:60%">Denominação (O que será feito)</th>`;
     html += `<th style="border:1px solid #ccc;padding:6px">Justificativa</th>`;
@@ -345,7 +428,7 @@ export class ExportPgaPdfService {
     const total = allAnexos.reduce((sum, a) => sum + Number(a.precoTotal.replace(',', '.')), 0);
 
     let html = `<table style="width:100%;border-collapse:collapse;margin-top:8px">`;
-    html += `<thead><tr style="background:#e8f4ea">`;
+    html += `<thead><tr style="background:#fde8e8">`;
     html += `<th style="border:1px solid #ccc;padding:6px;width:5%">Item</th>`;
     html += `<th style="border:1px solid #ccc;padding:6px;width:8%">Projeto</th>`;
     html += `<th style="border:1px solid #ccc;padding:6px;width:20%">Denominação / Especificação</th>`;

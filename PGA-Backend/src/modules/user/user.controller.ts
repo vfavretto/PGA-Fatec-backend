@@ -45,8 +45,10 @@ import { ProcessAccessRequestDto } from './dto/process-access-request.dto';
 import { GetUsersByUnitService } from './services/get-users-by-unit.service';
 import { ChangeUserRoleDto } from './dto/change-user-role.dto';
 import { ChangeUserRoleService } from './services/change-user-role.service';
+import { UpdateCargoUnidadeService } from './services/update-cargo-unidade.service';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
+import { CargoUnidade } from '@prisma/client';
 
 @ApiTags('Users')
 @ApiBearerAuth('JWT-auth')
@@ -65,6 +67,7 @@ export class UserController {
     private readonly requestAccessService: RequestAccessService,
     private readonly getUsersByUnitService: GetUsersByUnitService,
     private readonly changeUserRoleService: ChangeUserRoleService,
+    private readonly updateCargoUnidadeService: UpdateCargoUnidadeService,
   ) {}
 
   @Public()
@@ -242,6 +245,19 @@ export class UserController {
   })
   async findByUnidade(@Param('id', ParseUUIDPipe) id: string) {
     return this.getUsersByUnitService.execute(id);
+  }
+
+  @Patch(':id/cargo-unidade')
+  @UseGuards(RolesGuard)
+  @Roles('Administrador', 'CPS', 'Diretor')
+  @ApiOperation({ summary: 'Atualizar cargo na unidade', description: 'Define o cargo de gestão da pessoa na unidade (Equipe Gestora do PGA)' })
+  @ApiParam({ name: 'id', type: 'string', description: 'ID da pessoa' })
+  @ApiBody({ schema: { properties: { unidade_id: { type: 'string' }, cargo: { type: 'string', nullable: true } } } })
+  async updateCargoUnidade(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() body: { unidade_id: string; cargo: CargoUnidade | null },
+  ) {
+    return this.updateCargoUnidadeService.execute(id, body.unidade_id, body.cargo ?? null);
   }
 
   @Patch(':id/change-role')
