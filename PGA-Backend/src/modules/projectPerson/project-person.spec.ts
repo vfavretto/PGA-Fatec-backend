@@ -37,15 +37,15 @@ describe('FindAllProjectPersonService', () => {
 
   it('deve filtrar por unidade', async () => {
     mockRepo.findAllByUnit.mockResolvedValue([{ projeto_pessoa_id: 2 }]);
-    const result = await service.execute({ active_context: { tipo: 'unidade', id: 3 } });
-    expect(mockRepo.findAllByUnit).toHaveBeenCalledWith(3);
+    const result = await service.execute({ active_context: { tipo: 'unidade', id: 'uuid-3' } });
+    expect(mockRepo.findAllByUnit).toHaveBeenCalledWith('uuid-3');
     expect(result).toHaveLength(1);
   });
 
   it('deve filtrar por regional', async () => {
     mockRepo.findAllByRegional.mockResolvedValue([{ projeto_pessoa_id: 3 }]);
-    const result = await service.execute({ active_context: { tipo: 'regional', id: 1 } });
-    expect(mockRepo.findAllByRegional).toHaveBeenCalledWith(1);
+    const result = await service.execute({ active_context: { tipo: 'regional', id: 'uuid-1' } });
+    expect(mockRepo.findAllByRegional).toHaveBeenCalledWith('uuid-1');
     expect(result).toHaveLength(1);
   });
 });
@@ -56,12 +56,12 @@ describe('FindOneProjectPersonService', () => {
 
   it('deve retornar a associação encontrada', async () => {
     mockRepo.findOneWithContext.mockResolvedValue({ projeto_pessoa_id: 1 });
-    expect(await service.execute(1)).toEqual({ projeto_pessoa_id: 1 });
+    expect(await service.execute('uuid-1')).toEqual({ projeto_pessoa_id: 1 });
   });
 
   it('deve lançar NotFoundException se não encontrada', async () => {
     mockRepo.findOneWithContext.mockResolvedValue(null);
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99')).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -72,12 +72,12 @@ describe('UpdateProjectPersonService', () => {
   it('deve atualizar e retornar a associação', async () => {
     mockRepo.findOne.mockResolvedValue({ projeto_pessoa_id: 1 });
     mockRepo.update.mockResolvedValue({ projeto_pessoa_id: 1, papel: 'Coordenador' });
-    expect((await service.execute(1, { papel: 'Coordenador' } as any)).papel).toBe('Coordenador');
+    expect((await service.execute('uuid-1', { papel: 'Coordenador' } as any)).papel).toBe('Coordenador');
   });
 
   it('deve lançar NotFoundException se não encontrada', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99, {} as any)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99', {} as any)).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -88,12 +88,12 @@ describe('DeleteProjectPersonService', () => {
   it('deve deletar a associação', async () => {
     mockRepo.findOne.mockResolvedValue({ projeto_pessoa_id: 1 });
     mockRepo.delete.mockResolvedValue({ projeto_pessoa_id: 1 });
-    await service.execute(1);
-    expect(mockRepo.delete).toHaveBeenCalledWith(1);
+    await service.execute('uuid-1');
+    expect(mockRepo.delete).toHaveBeenCalledWith('uuid-1');
   });
 
   it('deve lançar NotFoundException se não encontrada', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99')).rejects.toThrow(NotFoundException);
   });
 });

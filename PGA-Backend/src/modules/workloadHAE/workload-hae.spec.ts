@@ -41,12 +41,12 @@ describe('FindOneWorkloadHaeService', () => {
 
   it('deve retornar a carga HAE encontrada', async () => {
     mockRepo.findOne.mockResolvedValue({ workload_hae_id: 1 });
-    expect(await service.execute(1)).toEqual({ workload_hae_id: 1 });
+    expect(await service.execute('uuid-1')).toEqual({ workload_hae_id: 1 });
   });
 
-  it('deve lançar NotFoundException se não encontrada', async () => {
+  it('deve lançar NotFoundException se não encontrado', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99')).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -57,12 +57,12 @@ describe('UpdateWorkloadHaeService', () => {
   it('deve atualizar e retornar a carga HAE', async () => {
     mockRepo.findOne.mockResolvedValue({ workload_hae_id: 1 });
     mockRepo.update.mockResolvedValue({ id: 1, descricao: 'Novo' });
-    expect(((await service.execute(1, { descricao: 'Novo' } as any)) as any).descricao).toBe('Novo');
+    expect(((await service.execute('uuid-1', { descricao: 'Novo' } as any)) as any).descricao).toBe('Novo');
   });
 
   it('deve lançar NotFoundException se não encontrada', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99, {} as any)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99', {} as any)).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -74,19 +74,19 @@ describe('DeleteWorkloadHaeService', () => {
     mockRepo.findOne.mockResolvedValue({ workload_hae_id: 1 });
     mockPrisma.projetoPessoa.count.mockResolvedValue(0);
     mockRepo.softDelete.mockResolvedValue({ workload_hae_id: 1 });
-    await service.execute(1);
-    expect(mockRepo.softDelete).toHaveBeenCalledWith(1);
+    await service.execute('uuid-1');
+    expect(mockRepo.softDelete).toHaveBeenCalledWith('uuid-1');
   });
 
   it('deve lançar ConflictException se vínculo em uso', async () => {  
     mockRepo.findOne.mockResolvedValue({ workload_hae_id: 1 });
     mockPrisma.projetoPessoa.count.mockResolvedValue(3);
     const { ConflictException } = require('@nestjs/common');
-    await expect(service.execute(1)).rejects.toThrow(ConflictException);
+    await expect(service.execute('uuid-1')).rejects.toThrow(ConflictException);
   });
 
   it('deve lançar NotFoundException se não encontrada', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99')).rejects.toThrow(NotFoundException);
   });
 });

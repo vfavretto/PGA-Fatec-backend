@@ -31,7 +31,7 @@ export class ReviewPgaRegionalService {
       status: StatusPGA.AguardandoCPS,
       parecer_regional: parecer ?? null,
       data_parecer_regional: new Date(),
-      regionalResponsavel: { connect: { pessoa_id: pessoaId } },
+      regional_responsavel_id: pessoaId,
     });
   }
 
@@ -55,7 +55,7 @@ export class ReviewPgaRegionalService {
       status: StatusPGA.Reprovado,
       parecer_regional: parecer,
       data_parecer_regional: new Date(),
-      regionalResponsavel: { connect: { pessoa_id: pessoaId } },
+      regional_responsavel_id: pessoaId,
     });
   }
 

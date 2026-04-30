@@ -18,8 +18,8 @@ describe('CreateThematicAxisService', () => {
   beforeEach(() => { jest.clearAllMocks(); service = new CreateThematicAxisService(mockRepo as any); });
 
   it('deve criar e retornar o eixo temático', async () => {
-    mockRepo.create.mockResolvedValue({ thematic_axis_id: 1 });
-    expect(await service.execute({ nome: 'Eixo 1' } as any)).toEqual({ thematic_axis_id: 1 });
+    mockRepo.create.mockResolvedValue({ eixo_id: 'uuid-1' });
+    expect(await service.execute({ nome_eixo: 'Eixo 1' } as any)).toEqual({ eixo_id: 'uuid-1' });
   });
 });
 
@@ -28,7 +28,7 @@ describe('FindAllThematicAxisService', () => {
   beforeEach(() => { jest.clearAllMocks(); service = new FindAllThematicAxisService(mockRepo as any); });
 
   it('deve retornar todos os eixos temáticos', async () => {
-    mockRepo.findAll.mockResolvedValue([{ thematic_axis_id: 1 }]);
+    mockRepo.findAll.mockResolvedValue([{ eixo_id: 'uuid-1' }]);
     expect(await service.execute()).toHaveLength(1);
   });
 });
@@ -38,13 +38,13 @@ describe('FindOneThematicAxisService', () => {
   beforeEach(() => { jest.clearAllMocks(); service = new FindOneThematicAxisService(mockRepo as any); });
 
   it('deve retornar o eixo encontrado', async () => {
-    mockRepo.findOne.mockResolvedValue({ eixo_id: 1 });
-    expect(await service.execute(1)).toEqual({ eixo_id: 1 });
+    mockRepo.findOne.mockResolvedValue({ eixo_id: 'uuid-1' });
+    expect(await service.execute('uuid-1')).toEqual({ eixo_id: 'uuid-1' });
   });
 
   it('deve retornar null se não encontrado', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    expect(await service.execute(99)).toBeNull();
+    expect(await service.execute('uuid-99')).toBeNull();
   });
 });
 
@@ -53,14 +53,14 @@ describe('UpdateThematicAxisService', () => {
   beforeEach(() => { jest.clearAllMocks(); service = new UpdateThematicAxisService(mockRepo as any); });
 
   it('deve atualizar e retornar o eixo', async () => {
-    mockRepo.findOne.mockResolvedValue({ thematic_axis_id: 1 });
-    mockRepo.update.mockResolvedValue({ eixo_id: 1, nome: 'Novo' });
-    expect(((await service.execute(1, { nome: 'Novo' } as any)) as any).nome).toBe('Novo');
+    mockRepo.findOne.mockResolvedValue({ eixo_id: 'uuid-1' });
+    mockRepo.update.mockResolvedValue({ eixo_id: 'uuid-1', nome_eixo: 'Novo' });
+    expect((await service.execute('uuid-1', { nome_eixo: 'Novo' } as any) as any).nome_eixo).toBe('Novo');
   });
 
   it('deve lançar NotFoundException se não encontrado', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99, {} as any)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99', {} as any)).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -69,14 +69,14 @@ describe('DeleteThematicAxisService', () => {
   beforeEach(() => { jest.clearAllMocks(); service = new DeleteThematicAxisService(mockRepo as any); });
 
   it('deve deletar o eixo temático', async () => {
-    mockRepo.findOne.mockResolvedValue({ thematic_axis_id: 1 });
-    mockRepo.softDelete.mockResolvedValue({ thematic_axis_id: 1 });
-    await service.execute(1);
-    expect(mockRepo.softDelete).toHaveBeenCalledWith(1);
+    mockRepo.findOne.mockResolvedValue({ eixo_id: 'uuid-1' });
+    mockRepo.softDelete.mockResolvedValue({ eixo_id: 'uuid-1' });
+    await service.execute('uuid-1');
+    expect(mockRepo.softDelete).toHaveBeenCalledWith('uuid-1');
   });
 
   it('deve lançar NotFoundException se não encontrado', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99')).rejects.toThrow(NotFoundException);
   });
 });

@@ -15,6 +15,7 @@ const mockRepo = {
   findOne: jest.fn(),
   findOneWithContext: jest.fn(),
   update: jest.fn(),
+  updateWorkflow: jest.fn(),
   delete: jest.fn(),
 };
 
@@ -62,21 +63,21 @@ describe('FindAllPgaService', () => {
 
   it('deve retornar todos os PGAs sem contexto', async () => {
     mockRepo.findAll.mockResolvedValue([{ pga_id: 1 }]);
-    const result = await service.execute();
+    const result = await service.execute({ tipo_usuario: 'Administrador' });
     expect(mockRepo.findAll).toHaveBeenCalled();
     expect(result).toHaveLength(1);
   });
 
   it('deve filtrar por unidade quando contexto é unidade', async () => {
     mockRepo.findAllByUnit.mockResolvedValue([{ pga_id: 2 }]);
-    await service.execute({ active_context: { tipo: 'unidade', id: 3 } });
-    expect(mockRepo.findAllByUnit).toHaveBeenCalledWith(3);
+    await service.execute({ tipo_usuario: 'Administrador', active_context: { tipo: 'unidade', id: 'uuid-3' } });
+    expect(mockRepo.findAllByUnit).toHaveBeenCalledWith('uuid-3', false);
   });
 
   it('deve filtrar por regional quando contexto é regional', async () => {
     mockRepo.findAllByRegional.mockResolvedValue([]);
-    await service.execute({ active_context: { tipo: 'regional', id: 4 } });
-    expect(mockRepo.findAllByRegional).toHaveBeenCalledWith(4);
+    await service.execute({ active_context: { tipo: 'regional', id: 'uuid-4' } });
+    expect(mockRepo.findAllByRegional).toHaveBeenCalledWith('uuid-4');
   });
 });
 
@@ -90,14 +91,14 @@ describe('FindOnePgaService', () => {
   });
 
   it('deve retornar PGA encontrado', async () => {
-    mockRepo.findOneWithContext.mockResolvedValue({ pga_id: 1 });
-    const result = await service.execute(1);
-    expect(result).toEqual({ pga_id: 1 });
+    mockRepo.findOneWithContext.mockResolvedValue({ pga_id: 'uuid-1' });
+    const result = await service.execute('uuid-1');
+    expect(result).toEqual({ pga_id: 'uuid-1' });
   });
 
   it('deve lançar NotFoundException se PGA não encontrado', async () => {
     mockRepo.findOneWithContext.mockResolvedValue(null);
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99')).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -107,27 +108,27 @@ describe('UpdatePgaService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    service = new UpdatePgaService(mockRepo as any);
+    service = new UpdatePgaService(mockRepo as any, mockPrisma as any);
   });
 
   it('deve atualizar PGA', async () => {
-    mockRepo.findOne.mockResolvedValue({ pga_id: 1, status: 'Rascunho' });
-    mockRepo.update.mockResolvedValue({ pga_id: 1, ano: 2026 });
+    mockRepo.findOne.mockResolvedValue({ pga_id: 'uuid-1', status: 'Rascunho' });
+    mockRepo.update.mockResolvedValue({ pga_id: 'uuid-1', ano: 2026 });
 
-    const result = await service.execute(1, { ano: 2026 } as any);
+    const result = await service.execute('uuid-1', { ano: 2026 } as any, { tipo_usuario: 'Administrador' });
     expect(result.ano).toBe(2026);
   });
 
   it('deve definir data_elaboracao ao submeter PGA', async () => {
-    mockRepo.findOne.mockResolvedValue({ pga_id: 1, status: 'Rascunho' });
-    mockRepo.update.mockResolvedValue({ pga_id: 1, status: 'Submetido' });
-    await service.execute(1, { status: 'Submetido' } as any);
-    expect(mockRepo.update).toHaveBeenCalledWith(1, expect.objectContaining({ data_elaboracao: expect.any(Date) }));
+    mockRepo.findOne.mockResolvedValue({ pga_id: 'uuid-1', status: 'Rascunho' });
+    mockRepo.update.mockResolvedValue({ pga_id: 'uuid-1', status: 'Submetido' });
+    await service.execute('uuid-1', { status: 'Submetido' } as any, { tipo_usuario: 'Administrador' });
+    expect(mockRepo.update).toHaveBeenCalledWith('uuid-1', expect.objectContaining({ data_elaboracao: expect.any(Date) }));
   });
 
   it('deve lançar NotFoundException se PGA não encontrado', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99, {} as any)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99', {} as any)).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -142,22 +143,22 @@ describe('DeletePgaService', () => {
 
   it('deve lançar NotFoundException se PGA não encontrado', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99')).rejects.toThrow(NotFoundException);
   });
 
   it('deve lançar ConflictException se há ações de projeto ativas', async () => {
-    mockRepo.findOne.mockResolvedValue({ pga_id: 1 });
+    mockRepo.findOne.mockResolvedValue({ pga_id: 'uuid-1' });
     mockPrisma.acaoProjeto.count.mockResolvedValue(3);
 
-    await expect(service.execute(1)).rejects.toThrow(ConflictException);
+    await expect(service.execute('uuid-1')).rejects.toThrow(ConflictException);
   });
 
   it('deve executar transação de delete sem conflitos', async () => {
-    mockRepo.findOne.mockResolvedValue({ pga_id: 1 });
+    mockRepo.findOne.mockResolvedValue({ pga_id: 'uuid-1' });
     mockPrisma.acaoProjeto.count.mockResolvedValue(0);
-    mockPrisma.$transaction.mockResolvedValue({ pga_id: 1, ativo: false });
+    mockPrisma.$transaction.mockResolvedValue({ pga_id: 'uuid-1', ativo: false });
 
-    await service.execute(1);
+    await service.execute('uuid-1');
     expect(mockPrisma.$transaction).toHaveBeenCalled();
   });
 });
@@ -173,53 +174,53 @@ describe('SubmitPgaService', () => {
 
   it('deve lançar NotFoundException se PGA não encontrado', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99, 1)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99', 'uuid-1')).rejects.toThrow(NotFoundException);
   });
 
   it('deve lançar BadRequestException se PGA não está EmElaboracao', async () => {
-    mockRepo.findOne.mockResolvedValue({ pga_id: 1, status: 'Submetido' });
-    await expect(service.execute(1, 1)).rejects.toThrow(BadRequestException);
+    mockRepo.findOne.mockResolvedValue({ pga_id: 'uuid-1', status: 'Submetido' });
+    await expect(service.execute('uuid-1', 'uuid-1')).rejects.toThrow(BadRequestException);
   });
 
   it('deve lançar NotFoundException se pessoa não encontrada', async () => {
-    mockRepo.findOne.mockResolvedValue({ pga_id: 1, status: 'EmElaboracao' });
+    mockRepo.findOne.mockResolvedValue({ pga_id: 'uuid-1', status: 'EmElaboracao' });
     mockPrisma.pessoa.findUnique.mockResolvedValue(null);
 
-    await expect(service.execute(1, 99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-1', 'uuid-99')).rejects.toThrow(NotFoundException);
   });
 
   it('deve lançar ForbiddenException se Diretor tentar submeter PGA de outra unidade', async () => {
-    mockRepo.findOne.mockResolvedValue({ pga_id: 1, status: 'EmElaboracao', unidade_id: 10 });
+    mockRepo.findOne.mockResolvedValue({ pga_id: 'uuid-1', status: 'EmElaboracao', unidade_id: 'uuid-10' });
     mockPrisma.pessoa.findUnique.mockResolvedValue({
       tipo_usuario: 'Diretor',
-      unidades: [{ unidade_id: 20 }],
+      unidades: [{ unidade_id: 'uuid-20' }],
     });
 
-    await expect(service.execute(1, 1)).rejects.toThrow(ForbiddenException);
+    await expect(service.execute('uuid-1', 'uuid-1')).rejects.toThrow(ForbiddenException);
   });
 
   it('deve submeter PGA quando Diretor é da mesma unidade', async () => {
-    mockRepo.findOne.mockResolvedValue({ pga_id: 1, status: 'EmElaboracao', unidade_id: 10 });
+    mockRepo.findOne.mockResolvedValue({ pga_id: 'uuid-1', status: 'EmElaboracao', unidade_id: 'uuid-10' });
     mockPrisma.pessoa.findUnique.mockResolvedValue({
       tipo_usuario: 'Diretor',
-      unidades: [{ unidade_id: 10 }],
+      unidades: [{ unidade_id: 'uuid-10' }],
     });
-    mockRepo.update.mockResolvedValue({ pga_id: 1, status: 'Submetido' });
+    mockRepo.updateWorkflow.mockResolvedValue({ pga_id: 'uuid-1', status: 'Submetido' });
 
-    const result = await service.execute(1, 1);
-    expect(mockRepo.update).toHaveBeenCalled();
+    const result = await service.execute('uuid-1', 'uuid-1');
+    expect(mockRepo.updateWorkflow).toHaveBeenCalled();
   });
 
   it('deve submeter PGA para Administrador sem restrição de unidade', async () => {
-    mockRepo.findOne.mockResolvedValue({ pga_id: 1, status: 'EmElaboracao', unidade_id: 10 });
+    mockRepo.findOne.mockResolvedValue({ pga_id: 'uuid-1', status: 'EmElaboracao', unidade_id: 'uuid-10' });
     mockPrisma.pessoa.findUnique.mockResolvedValue({
       tipo_usuario: 'Administrador',
       unidades: [],
     });
-    mockRepo.update.mockResolvedValue({ pga_id: 1, status: 'Submetido' });
+    mockRepo.updateWorkflow.mockResolvedValue({ pga_id: 'uuid-1', status: 'Submetido' });
 
-    await service.execute(1, 1);
-    expect(mockRepo.update).toHaveBeenCalled();
+    await service.execute('uuid-1', 'uuid-1');
+    expect(mockRepo.updateWorkflow).toHaveBeenCalled();
   });
 });
 
@@ -231,6 +232,9 @@ describe('PgaController', () => {
   const mockUpdate = { execute: jest.fn() };
   const mockDelete = { execute: jest.fn() };
   const mockSubmit = { execute: jest.fn() };
+  const mockPublish = { execute: jest.fn() };
+  const mockReviewRegional = { execute: jest.fn() };
+  const mockReviewCps = { execute: jest.fn() };
   const mockExportCsv = { execute: jest.fn() };
   const mockExportPdf = { execute: jest.fn() };
   let controller: PgaController;
@@ -244,6 +248,9 @@ describe('PgaController', () => {
       mockUpdate as any,
       mockDelete as any,
       mockSubmit as any,
+      mockPublish as any,
+      mockReviewRegional as any,
+      mockReviewCps as any,
       mockExportCsv as any,
       mockExportPdf as any,
     );
@@ -251,7 +258,7 @@ describe('PgaController', () => {
 
   it('create deve chamar createPgaService', async () => {
     mockCreate.execute.mockResolvedValue({ pga_id: 1 });
-    await controller.create({ unidade_id: 1, ano: 2025 } as any);
+    await controller.create({ unidade_id: 'uuid-1', ano: 2025 } as any, {} as any);
     expect(mockCreate.execute).toHaveBeenCalled();
   });
 
