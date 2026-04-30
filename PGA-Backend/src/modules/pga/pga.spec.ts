@@ -258,7 +258,7 @@ describe('PgaController', () => {
 
   it('create deve chamar createPgaService', async () => {
     mockCreate.execute.mockResolvedValue({ pga_id: 1 });
-    await controller.create({ unidade_id: 1, ano: 2025 } as any, {} as any);
+    await controller.create({ unidade_id: 'uuid-1', ano: 2025 } as any, {} as any);
     expect(mockCreate.execute).toHaveBeenCalled();
   });
 

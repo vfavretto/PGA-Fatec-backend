@@ -30,7 +30,7 @@ describe('AuthController', () => {
       const tokenDto = { access_token: 'at', refresh_token: 'rt' };
       mockLoginService.execute.mockResolvedValue(tokenDto);
 
-      const req = { user: { email: 'a@a.com', pessoa_id: 1 } };
+      const req = { user: { email: 'a@a.com', pessoa_id: 'uuid-1' } };
       const result = await controller.login(req, mockRes);
 
       expect(mockLoginService.execute).toHaveBeenCalledWith(req.user);

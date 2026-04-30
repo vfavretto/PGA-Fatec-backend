@@ -68,9 +68,9 @@ describe('FindOneAttachmentService', () => {
   beforeEach(() => { jest.clearAllMocks(); service = new FindOneAttachmentService(mockRepo as any); });
 
   it('deve retornar anexo encontrado', async () => {
-    mockRepo.findOneWithContext.mockResolvedValue({ anexo_id: 1 });
+    mockRepo.findOneWithContext.mockResolvedValue({ anexo_id: 'uuid-1' });
     const result = await service.execute('uuid-1');
-    expect(result).toEqual({ anexo_id: 1 });
+    expect(result).toEqual({ anexo_id: 'uuid-1' });
   });
 
   it('deve retornar null se não encontrado', async () => {
@@ -85,7 +85,7 @@ describe('UpdateAttachmentService', () => {
   beforeEach(() => { jest.clearAllMocks(); service = new UpdateAttachmentService(mockRepo as any); });
 
   it('deve atualizar o anexo', async () => {
-    mockRepo.update.mockResolvedValue({ anexo_id: 1, item: 'Documento' });
+    mockRepo.update.mockResolvedValue({ anexo_id: 'uuid-1', item: 'Documento' });
     const result = await service.execute('uuid-1', { item: 'Documento' } as any);
     expect((result as any).item).toBe('Documento');
   });

@@ -35,17 +35,17 @@ describe('FindAllDeliverableService', () => {
     expect(await service.execute()).toHaveLength(1);
   });
 
-  it('deve filtrar por unidade', async () => {
-    mockRepo.findAllByUnit.mockResolvedValue([{ deliverable_id: 2 }]);
+  it('deve retornar todos os entregáveis ignorando contexto de unidade', async () => {
+    mockRepo.findAll.mockResolvedValue([{ deliverable_id: 2 }]);
     const result = await service.execute({ active_context: { tipo: 'unidade', id: 'uuid-5' } });
-    expect(mockRepo.findAllByUnit).toHaveBeenCalledWith('uuid-5');
+    expect(mockRepo.findAll).toHaveBeenCalled();
     expect(result).toHaveLength(1);
   });
 
-  it('deve filtrar por regional', async () => {
-    mockRepo.findAllByRegional.mockResolvedValue([{ deliverable_id: 3 }]);
+  it('deve retornar todos os entregáveis ignorando contexto de regional', async () => {
+    mockRepo.findAll.mockResolvedValue([{ deliverable_id: 3 }]);
     const result = await service.execute({ active_context: { tipo: 'regional', id: 'uuid-2' } });
-    expect(mockRepo.findAllByRegional).toHaveBeenCalledWith('uuid-2');
+    expect(mockRepo.findAll).toHaveBeenCalled();
     expect(result).toHaveLength(1);
   });
 });
