@@ -9,7 +9,6 @@ import { UpdateAttachmentService } from './services/update-attachment.service';
 import { DeleteAttachmentService } from './services/delete-attachment.service';
 import { FindByProcessStepService } from './services/find-by-process-step.service';
 import { FindByDeliverableService } from './services/find-by-deliverable.service';
-import { Public } from '../auth/decorators/is-public.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('Projects')
@@ -27,7 +26,6 @@ export class AttachmentController {
     private readonly findByEntregavelService: FindByDeliverableService,
   ) {}
 
-  @Public()
   @Post()
   @ApiOperation({ summary: 'Criar anexo', description: 'Cria um novo anexo no sistema' })
   @ApiBody({ type: CreateAttachmentDto })

@@ -58,12 +58,12 @@ describe('FindOneInstitutionalRoutineService', () => {
 
   it('deve retornar rotina encontrada', async () => {
     mockRepo.findOneWithContext.mockResolvedValue({ rotina_id: 1 });
-    expect(await service.execute(1)).toEqual({ rotina_id: 1 });
+    expect(await service.execute('1')).toEqual({ rotina_id: 1 });
   });
 
   it('deve lançar NotFoundException se não encontrada', async () => {
     mockRepo.findOneWithContext.mockResolvedValue(null);
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('99')).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -74,12 +74,12 @@ describe('UpdateInstitutionalRoutineService', () => {
   it('deve atualizar e retornar a rotina', async () => {
     mockRepo.findOne.mockResolvedValue({ rotina_id: 1 });
     mockRepo.update.mockResolvedValue({ rotina_id: 1, descricao: 'Novo' });
-    expect(((await service.execute(1, { descricao: 'Novo' } as any)) as any).descricao).toBe('Novo');
+    expect(((await service.execute('1', { descricao: 'Novo' } as any)) as any).descricao).toBe('Novo');
   });
 
   it('deve lançar NotFoundException se não encontrada', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99, {} as any)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('99', {} as any)).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -92,12 +92,12 @@ describe('DeleteInstitutionalRoutineService', () => {
     mockPrisma.$transaction.mockImplementation(async (fn: any) =>
       fn({ rotinaOcorrencia: { updateMany: jest.fn() }, rotinaParticipante: { updateMany: jest.fn() }, rotinaInstitucional: { update: jest.fn() } }),
     );
-    await service.execute(1);
+    await service.execute('1');
     expect(mockPrisma.$transaction).toHaveBeenCalled();
   });
 
   it('deve lançar NotFoundException se não encontrada', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('99')).rejects.toThrow(NotFoundException);
   });
 });

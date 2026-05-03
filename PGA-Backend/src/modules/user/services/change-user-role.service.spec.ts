@@ -23,14 +23,14 @@ describe('ChangeUserRoleService', () => {
 
   it('deve lançar NotFoundException se usuário alvo não encontrado', async () => {
     mockRepo.findById.mockResolvedValue(null);
-    await expect(service.execute(99, 'Diretor' as any)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('99', 'Diretor' as any)).rejects.toThrow(NotFoundException);
   });
 
   it('deve lançar ForbiddenException se usuário logado sem permissão', async () => {
     mockRepo.findById
       .mockResolvedValueOnce({ pessoa_id: 1, tipo_usuario: 'Docente' })
       .mockResolvedValueOnce({ pessoa_id: 2, tipo_usuario: 'Docente' });
-    await expect(service.execute(1, 'Diretor' as any, undefined, 2)).rejects.toThrow(ForbiddenException);
+    await expect(service.execute('1', 'Diretor' as any, undefined, '2')).rejects.toThrow(ForbiddenException);
   });
 
   it('deve executar transação se usuário logado é Administrador', async () => {
@@ -38,7 +38,7 @@ describe('ChangeUserRoleService', () => {
       .mockResolvedValueOnce({ pessoa_id: 1, tipo_usuario: 'Docente' })
       .mockResolvedValueOnce({ pessoa_id: 2, tipo_usuario: 'Administrador' });
     mockTx.unidade.findUnique.mockResolvedValue({ unidade_id: 10, diretor_id: null });
-    await service.execute(1, 'Diretor' as any, 10, 2);
+    await service.execute('1', 'Diretor' as any, '10', '2');
     expect(mockPrisma.$transaction).toHaveBeenCalled();
   });
 
@@ -46,24 +46,27 @@ describe('ChangeUserRoleService', () => {
     mockRepo.findById.mockResolvedValue({ pessoa_id: 1, tipo_usuario: 'Diretor' });
     mockTx.unidade.findFirst.mockResolvedValue({ unidade_id: 5 });
     mockTx.unidade.update.mockResolvedValue({});
-    await service.execute(1, 'Docente' as any);
+    await service.execute('1', 'Docente' as any);
     expect(mockTx.unidade.update).toHaveBeenCalled();
   });
 
   it('deve lançar ForbiddenException se definindo Diretor sem unidadeId', async () => {
     mockRepo.findById.mockResolvedValue({ pessoa_id: 1, tipo_usuario: 'Docente' });
-    await expect(service.execute(1, 'Diretor' as any)).rejects.toThrow(ForbiddenException);
+    await expect(service.execute('1', 'Diretor' as any)).rejects.toThrow(ForbiddenException);
   });
 
   it('deve lançar NotFoundException se unidade não encontrada ao definir Diretor', async () => {
     mockRepo.findById.mockResolvedValue({ pessoa_id: 1, tipo_usuario: 'Docente' });
     mockTx.unidade.findUnique.mockResolvedValue(null);
-    await expect(service.execute(1, 'Diretor' as any, 99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('1', 'Diretor' as any, '99')).rejects.toThrow(NotFoundException);
   });
 
-  it('deve lançar ConflictException se unidade já tem diretor diferente', async () => {
+  it('deve demover diretor anterior se unidade já tem diretor diferente', async () => {
     mockRepo.findById.mockResolvedValue({ pessoa_id: 1, tipo_usuario: 'Docente' });
-    mockTx.unidade.findUnique.mockResolvedValue({ unidade_id: 10, diretor_id: 99, diretor: { nome: 'Outro' } });
-    await expect(service.execute(1, 'Diretor' as any, 10)).rejects.toThrow(ConflictException);
+    mockTx.unidade.findUnique.mockResolvedValue({ unidade_id: 10, diretor_id: '99', diretor: { nome: 'Outro' } });
+    mockTx.pessoa.update.mockResolvedValue({});
+    mockTx.unidade.update.mockResolvedValue({});
+    await service.execute('1', 'Diretor' as any, '10');
+    expect(mockTx.pessoa.update).toHaveBeenCalled();
   });
 });

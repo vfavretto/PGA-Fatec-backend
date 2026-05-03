@@ -19,14 +19,14 @@ describe('ListAccessRequestsService', () => {
       { status: 'Pendente' },
       { status: 'Aprovada' },
     ]);
-    const result = await service.execute(1, 'Administrador' as any);
+    const result = await service.execute('1', 'Administrador' as any);
     expect(result.pendingRequests).toHaveLength(1);
     expect(result.processedRequests).toHaveLength(1);
   });
 
   it('deve retornar vazio para Diretor sem unidades', async () => {
     mockPrisma.pessoaUnidade.findMany.mockResolvedValue([]);
-    const result = await service.execute(1, 'Diretor' as any);
+    const result = await service.execute('1', 'Diretor' as any);
     expect(result.pendingRequests).toHaveLength(0);
     expect(result.processedRequests).toHaveLength(0);
   });
@@ -37,12 +37,12 @@ describe('ListAccessRequestsService', () => {
       { status: 'Pendente' },
       { status: 'Rejeitada' },
     ]);
-    const result = await service.execute(1, 'Diretor' as any);
+    const result = await service.execute('1', 'Diretor' as any);
     expect(result.pendingRequests).toHaveLength(1);
     expect(result.processedRequests).toHaveLength(1);
   });
 
   it('deve lançar ForbiddenException para tipo não autorizado', async () => {
-    await expect(service.execute(1, 'Docente' as any)).rejects.toThrow(ForbiddenException);
+    await expect(service.execute('1', 'Docente' as any)).rejects.toThrow(ForbiddenException);
   });
 });

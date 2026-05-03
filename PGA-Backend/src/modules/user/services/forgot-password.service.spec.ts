@@ -21,6 +21,6 @@ describe('ForgotPasswordService', () => {
     mockRepo.findByEmail.mockResolvedValue({ email: 'a@b.com' });
     mockSendPasswordReset.execute.mockResolvedValue(undefined);
     await service.execute('a@b.com');
-    expect(mockSendPasswordReset.execute).toHaveBeenCalledWith('a@b.com', 'token123');
+    expect(mockSendPasswordReset.execute).toHaveBeenCalledWith('a@b.com', 'token123', false);
   });
 });

@@ -30,7 +30,7 @@ describe('CreateCourseService', () => {
   });
 
   it('deve criar e retornar o curso', async () => {
-    const dto = { nome: 'TSI', unidade_id: 1, tipo: 'Superior' as any, status: 'Ativo' as any };
+    const dto = { nome: 'TSI', unidade_id: '1', tipo: 'Superior' as any, status: 'Ativo' as any };
     const created = { curso_id: 1, ...dto };
     mockRepo.create.mockResolvedValue(created);
 
@@ -81,14 +81,14 @@ describe('FindOneCourseService', () => {
     const course = { curso_id: 1, nome: 'TSI' };
     mockRepo.findOneWithContext.mockResolvedValue(course);
 
-    const result = await service.execute(1);
+    const result = await service.execute('1');
     expect(result).toBe(course);
   });
 
   it('deve lançar NotFoundException se curso não encontrado', async () => {
     mockRepo.findOneWithContext.mockResolvedValue(null);
 
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('99')).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -105,14 +105,14 @@ describe('UpdateCourseService', () => {
     mockRepo.findOne.mockResolvedValue(course);
     mockRepo.update.mockResolvedValue({ ...course, nome: 'Novo Nome' });
 
-    const result = await service.execute(1, { nome: 'Novo Nome' } as any);
+    const result = await service.execute('1', { nome: 'Novo Nome' } as any);
     expect(result.nome).toBe('Novo Nome');
   });
 
   it('deve lançar NotFoundException se curso não encontrado', async () => {
     mockRepo.findOne.mockResolvedValue(null);
 
-    await expect(service.execute(99, {} as any)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('99', {} as any)).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -127,14 +127,14 @@ describe('DeleteCourseService', () => {
   it('deve lançar NotFoundException se curso não encontrado', async () => {
     mockRepo.findOne.mockResolvedValue(null);
 
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('99')).rejects.toThrow(NotFoundException);
   });
 
   it('deve lançar ConflictException se há rotinas vinculadas', async () => {
     mockRepo.findOne.mockResolvedValue({ curso_id: 1 });
     mockPrisma.rotinaInstitucional.count.mockResolvedValue(2);
 
-    await expect(service.execute(1)).rejects.toThrow();
+    await expect(service.execute('1')).rejects.toThrow();
   });
 
   it('deve excluir o curso quando sem dependências', async () => {
@@ -142,8 +142,8 @@ describe('DeleteCourseService', () => {
     mockPrisma.rotinaInstitucional.count.mockResolvedValue(0);
     mockRepo.softDelete.mockResolvedValue({ curso_id: 1, ativo: false });
 
-    const result = await service.execute(1);
-    expect(mockRepo.softDelete).toHaveBeenCalledWith(1);
+    const result = await service.execute('1');
+    expect(mockRepo.softDelete).toHaveBeenCalledWith('1');
   });
 });
 
@@ -168,7 +168,7 @@ describe('CourseController', () => {
 
   it('create deve chamar createService', async () => {
     mockCreate.execute.mockResolvedValue({ curso_id: 1 });
-    const dto = { nome: 'TSI', unidade_id: 1, tipo: 'Superior' as any, status: 'Ativo' as any };
+    const dto = { nome: 'TSI', unidade_id: '1', tipo: 'Superior' as any, status: 'Ativo' as any };
     await controller.create(dto);
     expect(mockCreate.execute).toHaveBeenCalledWith(dto);
   });
@@ -181,19 +181,19 @@ describe('CourseController', () => {
 
   it('findOne deve passar id e user', async () => {
     mockFindOne.execute.mockResolvedValue({ curso_id: 1 });
-    await controller.findOne({ user: {} }, 1);
-    expect(mockFindOne.execute).toHaveBeenCalledWith(1, {});
+    await controller.findOne({ user: {} }, '1');
+    expect(mockFindOne.execute).toHaveBeenCalledWith('1', {});
   });
 
   it('update deve passar id e dto', async () => {
     mockUpdate.execute.mockResolvedValue({ curso_id: 1 });
-    await controller.update(1, {} as any);
-    expect(mockUpdate.execute).toHaveBeenCalledWith(1, {});
+    await controller.update('1', {} as any);
+    expect(mockUpdate.execute).toHaveBeenCalledWith('1', {});
   });
 
   it('delete deve passar id', async () => {
     mockDelete.execute.mockResolvedValue({ curso_id: 1, ativo: false });
-    await controller.delete(1);
-    expect(mockDelete.execute).toHaveBeenCalledWith(1);
+    await controller.delete('1');
+    expect(mockDelete.execute).toHaveBeenCalledWith('1');
   });
 });

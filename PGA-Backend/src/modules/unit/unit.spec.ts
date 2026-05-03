@@ -86,13 +86,13 @@ describe('FindOneUnitService', () => {
 
   it('deve retornar unidade encontrada', async () => {
     mockRepo.findOneWithContext.mockResolvedValue({ unidade_id: 1 });
-    const result = await service.execute(1);
+    const result = await service.execute('1');
     expect(result).toEqual({ unidade_id: 1 });
   });
 
   it('deve lançar NotFoundException se não encontrada', async () => {
     mockRepo.findOneWithContext.mockResolvedValue(null);
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('99')).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -108,13 +108,13 @@ describe('UpdateUnitService', () => {
     mockRepo.findOne.mockResolvedValue({ unidade_id: 1 });
     mockRepo.update.mockResolvedValue({ unidade_id: 1, nome_unidade: 'Novo' });
 
-    const result = await service.execute(1, { nome_unidade: 'Novo' } as any);
+    const result = await service.execute('1', { nome_unidade: 'Novo' } as any);
     expect(result.nome_unidade).toBe('Novo');
   });
 
   it('deve lançar NotFoundException se não encontrada', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99, {} as any)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('99', {} as any)).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -128,13 +128,13 @@ describe('DeleteUnitService', () => {
 
   it('deve lançar NotFoundException se não encontrada', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('99')).rejects.toThrow(NotFoundException);
   });
 
   it('deve lançar ConflictException se há PGAs ativos', async () => {
     mockRepo.findOne.mockResolvedValue({ unidade_id: 1 });
     mockPrisma.pGA.count.mockResolvedValue(1);
-    await expect(service.execute(1)).rejects.toThrow(ConflictException);
+    await expect(service.execute('1')).rejects.toThrow(ConflictException);
   });
 
   it('deve excluir quando sem dependências', async () => {
@@ -142,8 +142,8 @@ describe('DeleteUnitService', () => {
     mockPrisma.pGA.count.mockResolvedValue(0);
     mockRepo.softDelete.mockResolvedValue({ unidade_id: 1, ativo: false });
 
-    await service.execute(1);
-    expect(mockRepo.softDelete).toHaveBeenCalledWith(1);
+    await service.execute('1');
+    expect(mockRepo.softDelete).toHaveBeenCalledWith('1');
   });
 });
 

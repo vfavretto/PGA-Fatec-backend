@@ -39,12 +39,12 @@ describe('FindOneRoutineParticipantService', () => {
 
   it('deve retornar o participante encontrado', async () => {
     mockRepo.findOne.mockResolvedValue({ participant_id: 1 });
-    expect(await service.execute(1)).toEqual({ participant_id: 1 });
+    expect(await service.execute('1')).toEqual({ participant_id: 1 });
   });
 
   it('deve lançar NotFoundException se não encontrado', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('99')).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -55,12 +55,12 @@ describe('UpdateRoutineParticipantService', () => {
   it('deve atualizar e retornar o participante', async () => {
     mockRepo.findOne.mockResolvedValue({ participant_id: 1 });
     mockRepo.update.mockResolvedValue({ rotina_participante_id: 1, papel: 'Coordenador' });
-    expect(((await service.execute(1, { papel: 'Coordenador' } as any)) as any).papel).toBe('Coordenador');
+    expect(((await service.execute('1', { papel: 'Coordenador' } as any)) as any).papel).toBe('Coordenador');
   });
 
   it('deve lançar NotFoundException se não encontrado', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99, {} as any)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('99', {} as any)).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -71,12 +71,12 @@ describe('DeleteRoutineParticipantService', () => {
   it('deve deletar o participante', async () => {
     mockRepo.findOne.mockResolvedValue({ participant_id: 1 });
     mockRepo.softDelete.mockResolvedValue({ participant_id: 1 });
-    await service.execute(1);
-    expect(mockRepo.softDelete).toHaveBeenCalledWith(1);
+    await service.execute('1');
+    expect(mockRepo.softDelete).toHaveBeenCalledWith('1');
   });
 
   it('deve lançar NotFoundException se não encontrado', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('99')).rejects.toThrow(NotFoundException);
   });
 });

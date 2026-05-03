@@ -14,16 +14,16 @@ describe('GetUsersByUnitService', () => {
     const users = [{ pessoa_id: 1 }, { pessoa_id: 2 }];
     mockRepo.findByUnidadeId.mockResolvedValue(users);
 
-    const result = await service.execute(10);
+    const result = await service.execute('10');
 
-    expect(mockRepo.findByUnidadeId).toHaveBeenCalledWith(10);
+    expect(mockRepo.findByUnidadeId).toHaveBeenCalledWith('10');
     expect(result).toEqual(users);
   });
 
   it('deve retornar array vazio quando unidade não tem usuários', async () => {
     mockRepo.findByUnidadeId.mockResolvedValue([]);
 
-    const result = await service.execute(999);
+    const result = await service.execute('999');
     expect(result).toEqual([]);
   });
 });

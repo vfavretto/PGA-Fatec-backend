@@ -32,12 +32,12 @@ describe('AuditLogService', () => {
 
     const dto = {
       tabela: 'pga',
-      registro_id: 1,
+      registro_id: '1',
       ano: 2024,
       operacao: 'CREATE' as any,
       dados_antes: null,
       dados_depois: {},
-      usuario_id: 1,
+      usuario_id: '1',
       motivo: 'test',
     };
 
@@ -51,12 +51,12 @@ describe('AuditLogService', () => {
 
     await expect(service.createLog({
       tabela: 'pga',
-      registro_id: 1,
+      registro_id: '1',
       ano: 2024,
       operacao: 'CREATE' as any,
       dados_antes: null,
       dados_depois: {},
-      usuario_id: 1,
+      usuario_id: '1',
       motivo: '',
     })).rejects.toThrow('DB error');
   });

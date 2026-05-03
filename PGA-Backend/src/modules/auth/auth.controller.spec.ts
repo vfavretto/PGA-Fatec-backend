@@ -6,6 +6,11 @@ const mockContextService = {
   getAvailableContexts: jest.fn(),
   selectContext: jest.fn(),
 };
+const mockRes = {
+  clearCookie: jest.fn(),
+  cookie: jest.fn(),
+  status: jest.fn().mockReturnThis(),
+};
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -25,10 +30,9 @@ describe('AuthController', () => {
       mockLoginService.execute.mockResolvedValue(tokenDto);
 
       const req = { user: { email: 'a@a.com', pessoa_id: 1 } };
-      const result = await controller.login(req);
+      await controller.login(req, mockRes as any);
 
       expect(mockLoginService.execute).toHaveBeenCalledWith(req.user);
-      expect(result).toBe(tokenDto);
     });
   });
 
@@ -46,9 +50,10 @@ describe('AuthController', () => {
       const result = await controller.selectContext(
         { user: { tipo_usuario: 'Diretor' } },
         { tipo: 'unidade', id: 1 } as any,
+        mockRes as any,
       );
       expect(mockContextService.selectContext).toHaveBeenCalled();
-      expect(result.access_token).toBeDefined();
+      expect(result).toHaveProperty('ok');
     });
   });
 
@@ -65,18 +70,21 @@ describe('AuthController', () => {
       mockJwtService.verify.mockReturnValue({ email: 'a@a.com', pessoa_id: 1 });
       mockJwtService.sign.mockReturnValue('new-access-token');
 
-      const result = controller.refresh('valid-refresh-token');
-      expect(result).toEqual({ access_token: 'new-access-token' });
+      const req = { cookies: { refresh_token: 'valid-refresh-token' } };
+      const result = controller.refresh(req as any, mockRes as any);
+      expect(result).toHaveProperty('ok');
     });
 
     it('deve retornar erro se refresh_token não fornecido', () => {
-      const result = controller.refresh(undefined as any);
+      const req = { cookies: {} };
+      const result = controller.refresh(req as any, mockRes as any);
       expect(result).toHaveProperty('error');
     });
 
     it('deve retornar erro se refresh_token inválido', () => {
       mockJwtService.verify.mockImplementation(() => { throw new Error('invalid'); });
-      const result = controller.refresh('bad-token');
+      const req = { cookies: { refresh_token: 'bad-token' } };
+      const result = controller.refresh(req as any, mockRes as any);
       expect(result).toHaveProperty('error');
     });
   });

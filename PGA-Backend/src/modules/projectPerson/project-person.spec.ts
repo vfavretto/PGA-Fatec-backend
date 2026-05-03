@@ -56,12 +56,12 @@ describe('FindOneProjectPersonService', () => {
 
   it('deve retornar a associação encontrada', async () => {
     mockRepo.findOneWithContext.mockResolvedValue({ projeto_pessoa_id: 1 });
-    expect(await service.execute(1)).toEqual({ projeto_pessoa_id: 1 });
+    expect(await service.execute('1')).toEqual({ projeto_pessoa_id: 1 });
   });
 
   it('deve lançar NotFoundException se não encontrada', async () => {
     mockRepo.findOneWithContext.mockResolvedValue(null);
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('99')).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -72,12 +72,12 @@ describe('UpdateProjectPersonService', () => {
   it('deve atualizar e retornar a associação', async () => {
     mockRepo.findOne.mockResolvedValue({ projeto_pessoa_id: 1 });
     mockRepo.update.mockResolvedValue({ projeto_pessoa_id: 1, papel: 'Coordenador' });
-    expect((await service.execute(1, { papel: 'Coordenador' } as any)).papel).toBe('Coordenador');
+    expect(((await service.execute('1', { papel: 'Coordenador' } as any)) as any).papel).toBe('Coordenador');
   });
 
-  it('deve lançar NotFoundException se não encontrada', async () => {
+  it('deve lançar NotFoundException se não encontrado', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99, {} as any)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('99', {} as any)).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -88,12 +88,12 @@ describe('DeleteProjectPersonService', () => {
   it('deve deletar a associação', async () => {
     mockRepo.findOne.mockResolvedValue({ projeto_pessoa_id: 1 });
     mockRepo.delete.mockResolvedValue({ projeto_pessoa_id: 1 });
-    await service.execute(1);
-    expect(mockRepo.delete).toHaveBeenCalledWith(1);
+    await service.execute('1');
+    expect(mockRepo.delete).toHaveBeenCalledWith('1');
   });
 
-  it('deve lançar NotFoundException se não encontrada', async () => {
+  it('deve lançar NotFoundException se não encontrado', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('99')).rejects.toThrow(NotFoundException);
   });
 });

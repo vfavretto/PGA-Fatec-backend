@@ -69,7 +69,7 @@ describe('ContextService', () => {
       const result = await service.selectContext(
         { tipo_usuario: 'Administrador', email: 'a@a.com', pessoa_id: 1, nome: 'A' },
         'unidade',
-        1,
+        '1',
       );
 
       expect(result.access_token).toBeDefined();
@@ -79,7 +79,7 @@ describe('ContextService', () => {
       mockPrisma.unidade.findFirst.mockResolvedValue(null);
 
       await expect(
-        service.selectContext({ tipo_usuario: 'Administrador' }, 'unidade', 999),
+        service.selectContext({ tipo_usuario: 'Administrador' }, 'unidade', '999'),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -87,7 +87,7 @@ describe('ContextService', () => {
       mockPrisma.pessoa.findFirst.mockResolvedValue(null);
 
       await expect(
-        service.selectContext({ tipo_usuario: 'Administrador' }, 'regional', 999),
+        service.selectContext({ tipo_usuario: 'Administrador' }, 'regional', '999'),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -95,7 +95,7 @@ describe('ContextService', () => {
       mockPrisma.pessoaUnidade.findFirst.mockResolvedValue(null);
 
       await expect(
-        service.selectContext({ tipo_usuario: 'Diretor', pessoa_id: 1 }, 'unidade', 5),
+        service.selectContext({ tipo_usuario: 'Diretor', pessoa_id: 1 }, 'unidade', '5'),
       ).rejects.toThrow(BadRequestException);
     });
   });

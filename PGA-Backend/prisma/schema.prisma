@@ -307,7 +307,7 @@ model EtapaProcesso {
 
 model Anexo {
   anexo_id                  String          @id @default(uuid())
-  etapa_processo_id         String?            
+  etapa_processo_id         String            
   entregavel_id             String
   item                      String          @db.VarChar(100)
   descricao                 String          @db.VarChar(255)
@@ -318,7 +318,7 @@ model Anexo {
   criado_em                 DateTime        @default(now())
   atualizado_em             DateTime        @updatedAt
   
-  etapaProcesso             EtapaProcesso?   @relation(fields: [etapa_processo_id], references: [etapa_id], onDelete: SetNull)
+  etapaProcesso             EtapaProcesso    @relation(fields: [etapa_processo_id], references: [etapa_id], onDelete: Cascade)
   entregavel                EntregavelLinkSei @relation(fields: [entregavel_id], references: [entregavel_id])
 
   @@index([etapa_processo_id])
