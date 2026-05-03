@@ -5,7 +5,7 @@ export class CreateCpaActionDto {
   @ApiProperty({
     description: 'ID do PGA ao qual a ação CPA pertence',
     example: 1,
-    type: 'integer'
+    type: 'integer',
   })
   @IsNotEmpty()
   @IsUUID('4')
@@ -13,7 +13,7 @@ export class CreateCpaActionDto {
 
   @ApiProperty({
     description: 'Descrição da ação da CPA',
-    example: 'Implementar processo de avaliação institucional'
+    example: 'Implementar processo de avaliação institucional',
   })
   @IsNotEmpty()
   @IsString()
@@ -21,7 +21,7 @@ export class CreateCpaActionDto {
 
   @ApiPropertyOptional({
     description: 'Justificativa para a ação CPA',
-    example: 'Necessário para melhoria da qualidade educacional'
+    example: 'Necessário para melhoria da qualidade educacional',
   })
   @IsOptional()
   @IsString()

@@ -154,8 +154,10 @@ export class RegionalController {
 
       if (!userRegionalId) return [];
 
-      const regionalData = await this.getRegionalService.execute(userRegionalId);
-      const unidades = await this.listRegionalUnitsService.execute(userRegionalId);
+      const regionalData =
+        await this.getRegionalService.execute(userRegionalId);
+      const unidades =
+        await this.listRegionalUnitsService.execute(userRegionalId);
       return { ...regionalData, unidades };
     }
 
@@ -223,9 +225,7 @@ export class RegionalController {
     }
 
     const regionalId =
-      active && active.tipo === 'regional'
-        ? active.id
-        : req.user.pessoa_id;
+      active && active.tipo === 'regional' ? active.id : req.user.pessoa_id;
     return this.listRegionalPgasService.execute(regionalId, query);
   }
 
@@ -251,9 +251,7 @@ export class RegionalController {
     }
 
     const regionalId =
-      active && active.tipo === 'regional'
-        ? active.id
-        : req.user.pessoa_id;
+      active && active.tipo === 'regional' ? active.id : req.user.pessoa_id;
     return this.getRegionalPgaService.execute(regionalId, id);
   }
 
@@ -280,9 +278,7 @@ export class RegionalController {
   ) {
     const active = req.user.active_context;
     const regionalId =
-      active && active.tipo === 'regional'
-        ? active.id
-        : req.user.pessoa_id;
+      active && active.tipo === 'regional' ? active.id : req.user.pessoa_id;
     return this.reviewRegionalPgaService.execute(regionalId, id, body);
   }
 
@@ -307,9 +303,7 @@ export class RegionalController {
     }
 
     const regionalId =
-      active && active.tipo === 'regional'
-        ? active.id
-        : req.user.pessoa_id;
+      active && active.tipo === 'regional' ? active.id : req.user.pessoa_id;
     return this.listRegionalProjectsService.execute(regionalId, query);
   }
 
@@ -331,9 +325,7 @@ export class RegionalController {
   async getProject(@Request() req, @Param('id', ParseUUIDPipe) id: string) {
     const active = req.user.active_context;
     const regionalId =
-      active && active.tipo === 'regional'
-        ? active.id
-        : req.user.pessoa_id;
+      active && active.tipo === 'regional' ? active.id : req.user.pessoa_id;
     return this.getRegionalProjectService.execute(regionalId, id);
   }
 
@@ -360,9 +352,7 @@ export class RegionalController {
   ) {
     const active = req.user.active_context;
     const regionalId =
-      active && active.tipo === 'regional'
-        ? active.id
-        : req.user.pessoa_id;
+      active && active.tipo === 'regional' ? active.id : req.user.pessoa_id;
     return this.reviewRegionalProjectService.execute(regionalId, id, body);
   }
 

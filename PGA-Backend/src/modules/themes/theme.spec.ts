@@ -16,17 +16,25 @@ const mockRepo = {
 
 describe('CreateThemeService', () => {
   let service: CreateThemeService;
-  beforeEach(() => { jest.clearAllMocks(); service = new CreateThemeService(mockRepo as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new CreateThemeService(mockRepo as any);
+  });
 
   it('deve criar e retornar o tema', async () => {
     mockRepo.create.mockResolvedValue({ theme_id: 1 });
-    expect(await service.execute({ nome: 'Tema 1' } as any)).toEqual({ theme_id: 1 });
+    expect(await service.execute({ nome: 'Tema 1' } as any)).toEqual({
+      theme_id: 1,
+    });
   });
 });
 
 describe('FindAllThemeService', () => {
   let service: FindAllThemeService;
-  beforeEach(() => { jest.clearAllMocks(); service = new FindAllThemeService(mockRepo as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new FindAllThemeService(mockRepo as any);
+  });
 
   it('deve retornar todos os temas', async () => {
     mockRepo.findAll.mockResolvedValue([{ theme_id: 1 }]);
@@ -36,7 +44,10 @@ describe('FindAllThemeService', () => {
 
 describe('FindOneThemeService', () => {
   let service: FindOneThemeService;
-  beforeEach(() => { jest.clearAllMocks(); service = new FindOneThemeService(mockRepo as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new FindOneThemeService(mockRepo as any);
+  });
 
   it('deve retornar o tema encontrado', async () => {
     mockRepo.findOne.mockResolvedValue({ tema_id: 1 });
@@ -51,23 +62,34 @@ describe('FindOneThemeService', () => {
 
 describe('UpdateThemeService', () => {
   let service: UpdateThemeService;
-  beforeEach(() => { jest.clearAllMocks(); service = new UpdateThemeService(mockRepo as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new UpdateThemeService(mockRepo as any);
+  });
 
   it('deve atualizar e retornar o tema', async () => {
     mockRepo.findOne.mockResolvedValue({ theme_id: 1 });
     mockRepo.update.mockResolvedValue({ tema_id: 1, descricao: 'Novo' });
-    expect(((await service.execute('1', { descricao: 'Novo' } as any)) as any).descricao).toBe('Novo');
+    expect(
+      ((await service.execute('1', { descricao: 'Novo' } as any)) as any)
+        .descricao,
+    ).toBe('Novo');
   });
 
   it('deve lançar NotFoundException se não encontrado', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute('99', {} as any)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('99', {} as any)).rejects.toThrow(
+      NotFoundException,
+    );
   });
 });
 
 describe('DeleteThemeService', () => {
   let service: DeleteThemeService;
-  beforeEach(() => { jest.clearAllMocks(); service = new DeleteThemeService(mockRepo as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new DeleteThemeService(mockRepo as any);
+  });
 
   it('deve deletar o tema', async () => {
     mockRepo.findOne.mockResolvedValue({ tema_id: 1 });

@@ -61,13 +61,19 @@ export class DeliverableRepository extends BaseRepository<EntregavelLinkSei> {
   async findOneWithContext(id: string, active_context?: any) {
     if (active_context && active_context.tipo === 'unidade') {
       return this.prisma.entregavelLinkSei.findFirst({
-        where: this.whereActive({ entregavel_id: id, unidade_id: active_context.id }),
+        where: this.whereActive({
+          entregavel_id: id,
+          unidade_id: active_context.id,
+        }),
       });
     }
 
     if (active_context && active_context.tipo === 'regional') {
       return this.prisma.entregavelLinkSei.findFirst({
-        where: this.whereActive({ entregavel_id: id, regional_id: active_context.id }),
+        where: this.whereActive({
+          entregavel_id: id,
+          regional_id: active_context.id,
+        }),
       });
     }
 

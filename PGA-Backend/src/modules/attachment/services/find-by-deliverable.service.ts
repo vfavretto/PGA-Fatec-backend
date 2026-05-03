@@ -7,7 +7,11 @@ export class FindByDeliverableService {
 
   async execute(entregavelId: string, user?: any) {
     const active = user?.active_context;
-    if (active) return this.attachmentRepository.findByEntregavelWithContext(entregavelId, active);
+    if (active)
+      return this.attachmentRepository.findByEntregavelWithContext(
+        entregavelId,
+        active,
+      );
     return this.attachmentRepository.findByEntregavel(entregavelId);
   }
 }

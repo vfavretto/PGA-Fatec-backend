@@ -1,4 +1,9 @@
-import { BadRequestException, ConflictException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreatePgaService } from './services/create-pga.service';
 import { FindAllPgaService } from './services/find-all-pga.service';
 import { FindOnePgaService } from './services/find-one-pga.service';
@@ -48,7 +53,9 @@ describe('CreatePgaService', () => {
   it('deve lançar NotFoundException se unidade não existe', async () => {
     mockPrisma.unidade.findUnique.mockResolvedValue(null);
 
-    await expect(service.execute({ unidade_id: 99, ano: 2025 } as any)).rejects.toThrow(NotFoundException);
+    await expect(
+      service.execute({ unidade_id: 99, ano: 2025 } as any),
+    ).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -115,20 +122,29 @@ describe('UpdatePgaService', () => {
     mockRepo.findOne.mockResolvedValue({ pga_id: 1, status: 'Rascunho' });
     mockRepo.update.mockResolvedValue({ pga_id: 1, ano: 2026 });
 
-    const result = await service.execute('1', { ano: 2026 } as any, { tipo_usuario: 'Administrador' });
+    const result = await service.execute('1', { ano: 2026 } as any, {
+      tipo_usuario: 'Administrador',
+    });
     expect(result.ano).toBe(2026);
   });
 
   it('deve definir data_elaboracao ao submeter PGA', async () => {
     mockRepo.findOne.mockResolvedValue({ pga_id: 1, status: 'Rascunho' });
     mockRepo.update.mockResolvedValue({ pga_id: 1, status: 'Submetido' });
-    await service.execute('1', { status: 'Submetido' } as any, { tipo_usuario: 'Administrador' });
-    expect(mockRepo.update).toHaveBeenCalledWith('1', expect.objectContaining({ data_elaboracao: expect.any(Date) }));
+    await service.execute('1', { status: 'Submetido' } as any, {
+      tipo_usuario: 'Administrador',
+    });
+    expect(mockRepo.update).toHaveBeenCalledWith(
+      '1',
+      expect.objectContaining({ data_elaboracao: expect.any(Date) }),
+    );
   });
 
   it('deve lançar NotFoundException se PGA não encontrado', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute('99', {} as any, { tipo_usuario: 'Administrador' })).rejects.toThrow(NotFoundException);
+    await expect(
+      service.execute('99', {} as any, { tipo_usuario: 'Administrador' }),
+    ).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -179,7 +195,9 @@ describe('SubmitPgaService', () => {
 
   it('deve lançar BadRequestException se PGA não está EmElaboracao', async () => {
     mockRepo.findOne.mockResolvedValue({ pga_id: 1, status: 'Submetido' });
-    await expect(service.execute('1', '1')).rejects.toThrow(BadRequestException);
+    await expect(service.execute('1', '1')).rejects.toThrow(
+      BadRequestException,
+    );
   });
 
   it('deve lançar NotFoundException se pessoa não encontrada', async () => {
@@ -190,7 +208,11 @@ describe('SubmitPgaService', () => {
   });
 
   it('deve lançar ForbiddenException se Diretor tentar submeter PGA de outra unidade', async () => {
-    mockRepo.findOne.mockResolvedValue({ pga_id: 1, status: 'EmElaboracao', unidade_id: 10 });
+    mockRepo.findOne.mockResolvedValue({
+      pga_id: 1,
+      status: 'EmElaboracao',
+      unidade_id: 10,
+    });
     mockPrisma.pessoa.findUnique.mockResolvedValue({
       tipo_usuario: 'Diretor',
       unidades: [{ unidade_id: 20 }],
@@ -200,24 +222,38 @@ describe('SubmitPgaService', () => {
   });
 
   it('deve submeter PGA quando Diretor é da mesma unidade', async () => {
-    mockRepo.findOne.mockResolvedValue({ pga_id: 1, status: 'EmElaboracao', unidade_id: 10 });
+    mockRepo.findOne.mockResolvedValue({
+      pga_id: 1,
+      status: 'EmElaboracao',
+      unidade_id: 10,
+    });
     mockPrisma.pessoa.findUnique.mockResolvedValue({
       tipo_usuario: 'Diretor',
       unidades: [{ unidade_id: 10 }],
     });
-    mockRepo.updateWorkflow.mockResolvedValue({ pga_id: 1, status: 'Submetido' });
+    mockRepo.updateWorkflow.mockResolvedValue({
+      pga_id: 1,
+      status: 'Submetido',
+    });
 
     const result = await service.execute('1', '1');
     expect(mockRepo.updateWorkflow).toHaveBeenCalled();
   });
 
   it('deve submeter PGA para Administrador sem restrição de unidade', async () => {
-    mockRepo.findOne.mockResolvedValue({ pga_id: 1, status: 'EmElaboracao', unidade_id: 10 });
+    mockRepo.findOne.mockResolvedValue({
+      pga_id: 1,
+      status: 'EmElaboracao',
+      unidade_id: 10,
+    });
     mockPrisma.pessoa.findUnique.mockResolvedValue({
       tipo_usuario: 'Administrador',
       unidades: [],
     });
-    mockRepo.updateWorkflow.mockResolvedValue({ pga_id: 1, status: 'Submetido' });
+    mockRepo.updateWorkflow.mockResolvedValue({
+      pga_id: 1,
+      status: 'Submetido',
+    });
 
     await service.execute('1', '1');
     expect(mockRepo.updateWorkflow).toHaveBeenCalled();
@@ -258,7 +294,10 @@ describe('PgaController', () => {
 
   it('create deve chamar createPgaService', async () => {
     mockCreate.execute.mockResolvedValue({ pga_id: 1 });
-    await controller.create({ unidade_id: 1, ano: 2025 } as any, { user: {} } as any);
+    await controller.create(
+      { unidade_id: 1, ano: 2025 } as any,
+      { user: {} } as any,
+    );
     expect(mockCreate.execute).toHaveBeenCalled();
   });
 

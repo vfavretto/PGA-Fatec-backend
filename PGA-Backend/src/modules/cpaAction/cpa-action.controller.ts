@@ -1,5 +1,23 @@
-﻿import { Controller, Post, Body, Get, Param, Put, Delete, ParseUUIDPipe, Request, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
+﻿import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Param,
+  Put,
+  Delete,
+  ParseUUIDPipe,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiBody,
+} from '@nestjs/swagger';
 import { CreateCpaActionDto } from './dto/create-cpa-action.dto';
 import { UpdateCpaActionDto } from './dto/update-cpa-action.dto';
 import { CreateCpaActionService } from './services/create-cpa-action.service';
@@ -23,7 +41,10 @@ export class CpaActionController {
   ) {}
 
   @Post()
-  @ApiOperation({ summary: 'Criar ação CPA', description: 'Cria uma nova ação da Comissão Própria de Avaliação' })
+  @ApiOperation({
+    summary: 'Criar ação CPA',
+    description: 'Cria uma nova ação da Comissão Própria de Avaliação',
+  })
   @ApiBody({ type: CreateCpaActionDto })
   @ApiResponse({ status: 201, description: 'Ação CPA criada com sucesso' })
   @ApiResponse({ status: 400, description: 'Dados inválidos' })
@@ -32,14 +53,23 @@ export class CpaActionController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Listar ações CPA', description: 'Retorna lista de todas as ações CPA' })
-  @ApiResponse({ status: 200, description: 'Lista de ações CPA retornada com sucesso' })
+  @ApiOperation({
+    summary: 'Listar ações CPA',
+    description: 'Retorna lista de todas as ações CPA',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de ações CPA retornada com sucesso',
+  })
   findAll(@Request() req: any) {
     return this.findAllService.execute(req.user);
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Buscar ação CPA por ID', description: 'Retorna dados de uma ação CPA específica' })
+  @ApiOperation({
+    summary: 'Buscar ação CPA por ID',
+    description: 'Retorna dados de uma ação CPA específica',
+  })
   @ApiParam({ name: 'id', type: 'number', description: 'ID da ação CPA' })
   @ApiResponse({ status: 200, description: 'Ação CPA encontrada com sucesso' })
   @ApiResponse({ status: 404, description: 'Ação CPA não encontrada' })
@@ -48,17 +78,26 @@ export class CpaActionController {
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Atualizar ação CPA', description: 'Atualiza dados de uma ação CPA específica' })
+  @ApiOperation({
+    summary: 'Atualizar ação CPA',
+    description: 'Atualiza dados de uma ação CPA específica',
+  })
   @ApiParam({ name: 'id', type: 'number', description: 'ID da ação CPA' })
   @ApiBody({ type: UpdateCpaActionDto })
   @ApiResponse({ status: 200, description: 'Ação CPA atualizada com sucesso' })
   @ApiResponse({ status: 404, description: 'Ação CPA não encontrada' })
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateCpaActionDto) {
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateCpaActionDto,
+  ) {
     return this.updateService.execute(id, dto);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Excluir ação CPA', description: 'Remove uma ação CPA do sistema' })
+  @ApiOperation({
+    summary: 'Excluir ação CPA',
+    description: 'Remove uma ação CPA do sistema',
+  })
   @ApiParam({ name: 'id', type: 'number', description: 'ID da ação CPA' })
   @ApiResponse({ status: 200, description: 'Ação CPA excluída com sucesso' })
   @ApiResponse({ status: 404, description: 'Ação CPA não encontrada' })

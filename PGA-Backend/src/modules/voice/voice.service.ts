@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import * as natural from 'natural';
+import { ptBr } from 'stopword';
 
 export interface VoiceCommandResult {
   action: string;
@@ -7,12 +9,26 @@ export interface VoiceCommandResult {
   direction: 'enable' | 'disable' | null;
 }
 
-const TOGGLE_ACTIONS = new Set(['toggle_contrast', 'toggle_motion', 'toggle_sound']);
+const TOGGLE_ACTIONS = new Set([
+  'toggle_contrast',
+  'toggle_motion',
+  'toggle_sound',
+]);
 
-const ENABLE_WORDS = ['ativar', 'ativa', 'ative', 'ligar', 'liga', 'habilitar', 'habilita', 'habilite', 'enable'];
-const DISABLE_WORDS = ['desativar', 'desativa', 'desative', 'desligar', 'desliga', 'desabilitar', 'desabilita', 'desabilite', 'disable'];
+const ENABLE_WORDS = ['ativar', 'ligar', 'habilitar', 'enable'];
+const DISABLE_WORDS = [
+  'desativar',
+  'desativa', // stem distinto: desativ vs desat
+  'desligar',
+  'desabilitar',
+  'disable',
+];
 
-const INTENT_MAP: Array<{ keywords: string[]; action: string; description: string }> = [
+const INTENT_MAP: Array<{
+  keywords: string[];
+  action: string;
+  description: string;
+}> = [
   {
     keywords: ['escuro', 'dark', 'noite', 'noturno'],
     action: 'dark_mode',
@@ -44,7 +60,7 @@ const INTENT_MAP: Array<{ keywords: string[]; action: string; description: strin
     description: 'Fonte diminuída',
   },
   {
-    keywords: ['restaurar', 'padrao', 'reset', 'normal', 'padrao'],
+    keywords: ['restaurar', 'padrao', 'reset', 'normal'],
     action: 'reset_font',
     description: 'Fonte restaurada para o padrão',
   },
@@ -65,6 +81,10 @@ const INTENT_MAP: Array<{ keywords: string[]; action: string; description: strin
   },
 ];
 
+const stemmer = natural.PorterStemmerPt as { stem: (word: string) => string };
+const wordTokenizer = new natural.WordTokenizer();
+const stopwordSet = new Set(ptBr as string[]);
+
 function normalize(text: string): string {
   return text
     .toLowerCase()
@@ -73,22 +93,39 @@ function normalize(text: string): string {
     .replace(/[^a-z0-9\s]/g, '');
 }
 
-function tokenize(text: string): string[] {
-  return normalize(text).split(/\s+/).filter(Boolean);
+// Tokeniza, remove stopwords em PT-BR e aplica stemming (PorterStemmerPt)
+function preprocess(text: string): string[] {
+  const tokens = wordTokenizer.tokenize(normalize(text)) ?? [];
+  const filtered = tokens.filter((t) => !stopwordSet.has(t));
+  return filtered.map((t) => stemmer.stem(t));
 }
+
+// Stems pré-computados para detecção de direção (ativar/desativar)
+const ENABLE_STEMS = new Set(
+  ENABLE_WORDS.map((w) => stemmer.stem(normalize(w))),
+);
+const DISABLE_STEMS = new Set(
+  DISABLE_WORDS.map((w) => stemmer.stem(normalize(w))),
+);
+
+// Stems pré-computados para cada intenção do mapa
+const INTENT_STEMS = INTENT_MAP.map((intent) => ({
+  ...intent,
+  stems: new Set(intent.keywords.map((k) => stemmer.stem(normalize(k)))),
+}));
 
 @Injectable()
 export class VoiceService {
   classify(transcript: string): VoiceCommandResult {
-    const tokens = tokenize(transcript);
+    const stems = preprocess(transcript);
 
-    for (const intent of INTENT_MAP) {
-      const normalizedKeywords = intent.keywords.map(normalize);
-      if (tokens.some((t) => normalizedKeywords.includes(t))) {
+    for (const intent of INTENT_STEMS) {
+      if (stems.some((s) => intent.stems.has(s))) {
         let direction: 'enable' | 'disable' | null = null;
         if (TOGGLE_ACTIONS.has(intent.action)) {
-          if (tokens.some((t) => ENABLE_WORDS.includes(t))) direction = 'enable';
-          else if (tokens.some((t) => DISABLE_WORDS.includes(t))) direction = 'disable';
+          if (stems.some((s) => ENABLE_STEMS.has(s))) direction = 'enable';
+          else if (stems.some((s) => DISABLE_STEMS.has(s)))
+            direction = 'disable';
         }
         return {
           action: intent.action,

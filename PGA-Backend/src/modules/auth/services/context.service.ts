@@ -1,4 +1,8 @@
-﻿import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
+﻿import {
+  Injectable,
+  UnauthorizedException,
+  BadRequestException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../../config/prisma.service';
 
@@ -38,14 +42,22 @@ export class ContextService {
       const unidades = vinculos
         .map((v) => v.unidade)
         .filter((u) => Boolean(u))
-        .map((u) => ({ unidade_id: u!.unidade_id, nome_unidade: u!.nome_unidade }));
+        .map((u) => ({
+          unidade_id: u.unidade_id,
+          nome_unidade: u.nome_unidade,
+        }));
 
-      return { regionais: [{ pessoa_id: user.pessoa_id, nome: user.nome }], unidades };
+      return {
+        regionais: [{ pessoa_id: user.pessoa_id, nome: user.nome }],
+        unidades,
+      };
     }
 
     const pessoa = await this.prisma.pessoa.findUnique({
       where: { pessoa_id: user.pessoa_id },
-      include: { unidades: { where: { ativo: true }, include: { unidade: true } } },
+      include: {
+        unidades: { where: { ativo: true }, include: { unidade: true } },
+      },
     });
 
     if (!pessoa) {
@@ -65,12 +77,16 @@ export class ContextService {
 
     if (userTipo === 'Administrador' || userTipo === 'CPS') {
       if (tipo === 'unidade') {
-        const unidade = await this.prisma.unidade.findFirst({ where: { unidade_id: id, ativo: true } });
+        const unidade = await this.prisma.unidade.findFirst({
+          where: { unidade_id: id, ativo: true },
+        });
         if (!unidade) throw new BadRequestException('Unidade inválida');
       }
 
       if (tipo === 'regional') {
-        const regional = await this.prisma.pessoa.findFirst({ where: { pessoa_id: id, ativo: true, tipo_usuario: 'Regional' } });
+        const regional = await this.prisma.pessoa.findFirst({
+          where: { pessoa_id: id, ativo: true, tipo_usuario: 'Regional' },
+        });
         if (!regional) throw new BadRequestException('Regional inválida');
       }
     } else {
@@ -78,12 +94,17 @@ export class ContextService {
         const vinculo = await this.prisma.pessoaUnidade.findFirst({
           where: { pessoa_id: user.pessoa_id, unidade_id: id, ativo: true },
         });
-        if (!vinculo) throw new BadRequestException('Usuário não possui vínculo com a unidade informada');
+        if (!vinculo)
+          throw new BadRequestException(
+            'Usuário não possui vínculo com a unidade informada',
+          );
       }
 
       if (tipo === 'regional') {
         if (id !== user.pessoa_id) {
-          throw new BadRequestException('Usuário não autorizado a acessar essa regional');
+          throw new BadRequestException(
+            'Usuário não autorizado a acessar essa regional',
+          );
         }
       }
     }

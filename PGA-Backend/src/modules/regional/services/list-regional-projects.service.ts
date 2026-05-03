@@ -10,4 +10,3 @@ export class ListRegionalProjectsService {
     return this.repository.findProjectsByRegional(regionalId, filters);
   }
 }
-

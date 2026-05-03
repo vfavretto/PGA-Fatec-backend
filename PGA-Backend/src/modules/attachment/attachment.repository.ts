@@ -39,13 +39,18 @@ export class AttachmentRepository extends BaseRepository<Anexo> {
     });
   }
 
-  async findByEtapaProcessoWithContext(etapaProcessoId: string, active_context?: any) {
+  async findByEtapaProcessoWithContext(
+    etapaProcessoId: string,
+    active_context?: any,
+  ) {
     if (active_context?.tipo === 'unidade') {
       return this.prisma.anexo.findMany({
         where: {
           ...this.whereActive(),
           etapa_processo_id: etapaProcessoId,
-          etapaProcesso: { acaoProjeto: { pga: { unidade_id: active_context.id } } },
+          etapaProcesso: {
+            acaoProjeto: { pga: { unidade_id: active_context.id } },
+          },
         },
         include: { entregavel: true, etapaProcesso: true },
       });
@@ -62,7 +67,9 @@ export class AttachmentRepository extends BaseRepository<Anexo> {
         where: {
           ...this.whereActive(),
           etapa_processo_id: etapaProcessoId,
-          etapaProcesso: { acaoProjeto: { pga: { unidade_id: { in: unidadeIds } } } },
+          etapaProcesso: {
+            acaoProjeto: { pga: { unidade_id: { in: unidadeIds } } },
+          },
         },
         include: { entregavel: true, etapaProcesso: true },
       });
@@ -83,13 +90,18 @@ export class AttachmentRepository extends BaseRepository<Anexo> {
     });
   }
 
-  async findByEntregavelWithContext(entregavelId: string, active_context?: any) {
+  async findByEntregavelWithContext(
+    entregavelId: string,
+    active_context?: any,
+  ) {
     if (active_context?.tipo === 'unidade') {
       return this.prisma.anexo.findMany({
         where: {
           ...this.whereActive(),
           entregavel_id: entregavelId,
-          etapaProcesso: { acaoProjeto: { pga: { unidade_id: active_context.id } } },
+          etapaProcesso: {
+            acaoProjeto: { pga: { unidade_id: active_context.id } },
+          },
         },
         include: { etapaProcesso: true, entregavel: true },
       });
@@ -106,7 +118,9 @@ export class AttachmentRepository extends BaseRepository<Anexo> {
         where: {
           ...this.whereActive(),
           entregavel_id: entregavelId,
-          etapaProcesso: { acaoProjeto: { pga: { unidade_id: { in: unidadeIds } } } },
+          etapaProcesso: {
+            acaoProjeto: { pga: { unidade_id: { in: unidadeIds } } },
+          },
         },
         include: { etapaProcesso: true, entregavel: true },
       });
@@ -132,7 +146,9 @@ export class AttachmentRepository extends BaseRepository<Anexo> {
       return this.prisma.anexo.findFirst({
         where: {
           ...this.whereActive({ attachment_id: id }),
-          etapaProcesso: { acaoProjeto: { pga: { unidade_id: active_context.id } } },
+          etapaProcesso: {
+            acaoProjeto: { pga: { unidade_id: active_context.id } },
+          },
         },
         include: { etapaProcesso: true, entregavel: true },
       });
@@ -177,7 +193,9 @@ export class AttachmentRepository extends BaseRepository<Anexo> {
     return this.prisma.anexo.findMany({
       where: {
         ...this.whereActive(),
-        etapaProcesso: { acaoProjeto: { pga: { unidade_id: { in: unidadeIds } } } },
+        etapaProcesso: {
+          acaoProjeto: { pga: { unidade_id: { in: unidadeIds } } },
+        },
       },
       include: { entregavel: true, etapaProcesso: true },
     });

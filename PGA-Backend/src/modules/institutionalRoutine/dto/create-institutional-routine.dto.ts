@@ -1,4 +1,12 @@
-﻿import { IsUUID, IsNotEmpty, IsOptional, IsString, IsEnum, IsDateString, MaxLength } from 'class-validator';
+﻿import {
+  IsUUID,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsEnum,
+  IsDateString,
+  MaxLength,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { TipoRotina, PeriodicidadeRotina, StatusRotina } from '@prisma/client';
 
@@ -6,7 +14,7 @@ export class CreateInstitutionalRoutineDto {
   @ApiProperty({
     description: 'ID do PGA ao qual a rotina pertence',
     example: 1,
-    type: 'integer'
+    type: 'integer',
   })
   @IsNotEmpty()
   @IsUUID('4')
@@ -15,7 +23,7 @@ export class CreateInstitutionalRoutineDto {
   @ApiPropertyOptional({
     description: 'ID do curso relacionado (opcional)',
     example: 2,
-    type: 'integer'
+    type: 'integer',
   })
   @IsOptional()
   @IsUUID('4')
@@ -24,7 +32,7 @@ export class CreateInstitutionalRoutineDto {
   @ApiProperty({
     description: 'Tipo da rotina institucional',
     enum: TipoRotina,
-    example: 'Academica'
+    example: 'Academica',
   })
   @IsNotEmpty()
   @IsEnum(TipoRotina)
@@ -33,7 +41,7 @@ export class CreateInstitutionalRoutineDto {
   @ApiProperty({
     description: 'Título da rotina institucional',
     example: 'Conselho de Classe',
-    maxLength: 255
+    maxLength: 255,
   })
   @IsNotEmpty()
   @IsString()
@@ -42,7 +50,8 @@ export class CreateInstitutionalRoutineDto {
 
   @ApiProperty({
     description: 'Descrição detalhada da rotina',
-    example: 'Reunião periódica para avaliação do desempenho acadêmico dos estudantes'
+    example:
+      'Reunião periódica para avaliação do desempenho acadêmico dos estudantes',
   })
   @IsNotEmpty()
   @IsString()
@@ -51,7 +60,7 @@ export class CreateInstitutionalRoutineDto {
   @ApiProperty({
     description: 'Periodicidade da rotina',
     enum: PeriodicidadeRotina,
-    example: 'Semestral'
+    example: 'Semestral',
   })
   @IsNotEmpty()
   @IsEnum(PeriodicidadeRotina)
@@ -61,7 +70,7 @@ export class CreateInstitutionalRoutineDto {
     description: 'Data de início da rotina',
     example: '2024-03-01',
     type: 'string',
-    format: 'date'
+    format: 'date',
   })
   @IsOptional()
   @IsDateString()
@@ -71,7 +80,7 @@ export class CreateInstitutionalRoutineDto {
     description: 'Data de fim da rotina',
     example: '2024-12-31',
     type: 'string',
-    format: 'date'
+    format: 'date',
   })
   @IsOptional()
   @IsDateString()
@@ -80,7 +89,7 @@ export class CreateInstitutionalRoutineDto {
   @ApiProperty({
     description: 'ID da pessoa responsável pela rotina',
     example: 5,
-    type: 'integer'
+    type: 'integer',
   })
   @IsNotEmpty()
   @IsUUID('4')
@@ -88,7 +97,7 @@ export class CreateInstitutionalRoutineDto {
 
   @ApiPropertyOptional({
     description: 'Entregável esperado da rotina',
-    example: 'Relatório de desempenho acadêmico'
+    example: 'Relatório de desempenho acadêmico',
   })
   @IsOptional()
   @IsString()
@@ -97,7 +106,7 @@ export class CreateInstitutionalRoutineDto {
   @ApiPropertyOptional({
     description: 'Status atual da rotina',
     enum: StatusRotina,
-    example: 'Ativa'
+    example: 'Ativa',
   })
   @IsOptional()
   @IsEnum(StatusRotina)

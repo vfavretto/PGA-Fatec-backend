@@ -17,17 +17,25 @@ const mockPrisma = { projetoPessoa: { count: jest.fn() } };
 
 describe('CreateWorkloadHaeService', () => {
   let service: CreateWorkloadHaeService;
-  beforeEach(() => { jest.clearAllMocks(); service = new CreateWorkloadHaeService(mockRepo as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new CreateWorkloadHaeService(mockRepo as any);
+  });
 
   it('deve criar e retornar a carga horária HAE', async () => {
     mockRepo.create.mockResolvedValue({ workload_hae_id: 1 });
-    expect(await service.execute({ horas: 40 } as any)).toEqual({ workload_hae_id: 1 });
+    expect(await service.execute({ horas: 40 } as any)).toEqual({
+      workload_hae_id: 1,
+    });
   });
 });
 
 describe('FindAllWorkloadHaeService', () => {
   let service: FindAllWorkloadHaeService;
-  beforeEach(() => { jest.clearAllMocks(); service = new FindAllWorkloadHaeService(mockRepo as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new FindAllWorkloadHaeService(mockRepo as any);
+  });
 
   it('deve retornar todas as cargas HAE', async () => {
     mockRepo.findAll.mockResolvedValue([{ workload_hae_id: 1 }]);
@@ -37,7 +45,10 @@ describe('FindAllWorkloadHaeService', () => {
 
 describe('FindOneWorkloadHaeService', () => {
   let service: FindOneWorkloadHaeService;
-  beforeEach(() => { jest.clearAllMocks(); service = new FindOneWorkloadHaeService(mockRepo as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new FindOneWorkloadHaeService(mockRepo as any);
+  });
 
   it('deve retornar a carga HAE encontrada', async () => {
     mockRepo.findOne.mockResolvedValue({ workload_hae_id: 1 });
@@ -52,23 +63,34 @@ describe('FindOneWorkloadHaeService', () => {
 
 describe('UpdateWorkloadHaeService', () => {
   let service: UpdateWorkloadHaeService;
-  beforeEach(() => { jest.clearAllMocks(); service = new UpdateWorkloadHaeService(mockRepo as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new UpdateWorkloadHaeService(mockRepo as any);
+  });
 
   it('deve atualizar e retornar a carga HAE', async () => {
     mockRepo.findOne.mockResolvedValue({ workload_hae_id: 1 });
     mockRepo.update.mockResolvedValue({ id: 1, descricao: 'Novo' });
-    expect(((await service.execute('1', { descricao: 'Novo' } as any)) as any).descricao).toBe('Novo');
+    expect(
+      ((await service.execute('1', { descricao: 'Novo' } as any)) as any)
+        .descricao,
+    ).toBe('Novo');
   });
 
   it('deve lançar NotFoundException se não encontrada', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute('99', {} as any)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('99', {} as any)).rejects.toThrow(
+      NotFoundException,
+    );
   });
 });
 
 describe('DeleteWorkloadHaeService', () => {
   let service: DeleteWorkloadHaeService;
-  beforeEach(() => { jest.clearAllMocks(); service = new DeleteWorkloadHaeService(mockRepo as any, mockPrisma as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new DeleteWorkloadHaeService(mockRepo as any, mockPrisma as any);
+  });
 
   it('deve deletar a carga HAE', async () => {
     mockRepo.findOne.mockResolvedValue({ workload_hae_id: 1 });
@@ -78,7 +100,7 @@ describe('DeleteWorkloadHaeService', () => {
     expect(mockRepo.softDelete).toHaveBeenCalledWith('1');
   });
 
-  it('deve lançar ConflictException se vínculo em uso', async () => {  
+  it('deve lançar ConflictException se vínculo em uso', async () => {
     mockRepo.findOne.mockResolvedValue({ workload_hae_id: 1 });
     mockPrisma.projetoPessoa.count.mockResolvedValue(3);
     const { ConflictException } = require('@nestjs/common');

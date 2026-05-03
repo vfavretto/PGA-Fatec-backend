@@ -9,18 +9,28 @@ describe('ForgotPasswordService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    service = new ForgotPasswordService(mockRepo as any, mockSendPasswordReset as any, mockJwt as any);
+    service = new ForgotPasswordService(
+      mockRepo as any,
+      mockSendPasswordReset as any,
+      mockJwt as any,
+    );
   });
 
   it('deve lançar erro se usuário não encontrado', async () => {
     mockRepo.findByEmail.mockResolvedValue(null);
-    await expect(service.execute('a@b.com')).rejects.toThrow('Usuário não encontrado');
+    await expect(service.execute('a@b.com')).rejects.toThrow(
+      'Usuário não encontrado',
+    );
   });
 
   it('deve enviar email de reset se usuário encontrado', async () => {
     mockRepo.findByEmail.mockResolvedValue({ email: 'a@b.com' });
     mockSendPasswordReset.execute.mockResolvedValue(undefined);
     await service.execute('a@b.com');
-    expect(mockSendPasswordReset.execute).toHaveBeenCalledWith('a@b.com', 'token123', false);
+    expect(mockSendPasswordReset.execute).toHaveBeenCalledWith(
+      'a@b.com',
+      'token123',
+      false,
+    );
   });
 });

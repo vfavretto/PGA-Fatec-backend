@@ -28,7 +28,9 @@ describe('AuditLogService', () => {
   });
 
   it('deve criar log de auditoria', async () => {
-    mockPrisma.configuracaoAuditoria.create.mockResolvedValue({ auditoria_id: 1 });
+    mockPrisma.configuracaoAuditoria.create.mockResolvedValue({
+      auditoria_id: 1,
+    });
 
     const dto = {
       tabela: 'pga',
@@ -47,23 +49,34 @@ describe('AuditLogService', () => {
   });
 
   it('deve relançar erro se create falhar', async () => {
-    mockPrisma.configuracaoAuditoria.create.mockRejectedValue(new Error('DB error'));
+    mockPrisma.configuracaoAuditoria.create.mockRejectedValue(
+      new Error('DB error'),
+    );
 
-    await expect(service.createLog({
-      tabela: 'pga',
-      registro_id: '1',
-      ano: 2024,
-      operacao: 'CREATE' as any,
-      dados_antes: null,
-      dados_depois: {},
-      usuario_id: '1',
-      motivo: '',
-    })).rejects.toThrow('DB error');
+    await expect(
+      service.createLog({
+        tabela: 'pga',
+        registro_id: '1',
+        ano: 2024,
+        operacao: 'CREATE' as any,
+        dados_antes: null,
+        dados_depois: {},
+        usuario_id: '1',
+        motivo: '',
+      }),
+    ).rejects.toThrow('DB error');
   });
 
   it('deve retornar relatório de mudanças por ano', async () => {
     mockPrisma.configuracaoAuditoria.findMany.mockResolvedValue([
-      { tabela: 'pga', operacao: 'CREATE', usuario: { nome: 'Admin' }, data_operacao: new Date(), dados_antes: null, dados_depois: {} },
+      {
+        tabela: 'pga',
+        operacao: 'CREATE',
+        usuario: { nome: 'Admin' },
+        data_operacao: new Date(),
+        dados_antes: null,
+        dados_depois: {},
+      },
     ]);
 
     const result = await service.getChangesReport(2024);

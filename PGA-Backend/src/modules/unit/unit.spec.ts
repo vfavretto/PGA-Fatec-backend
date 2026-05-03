@@ -33,13 +33,18 @@ describe('CreateUnitService', () => {
     mockPrisma.regional.findUnique.mockResolvedValue({ regional_id: 1 });
     mockRepo.create.mockResolvedValue({ unidade_id: 1 });
 
-    const result = await service.execute({ regional_id: 1, nome_unidade: 'U1' } as any);
+    const result = await service.execute({
+      regional_id: 1,
+      nome_unidade: 'U1',
+    } as any);
     expect(result).toEqual({ unidade_id: 1 });
   });
 
   it('deve lançar NotFoundException se regional não existe', async () => {
     mockPrisma.regional.findUnique.mockResolvedValue(null);
-    await expect(service.execute({ regional_id: 99, nome_unidade: 'U1' } as any)).rejects.toThrow(NotFoundException);
+    await expect(
+      service.execute({ regional_id: 99, nome_unidade: 'U1' } as any),
+    ).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -59,13 +64,17 @@ describe('FindAllUnitsService', () => {
 
   it('deve retornar unidade específica no contexto de unidade', async () => {
     mockRepo.findOne.mockResolvedValue({ unidade_id: 5 });
-    const result = await service.execute({ active_context: { tipo: 'unidade', id: 5 } });
+    const result = await service.execute({
+      active_context: { tipo: 'unidade', id: 5 },
+    });
     expect(result).toEqual([{ unidade_id: 5 }]);
   });
 
   it('deve retornar array vazio se unidade do contexto não encontrada', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    const result = await service.execute({ active_context: { tipo: 'unidade', id: 99 } });
+    const result = await service.execute({
+      active_context: { tipo: 'unidade', id: 99 },
+    });
     expect(result).toEqual([]);
   });
 
@@ -114,7 +123,9 @@ describe('UpdateUnitService', () => {
 
   it('deve lançar NotFoundException se não encontrada', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute('99', {} as any)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('99', {} as any)).rejects.toThrow(
+      NotFoundException,
+    );
   });
 });
 

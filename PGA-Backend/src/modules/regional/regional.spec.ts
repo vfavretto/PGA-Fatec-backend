@@ -52,7 +52,10 @@ describe('ListRegionaisService', () => {
   });
 
   it('deve retornar lista de regionais', async () => {
-    mockRepo.findAll.mockResolvedValue([{ regional_id: 1 }, { regional_id: 2 }]);
+    mockRepo.findAll.mockResolvedValue([
+      { regional_id: 1 },
+      { regional_id: 2 },
+    ]);
     const result = await service.execute();
     expect(result).toHaveLength(2);
   });
@@ -101,28 +104,45 @@ describe('ReviewRegionalPgaService', () => {
 
   it('deve aprovar PGA encontrado', async () => {
     mockRepo.findPgaForRegional.mockResolvedValue({ pga_id: 1 });
-    mockRepo.updatePgaReview.mockResolvedValue({ pga_id: 1, status: 'Aprovado' });
+    mockRepo.updatePgaReview.mockResolvedValue({
+      pga_id: 1,
+      status: 'Aprovado',
+    });
 
-    const result = await service.execute('1', '1', { status: 'Aprovado' as any, parecer: 'OK' });
+    const result = await service.execute('1', '1', {
+      status: 'Aprovado' as any,
+      parecer: 'OK',
+    });
     expect(mockRepo.updatePgaReview).toHaveBeenCalled();
     expect(result.status).toBe('Aprovado');
   });
 
   it('deve reprovar PGA encontrado', async () => {
     mockRepo.findPgaForRegional.mockResolvedValue({ pga_id: 1 });
-    mockRepo.updatePgaReview.mockResolvedValue({ pga_id: 1, status: 'Reprovado' });
+    mockRepo.updatePgaReview.mockResolvedValue({
+      pga_id: 1,
+      status: 'Reprovado',
+    });
 
-    const result = await service.execute('1', '1', { status: 'Reprovado' as any, parecer: 'Não aprovado' });
+    const result = await service.execute('1', '1', {
+      status: 'Reprovado' as any,
+      parecer: 'Não aprovado',
+    });
     expect(result.status).toBe('Reprovado');
   });
 });
 
 describe('FindRegionalByResponsavelService', () => {
   let service: FindRegionalByResponsavelService;
-  beforeEach(() => { jest.clearAllMocks(); service = new FindRegionalByResponsavelService(mockRepo as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new FindRegionalByResponsavelService(mockRepo as any);
+  });
 
   it('deve retornar regionais por responsável', async () => {
-    mockRepo.findRegionalByResponsavelId.mockResolvedValue([{ regional_id: 1 }]);
+    mockRepo.findRegionalByResponsavelId.mockResolvedValue([
+      { regional_id: 1 },
+    ]);
     const result = await service.execute('10');
     expect(mockRepo.findRegionalByResponsavelId).toHaveBeenCalledWith('10');
     expect(result).toHaveLength(1);
@@ -131,7 +151,10 @@ describe('FindRegionalByResponsavelService', () => {
 
 describe('GetRegionalPgaService', () => {
   let service: GetRegionalPgaService;
-  beforeEach(() => { jest.clearAllMocks(); service = new GetRegionalPgaService(mockRepo as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new GetRegionalPgaService(mockRepo as any);
+  });
 
   it('deve retornar PGA da regional', async () => {
     mockRepo.findPgaForRegional.mockResolvedValue({ pga_id: 5 });
@@ -147,7 +170,10 @@ describe('GetRegionalPgaService', () => {
 
 describe('GetRegionalProjectService', () => {
   let service: GetRegionalProjectService;
-  beforeEach(() => { jest.clearAllMocks(); service = new GetRegionalProjectService(mockRepo as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new GetRegionalProjectService(mockRepo as any);
+  });
 
   it('deve retornar projeto da regional', async () => {
     mockRepo.findProjectForRegional.mockResolvedValue({ acao_projeto_id: 3 });
@@ -163,7 +189,10 @@ describe('GetRegionalProjectService', () => {
 
 describe('ListRegionalPgasService', () => {
   let service: ListRegionalPgasService;
-  beforeEach(() => { jest.clearAllMocks(); service = new ListRegionalPgasService(mockRepo as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new ListRegionalPgasService(mockRepo as any);
+  });
 
   it('deve retornar PGAs da regional com filtros', async () => {
     mockRepo.findPgasByRegional.mockResolvedValue([{ pga_id: 1 }]);
@@ -175,7 +204,10 @@ describe('ListRegionalPgasService', () => {
 
 describe('ListRegionalProjectsService', () => {
   let service: ListRegionalProjectsService;
-  beforeEach(() => { jest.clearAllMocks(); service = new ListRegionalProjectsService(mockRepo as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new ListRegionalProjectsService(mockRepo as any);
+  });
 
   it('deve retornar projetos da regional com filtros', async () => {
     mockRepo.findProjectsByRegional.mockResolvedValue([{ acao_projeto_id: 1 }]);
@@ -187,7 +219,10 @@ describe('ListRegionalProjectsService', () => {
 
 describe('ListRegionalUnitsService', () => {
   let service: ListRegionalUnitsService;
-  beforeEach(() => { jest.clearAllMocks(); service = new ListRegionalUnitsService(mockRepo as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new ListRegionalUnitsService(mockRepo as any);
+  });
 
   it('deve retornar unidades da regional', async () => {
     mockRepo.findUnitsByRegional.mockResolvedValue([{ unidade_id: 1 }]);
@@ -199,7 +234,10 @@ describe('ListRegionalUnitsService', () => {
 
 describe('ReviewRegionalProjectService', () => {
   let service: ReviewRegionalProjectService;
-  beforeEach(() => { jest.clearAllMocks(); service = new ReviewRegionalProjectService(mockRepo as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new ReviewRegionalProjectService(mockRepo as any);
+  });
 
   it('deve lançar BadRequestException para status inválido', async () => {
     await expect(
@@ -216,16 +254,28 @@ describe('ReviewRegionalProjectService', () => {
 
   it('deve aprovar projeto', async () => {
     mockRepo.findProjectForRegional.mockResolvedValue({ acao_projeto_id: 1 });
-    mockRepo.updateProjectReview.mockResolvedValue({ acao_projeto_id: 1, status: 'Aprovado' });
-    const result = await service.execute('1', '1', { status: 'Aprovado' as any, parecer: 'OK' });
+    mockRepo.updateProjectReview.mockResolvedValue({
+      acao_projeto_id: 1,
+      status: 'Aprovado',
+    });
+    const result = await service.execute('1', '1', {
+      status: 'Aprovado' as any,
+      parecer: 'OK',
+    });
     expect(mockRepo.updateProjectReview).toHaveBeenCalled();
     expect((result as any).status).toBe('Aprovado');
   });
 
   it('deve reprovar projeto', async () => {
     mockRepo.findProjectForRegional.mockResolvedValue({ acao_projeto_id: 1 });
-    mockRepo.updateProjectReview.mockResolvedValue({ acao_projeto_id: 1, status: 'Reprovado' });
-    const result = await service.execute('1', '1', { status: 'Reprovado' as any, parecer: 'Não aprovado' });
+    mockRepo.updateProjectReview.mockResolvedValue({
+      acao_projeto_id: 1,
+      status: 'Reprovado',
+    });
+    const result = await service.execute('1', '1', {
+      status: 'Reprovado' as any,
+      parecer: 'Não aprovado',
+    });
     expect((result as any).status).toBe('Reprovado');
   });
 });

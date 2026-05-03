@@ -431,8 +431,10 @@ export class AuditLogService {
 
       if (entregavelIds.length > 0) {
         const where: any = { entregavel_id: { in: entregavelIds } };
-        if (active_context?.tipo === 'unidade') where.unidade_id = active_context.id;
-        if (active_context?.tipo === 'regional') where.regional_id = active_context.id;
+        if (active_context?.tipo === 'unidade')
+          where.unidade_id = active_context.id;
+        if (active_context?.tipo === 'regional')
+          where.regional_id = active_context.id;
 
         const entregaveis = await this.prisma.entregavelLinkSei.findMany({
           where,
@@ -447,8 +449,10 @@ export class AuditLogService {
 
       const endOfYear = new Date(`${ano}-12-31T23:59:59.999Z`);
       const where: any = { criado_em: { lte: endOfYear } };
-      if (active_context?.tipo === 'unidade') where.unidade_id = active_context.id;
-      if (active_context?.tipo === 'regional') where.regional_id = active_context.id;
+      if (active_context?.tipo === 'unidade')
+        where.unidade_id = active_context.id;
+      if (active_context?.tipo === 'regional')
+        where.regional_id = active_context.id;
 
       const entregaveis = await this.prisma.entregavelLinkSei.findMany({
         where,

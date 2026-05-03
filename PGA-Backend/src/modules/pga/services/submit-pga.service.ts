@@ -21,7 +21,10 @@ export class SubmitPgaService {
       throw new NotFoundException('PGA não encontrado');
     }
 
-    const statusPermitidos: StatusPGA[] = [StatusPGA.EmElaboracao, StatusPGA.Reprovado];
+    const statusPermitidos: StatusPGA[] = [
+      StatusPGA.EmElaboracao,
+      StatusPGA.Reprovado,
+    ];
     if (!statusPermitidos.includes(pga.status)) {
       throw new BadRequestException(
         `PGA não pode ser submetido pois está com status "${pga.status}".`,

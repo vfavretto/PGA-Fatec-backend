@@ -29,7 +29,10 @@ const mockRepo = {
 
 describe('CreateAttachmentService', () => {
   let service: CreateAttachmentService;
-  beforeEach(() => { jest.clearAllMocks(); service = new CreateAttachmentService(mockRepo as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new CreateAttachmentService(mockRepo as any);
+  });
 
   it('deve criar e retornar o anexo', async () => {
     mockRepo.create.mockResolvedValue({ attachment_id: 1 });
@@ -40,7 +43,10 @@ describe('CreateAttachmentService', () => {
 
 describe('FindAllAttachmentService', () => {
   let service: FindAllAttachmentService;
-  beforeEach(() => { jest.clearAllMocks(); service = new FindAllAttachmentService(mockRepo as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new FindAllAttachmentService(mockRepo as any);
+  });
 
   it('deve retornar todos os anexos', async () => {
     mockRepo.findAll.mockResolvedValue([{ attachment_id: 1 }]);
@@ -50,14 +56,18 @@ describe('FindAllAttachmentService', () => {
 
   it('deve filtrar por unidade', async () => {
     mockRepo.findAllByUnit.mockResolvedValue([{ attachment_id: 2 }]);
-    const result = await service.execute({ active_context: { tipo: 'unidade', id: 5 } });
+    const result = await service.execute({
+      active_context: { tipo: 'unidade', id: 5 },
+    });
     expect(mockRepo.findAllByUnit).toHaveBeenCalledWith(5);
     expect(result).toHaveLength(1);
   });
 
   it('deve filtrar por regional', async () => {
     mockRepo.findAllByRegional.mockResolvedValue([{ attachment_id: 3 }]);
-    const result = await service.execute({ active_context: { tipo: 'regional', id: 2 } });
+    const result = await service.execute({
+      active_context: { tipo: 'regional', id: 2 },
+    });
     expect(mockRepo.findAllByRegional).toHaveBeenCalledWith(2);
     expect(result).toHaveLength(1);
   });
@@ -65,7 +75,10 @@ describe('FindAllAttachmentService', () => {
 
 describe('FindOneAttachmentService', () => {
   let service: FindOneAttachmentService;
-  beforeEach(() => { jest.clearAllMocks(); service = new FindOneAttachmentService(mockRepo as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new FindOneAttachmentService(mockRepo as any);
+  });
 
   it('deve retornar anexo encontrado', async () => {
     mockRepo.findOneWithContext.mockResolvedValue({ anexo_id: 1 });
@@ -82,7 +95,10 @@ describe('FindOneAttachmentService', () => {
 
 describe('UpdateAttachmentService', () => {
   let service: UpdateAttachmentService;
-  beforeEach(() => { jest.clearAllMocks(); service = new UpdateAttachmentService(mockRepo as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new UpdateAttachmentService(mockRepo as any);
+  });
 
   it('deve atualizar o anexo', async () => {
     mockRepo.update.mockResolvedValue({ anexo_id: 1, item: 'Documento' });
@@ -99,7 +115,10 @@ describe('UpdateAttachmentService', () => {
 
 describe('DeleteAttachmentService', () => {
   let service: DeleteAttachmentService;
-  beforeEach(() => { jest.clearAllMocks(); service = new DeleteAttachmentService(mockRepo as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new DeleteAttachmentService(mockRepo as any);
+  });
 
   it('deve deletar o anexo', async () => {
     mockRepo.findOne.mockResolvedValue({ attachment_id: 1 });
@@ -116,7 +135,10 @@ describe('DeleteAttachmentService', () => {
 
 describe('FindByDeliverableService', () => {
   let service: FindByDeliverableService;
-  beforeEach(() => { jest.clearAllMocks(); service = new FindByDeliverableService(mockRepo as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new FindByDeliverableService(mockRepo as any);
+  });
 
   it('deve retornar anexos do entregável', async () => {
     mockRepo.findByEntregavel.mockResolvedValue([{ attachment_id: 1 }]);
@@ -126,8 +148,12 @@ describe('FindByDeliverableService', () => {
   });
 
   it('deve usar contexto ativo quando fornecido', async () => {
-    mockRepo.findByEntregavelWithContext.mockResolvedValue([{ attachment_id: 2 }]);
-    const result = await service.execute('5', { active_context: { tipo: 'unidade', id: 1 } });
+    mockRepo.findByEntregavelWithContext.mockResolvedValue([
+      { attachment_id: 2 },
+    ]);
+    const result = await service.execute('5', {
+      active_context: { tipo: 'unidade', id: 1 },
+    });
     expect(mockRepo.findByEntregavelWithContext).toHaveBeenCalled();
     expect(result).toHaveLength(1);
   });
@@ -135,7 +161,10 @@ describe('FindByDeliverableService', () => {
 
 describe('FindByProcessStepService', () => {
   let service: FindByProcessStepService;
-  beforeEach(() => { jest.clearAllMocks(); service = new FindByProcessStepService(mockRepo as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new FindByProcessStepService(mockRepo as any);
+  });
 
   it('deve retornar anexos da etapa de processo', async () => {
     mockRepo.findByEtapaProcesso.mockResolvedValue([{ attachment_id: 2 }]);
@@ -145,8 +174,12 @@ describe('FindByProcessStepService', () => {
   });
 
   it('deve usar contexto ativo quando fornecido', async () => {
-    mockRepo.findByEtapaProcessoWithContext.mockResolvedValue([{ attachment_id: 3 }]);
-    const result = await service.execute('3', { active_context: { tipo: 'regional', id: 1 } });
+    mockRepo.findByEtapaProcessoWithContext.mockResolvedValue([
+      { attachment_id: 3 },
+    ]);
+    const result = await service.execute('3', {
+      active_context: { tipo: 'regional', id: 1 },
+    });
     expect(mockRepo.findByEtapaProcessoWithContext).toHaveBeenCalled();
     expect(result).toHaveLength(1);
   });

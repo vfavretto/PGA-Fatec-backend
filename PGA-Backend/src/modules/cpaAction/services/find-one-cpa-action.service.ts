@@ -7,7 +7,10 @@ export class FindOneCpaActionService {
   constructor(private readonly repository: CpaActionRepository) {}
 
   async execute(id: string, user?: any): Promise<CpaAction> {
-    const action = await this.repository.findOneWithContext(id, user?.active_context);
+    const action = await this.repository.findOneWithContext(
+      id,
+      user?.active_context,
+    );
     if (!action) throw new NotFoundException('AcaoCPA não encontrada');
     return action;
   }

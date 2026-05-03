@@ -23,7 +23,9 @@ export class RegionalRepository {
       },
     });
 
-    return vinculos.flatMap((v) => v.regional.unidades.map((u) => u.unidade_id));
+    return vinculos.flatMap((v) =>
+      v.regional.unidades.map((u) => u.unidade_id),
+    );
   }
 
   async findUnitsByRegional(regionalId: string) {

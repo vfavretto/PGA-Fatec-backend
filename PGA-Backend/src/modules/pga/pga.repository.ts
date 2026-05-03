@@ -11,7 +11,12 @@ export class PgaRepository extends BaseRepository<PGA> {
     super(prisma);
   }
 
-  async create(data: CreatePgaDto & { is_template?: boolean; usuario_criacao_id?: string | null }) {
+  async create(
+    data: CreatePgaDto & {
+      is_template?: boolean;
+      usuario_criacao_id?: string | null;
+    },
+  ) {
     return this.prisma.pGA.create({
       data,
     });
@@ -31,7 +36,11 @@ export class PgaRepository extends BaseRepository<PGA> {
         unidade: this.unidadeInclude,
         regionalResponsavel: true,
       },
-      orderBy: [{ is_template: 'desc' }, { ano: 'desc' }, { unidade: { nome_unidade: 'asc' } }],
+      orderBy: [
+        { is_template: 'desc' },
+        { ano: 'desc' },
+        { unidade: { nome_unidade: 'asc' } },
+      ],
     });
   }
 
@@ -49,7 +58,13 @@ export class PgaRepository extends BaseRepository<PGA> {
   async findAllByRegional(regionalId: string) {
     const vinculos = await this.prisma.pessoaRegional.findMany({
       where: { pessoa_id: regionalId, ativo: true },
-      include: { regional: { select: { unidades: { where: { ativo: true }, select: { unidade_id: true } } } } },
+      include: {
+        regional: {
+          select: {
+            unidades: { where: { ativo: true }, select: { unidade_id: true } },
+          },
+        },
+      },
     });
 
     const unidadeIds = vinculos.flatMap((v) =>
@@ -58,7 +73,10 @@ export class PgaRepository extends BaseRepository<PGA> {
     if (!unidadeIds.length) return [];
 
     return this.prisma.pGA.findMany({
-      where: this.whereActive({ unidade_id: { in: unidadeIds }, is_template: false }),
+      where: this.whereActive({
+        unidade_id: { in: unidadeIds },
+        is_template: false,
+      }),
       include: { unidade: this.unidadeInclude, regionalResponsavel: true },
       orderBy: [{ ano: 'desc' }, { unidade: { nome_unidade: 'asc' } }],
     });
@@ -90,7 +108,9 @@ export class PgaRepository extends BaseRepository<PGA> {
             cursos: {
               where: { ativo: true },
               include: {
-                coordenador: { select: { nome: true, telefone: true, email: true } },
+                coordenador: {
+                  select: { nome: true, telefone: true, email: true },
+                },
               },
               orderBy: [{ nome: 'asc' }],
             },
@@ -116,7 +136,10 @@ export class PgaRepository extends BaseRepository<PGA> {
             situacoesProblemas: { include: { situacaoProblema: true } },
             etapas: {
               where: { ativo: true },
-              include: { entregavel_link_sei: true, anexos: { where: { ativo: true } } },
+              include: {
+                entregavel_link_sei: true,
+                anexos: { where: { ativo: true } },
+              },
             },
             pessoas: {
               where: { ativo: true },
@@ -187,7 +210,10 @@ export class PgaRepository extends BaseRepository<PGA> {
     });
   }
 
-  async findOneWithContext(id: string, active_context?: { tipo: string; id?: string } | null) {
+  async findOneWithContext(
+    id: string,
+    active_context?: { tipo: string; id?: string } | null,
+  ) {
     const pga = await this.findOne(id);
     if (!pga) return null;
 
@@ -208,7 +234,12 @@ export class PgaRepository extends BaseRepository<PGA> {
           where: { unidade_id: pga.unidade_id },
           select: { regional_id: true },
         });
-        if (!unidade || !unidade.regional_id || !regionalIds.includes(unidade.regional_id)) return null;
+        if (
+          !unidade ||
+          !unidade.regional_id ||
+          !regionalIds.includes(unidade.regional_id)
+        )
+          return null;
       }
     }
 

@@ -1,4 +1,11 @@
-﻿import { IsUUID, IsNotEmpty, IsOptional, IsString, IsEnum, MaxLength } from 'class-validator';
+﻿import {
+  IsUUID,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsEnum,
+  MaxLength,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { TipoCurso, StatusCurso } from '@prisma/client';
 
@@ -6,7 +13,7 @@ export class CreateCourseDto {
   @ApiProperty({
     description: 'ID da unidade à qual o curso pertence',
     example: 1,
-    type: 'integer'
+    type: 'integer',
   })
   @IsNotEmpty()
   @IsUUID('4')
@@ -15,7 +22,7 @@ export class CreateCourseDto {
   @ApiProperty({
     description: 'Nome do curso',
     example: 'Tecnologia em Sistemas para Internet',
-    maxLength: 255
+    maxLength: 255,
   })
   @IsNotEmpty()
   @IsString()
@@ -25,7 +32,7 @@ export class CreateCourseDto {
   @ApiProperty({
     description: 'Tipo do curso',
     enum: TipoCurso,
-    example: 'Superior'
+    example: 'Superior',
   })
   @IsNotEmpty()
   @IsEnum(TipoCurso)
@@ -34,7 +41,7 @@ export class CreateCourseDto {
   @ApiProperty({
     description: 'Status atual do curso',
     enum: StatusCurso,
-    example: 'Ativo'
+    example: 'Ativo',
   })
   @IsNotEmpty()
   @IsEnum(StatusCurso)
@@ -43,7 +50,7 @@ export class CreateCourseDto {
   @ApiPropertyOptional({
     description: 'ID do coordenador do curso',
     example: 5,
-    type: 'integer'
+    type: 'integer',
   })
   @IsOptional()
   @IsUUID('4')

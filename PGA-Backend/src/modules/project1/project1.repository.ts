@@ -56,7 +56,10 @@ export class Project1Repository extends BaseRepository<AcaoProjeto> {
         regionalResponsavel: true,
         etapas: { where: this.whereActive() },
         pessoas: { where: this.whereActive(), include: { pessoa: true } },
-        situacoesProblemas: { where: this.whereActive(), include: { situacaoProblema: true } },
+        situacoesProblemas: {
+          where: this.whereActive(),
+          include: { situacaoProblema: true },
+        },
       },
       orderBy: [{ pga: { ano: 'desc' } }, { codigo_projeto: 'asc' }],
     });
@@ -80,13 +83,19 @@ export class Project1Repository extends BaseRepository<AcaoProjeto> {
         regionalResponsavel: true,
         etapas: { where: this.whereActive() },
         pessoas: { where: this.whereActive(), include: { pessoa: true } },
-        situacoesProblemas: { where: this.whereActive(), include: { situacaoProblema: true } },
+        situacoesProblemas: {
+          where: this.whereActive(),
+          include: { situacaoProblema: true },
+        },
       },
       orderBy: [{ pga: { ano: 'desc' } }, { codigo_projeto: 'asc' }],
     });
   }
 
-  async findOneWithContext(id: string, active_context?: { tipo: string; id?: string } | null) {
+  async findOneWithContext(
+    id: string,
+    active_context?: { tipo: string; id?: string } | null,
+  ) {
     const projeto = await this.findOne(id);
     if (!projeto) return null;
 
@@ -101,7 +110,8 @@ export class Project1Repository extends BaseRepository<AcaoProjeto> {
           select: { unidade_id: true },
         });
         const ids = vinculos.map((v) => v.unidade_id);
-        if (!projeto.pga.unidade_id || !ids.includes(projeto.pga.unidade_id)) return null;
+        if (!projeto.pga.unidade_id || !ids.includes(projeto.pga.unidade_id))
+          return null;
       }
     }
 

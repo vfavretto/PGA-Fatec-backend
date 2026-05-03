@@ -36,7 +36,9 @@ describe('ValidateUserService', () => {
   it('deve lançar UnauthorizedException se usuário não encontrado', async () => {
     mockPrisma.pessoa.findUnique.mockResolvedValue(null);
 
-    await expect(service.execute('notfound@test.com', 'any')).rejects.toThrow(UnauthorizedException);
+    await expect(service.execute('notfound@test.com', 'any')).rejects.toThrow(
+      UnauthorizedException,
+    );
   });
 
   it('deve lançar UnauthorizedException se usuário não tem senha', async () => {
@@ -48,7 +50,9 @@ describe('ValidateUserService', () => {
       tipo_usuario: 'Diretor',
     });
 
-    await expect(service.execute('user@test.com', 'any')).rejects.toThrow(UnauthorizedException);
+    await expect(service.execute('user@test.com', 'any')).rejects.toThrow(
+      UnauthorizedException,
+    );
   });
 
   it('deve lançar UnauthorizedException se senha for inválida', async () => {
@@ -61,6 +65,8 @@ describe('ValidateUserService', () => {
       tipo_usuario: 'Diretor',
     });
 
-    await expect(service.execute('user@test.com', 'errada')).rejects.toThrow(UnauthorizedException);
+    await expect(service.execute('user@test.com', 'errada')).rejects.toThrow(
+      UnauthorizedException,
+    );
   });
 });

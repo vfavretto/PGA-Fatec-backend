@@ -81,8 +81,14 @@ export class AuditController {
     status: 200,
     description: 'Configurações retornadas com sucesso',
   })
-  async getConfigurationsByYear(@Request() req: any, @Param('ano', ParseIntPipe) ano: number) {
-    return this.auditLogService.getConfigurationsByYear(ano, req.user?.active_context);
+  async getConfigurationsByYear(
+    @Request() req: any,
+    @Param('ano', ParseIntPipe) ano: number,
+  ) {
+    return this.auditLogService.getConfigurationsByYear(
+      ano,
+      req.user?.active_context,
+    );
   }
 
   @Get('configurations/situacoes-problema/year/:ano')

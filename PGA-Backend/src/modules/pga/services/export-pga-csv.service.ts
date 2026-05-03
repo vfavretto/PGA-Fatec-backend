@@ -8,15 +8,32 @@ export class ExportPgaCsvService {
   async execute(id: string, user?: any): Promise<string> {
     const active = user?.active_context ?? null;
     const activeContext = user?.active_context ?? null;
-    const hasAccess = await this.repository.findOneWithContext(id, activeContext);
-    if (!hasAccess) throw new NotFoundException('PGA não encontrada ou sem acesso');
+    const hasAccess = await this.repository.findOneWithContext(
+      id,
+      activeContext,
+    );
+    if (!hasAccess)
+      throw new NotFoundException('PGA não encontrada ou sem acesso');
 
     const pga = await this.repository.findOneWithRelations(id);
-    if (!pga) throw new NotFoundException('PGA não encontrada após carregamento de relações');
+    if (!pga)
+      throw new NotFoundException(
+        'PGA não encontrada após carregamento de relações',
+      );
 
     const unidadeNome = (pga as any).unidade?.nome_unidade ?? '';
 
-    const metaCols = ['pga_id', 'ano', 'versao', 'unidade_id', 'unidade_nome', 'analise_cenario', 'status', 'regional_responsavel_id', 'parecer_regional'];
+    const metaCols = [
+      'pga_id',
+      'ano',
+      'versao',
+      'unidade_id',
+      'unidade_nome',
+      'analise_cenario',
+      'status',
+      'regional_responsavel_id',
+      'parecer_regional',
+    ];
     const metaValues = [
       pga.pga_id,
       pga.ano,
@@ -31,21 +48,33 @@ export class ExportPgaCsvService {
 
     let csv = `${metaCols.join(',')}\n${metaValues.join(',')}\n\n`;
 
-    const situacaoCountMap: Record<number, { descricao: string; count: number }> = {};
+    const situacaoCountMap: Record<
+      number,
+      { descricao: string; count: number }
+    > = {};
     const projetos = (pga as any).acoesProjetos ?? [];
     for (const proj of projetos) {
       const sps = proj.situacoesProblemas ?? [];
       for (const sp of sps) {
-        const idSp = sp.situacao_problema_id ?? sp.situacao_id ?? (sp.situacaoProblema?.situacao_id ?? 0);
+        const idSp =
+          sp.situacao_problema_id ??
+          sp.situacao_id ??
+          sp.situacaoProblema?.situacao_id ??
+          0;
         const desc = sp.situacaoProblema?.descricao ?? sp.descricao ?? '';
         if (!idSp) continue;
-        if (!situacaoCountMap[idSp]) situacaoCountMap[idSp] = { descricao: desc, count: 0 };
+        if (!situacaoCountMap[idSp])
+          situacaoCountMap[idSp] = { descricao: desc, count: 0 };
         situacaoCountMap[idSp].count += 1;
       }
     }
 
     const situacoesOrdenadas = Object.keys(situacaoCountMap)
-      .map((k) => ({ situacao_id: k, descricao: situacaoCountMap[k].descricao, count: situacaoCountMap[k].count }))
+      .map((k) => ({
+        situacao_id: k,
+        descricao: situacaoCountMap[k].descricao,
+        count: situacaoCountMap[k].count,
+      }))
       .sort((a, b) => b.count - a.count);
 
     if (situacoesOrdenadas.length) {
@@ -60,20 +89,36 @@ export class ExportPgaCsvService {
     for (const proj of projetos) {
       const eixo = proj.eixo ?? { numero: 0, nome_eixo: '' };
       const eixoNum = eixo.numero ?? 0;
-      if (!eixoMap[eixoNum]) eixoMap[eixoNum] = { eixo_nome: eixo.nome_eixo ?? '', projetos: [] };
+      if (!eixoMap[eixoNum])
+        eixoMap[eixoNum] = { eixo_nome: eixo.nome_eixo ?? '', projetos: [] };
       eixoMap[eixoNum].projetos.push(proj);
     }
 
     const eixosOrdenados = Object.keys(eixoMap)
-      .map((k) => ({ numero: Number(k), nome: eixoMap[Number(k)].eixo_nome, projetos: eixoMap[Number(k)].projetos }))
+      .map((k) => ({
+        numero: Number(k),
+        nome: eixoMap[Number(k)].eixo_nome,
+        projetos: eixoMap[Number(k)].projetos,
+      }))
       .sort((a, b) => a.numero - b.numero);
 
-    csv += 'eixo_num,eixo_nome,projeto_codigo,projeto_nome,tema_num,prioridade_grau,responsavel,collaboradores,colaboradores_detalhados,situacoes_problema,o_que_sera_feito,por_que_sera_feito,objetivos_institucionais_referenciados,custo_total_estimado,fonte_recursos,data_inicio,data_final,etapas_count,entregaveis_count,etapas_detalhes\n';
+    csv +=
+      'eixo_num,eixo_nome,projeto_codigo,projeto_nome,tema_num,prioridade_grau,responsavel,collaboradores,colaboradores_detalhados,situacoes_problema,o_que_sera_feito,por_que_sera_feito,objetivos_institucionais_referenciados,custo_total_estimado,fonte_recursos,data_inicio,data_final,etapas_count,entregaveis_count,etapas_detalhes\n';
 
     for (const eixo of eixosOrdenados) {
       eixo.projetos.sort((a: any, b: any) => {
-        const pa = parseInt(String(a.codigo_projeto || '').trim().split(/[^0-9]/)[0] || '0', 10);
-        const pb = parseInt(String(b.codigo_projeto || '').trim().split(/[^0-9]/)[0] || '0', 10);
+        const pa = parseInt(
+          String(a.codigo_projeto || '')
+            .trim()
+            .split(/[^0-9]/)[0] || '0',
+          10,
+        );
+        const pb = parseInt(
+          String(b.codigo_projeto || '')
+            .trim()
+            .split(/[^0-9]/)[0] || '0',
+          10,
+        );
         return pa - pb;
       });
 
@@ -81,11 +126,20 @@ export class ExportPgaCsvService {
         const temaNum = proj.tema?.tema_num ?? '';
         const pri = proj.prioridade?.grau ?? '';
         const pessoas = proj.pessoas ?? [];
-        const responsavel = pessoas.find((pp: any) => pp.papel === 'Responsavel')?.pessoa?.nome ?? '';
-        const colaboradores = pessoas.filter((pp: any) => pp.papel !== 'Responsavel').map((pp: any) => pp.pessoa?.nome).filter(Boolean).join('; ');
+        const responsavel =
+          pessoas.find((pp: any) => pp.papel === 'Responsavel')?.pessoa?.nome ??
+          '';
+        const colaboradores = pessoas
+          .filter((pp: any) => pp.papel !== 'Responsavel')
+          .map((pp: any) => pp.pessoa?.nome)
+          .filter(Boolean)
+          .join('; ');
         const colaboradoresDetalhados = pessoas
           .filter((pp: any) => pp.papel !== 'Responsavel')
-          .map((pp: any) => `${pp.pessoa?.nome ?? ''}${pp.carga_horaria_semanal ? ` (CH/sem: ${pp.carga_horaria_semanal})` : ''}${pp.tipo_vinculo_hae ? ` (Tipo: ${pp.tipo_vinculo_hae.sigla ?? pp.tipo_vinculo_hae.descricao ?? ''})` : ''}`)
+          .map(
+            (pp: any) =>
+              `${pp.pessoa?.nome ?? ''}${pp.carga_horaria_semanal ? ` (CH/sem: ${pp.carga_horaria_semanal})` : ''}${pp.tipo_vinculo_hae ? ` (Tipo: ${pp.tipo_vinculo_hae.sigla ?? pp.tipo_vinculo_hae.descricao ?? ''})` : ''}`,
+          )
           .filter(Boolean)
           .join('; ');
         const etapas = proj.etapas ?? [];
@@ -114,12 +168,24 @@ export class ExportPgaCsvService {
         for (const e of etapas) {
           const desc = (e.descricao ?? '').replace(/"/g, '""');
           const entregavelObj = e.entregavel ?? e.entregavel_link_sei;
-          const entregavel = entregavelObj ? String(entregavelObj.descricao ?? entregavelObj.entregavel_numero ?? '') : '';
+          const entregavel = entregavelObj
+            ? String(
+                entregavelObj.descricao ??
+                  entregavelObj.entregavel_numero ??
+                  '',
+              )
+            : '';
           const numeroRef = e.numero_ref ?? '';
           const verif = e.status_verificacao ?? '';
-          const dataPrev = e.data_verificacao_prevista ? e.data_verificacao_prevista.toISOString().split('T')[0] : '';
-          const dataReal = e.data_verificacao_realizada ? e.data_verificacao_realizada.toISOString().split('T')[0] : '';
-          etapasDetalhesArr.push(`${desc}|${entregavel}|${numeroRef}|${verif}|${dataPrev}|${dataReal}`);
+          const dataPrev = e.data_verificacao_prevista
+            ? e.data_verificacao_prevista.toISOString().split('T')[0]
+            : '';
+          const dataReal = e.data_verificacao_realizada
+            ? e.data_verificacao_realizada.toISOString().split('T')[0]
+            : '';
+          etapasDetalhesArr.push(
+            `${desc}|${entregavel}|${numeroRef}|${verif}|${dataPrev}|${dataReal}`,
+          );
         }
         const etapasDetalhes = etapasDetalhesArr.join(';;');
 

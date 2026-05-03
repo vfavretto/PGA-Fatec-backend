@@ -1,5 +1,22 @@
-﻿import { Controller, Post, Get, Put, Delete, Body, Param, ParseUUIDPipe, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
+﻿import {
+  Controller,
+  Post,
+  Get,
+  Put,
+  Delete,
+  Body,
+  Param,
+  ParseUUIDPipe,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiBody,
+} from '@nestjs/swagger';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { CreateThemeDto } from './dto/create-theme.dto';
@@ -25,7 +42,10 @@ export class ThemesController {
   @Post()
   @UseGuards(RolesGuard)
   @Roles('Administrador', 'CPS')
-  @ApiOperation({ summary: 'Criar tema', description: 'Cria um novo tema no sistema' })
+  @ApiOperation({
+    summary: 'Criar tema',
+    description: 'Cria um novo tema no sistema',
+  })
   @ApiBody({ type: CreateThemeDto })
   @ApiResponse({ status: 201, description: 'Tema criado com sucesso' })
   @ApiResponse({ status: 400, description: 'Dados inválidos' })
@@ -34,14 +54,23 @@ export class ThemesController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Listar temas', description: 'Retorna lista de todos os temas' })
-  @ApiResponse({ status: 200, description: 'Lista de temas retornada com sucesso' })
+  @ApiOperation({
+    summary: 'Listar temas',
+    description: 'Retorna lista de todos os temas',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de temas retornada com sucesso',
+  })
   findAll() {
     return this.findAllService.execute();
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Buscar tema por ID', description: 'Retorna dados de um tema específico' })
+  @ApiOperation({
+    summary: 'Buscar tema por ID',
+    description: 'Retorna dados de um tema específico',
+  })
   @ApiParam({ name: 'id', type: 'number', description: 'ID do tema' })
   @ApiResponse({ status: 200, description: 'Tema encontrado com sucesso' })
   @ApiResponse({ status: 404, description: 'Tema não encontrado' })
@@ -52,7 +81,10 @@ export class ThemesController {
   @Put(':id')
   @UseGuards(RolesGuard)
   @Roles('Administrador', 'CPS')
-  @ApiOperation({ summary: 'Atualizar tema', description: 'Atualiza dados de um tema específico' })
+  @ApiOperation({
+    summary: 'Atualizar tema',
+    description: 'Atualiza dados de um tema específico',
+  })
   @ApiParam({ name: 'id', type: 'number', description: 'ID do tema' })
   @ApiBody({ type: UpdateThemeDto })
   @ApiResponse({ status: 200, description: 'Tema atualizado com sucesso' })
@@ -64,7 +96,10 @@ export class ThemesController {
   @Delete(':id')
   @UseGuards(RolesGuard)
   @Roles('Administrador', 'CPS')
-  @ApiOperation({ summary: 'Excluir tema', description: 'Remove um tema do sistema' })
+  @ApiOperation({
+    summary: 'Excluir tema',
+    description: 'Remove um tema do sistema',
+  })
   @ApiParam({ name: 'id', type: 'number', description: 'ID do tema' })
   @ApiResponse({ status: 200, description: 'Tema excluído com sucesso' })
   @ApiResponse({ status: 404, description: 'Tema não encontrado' })

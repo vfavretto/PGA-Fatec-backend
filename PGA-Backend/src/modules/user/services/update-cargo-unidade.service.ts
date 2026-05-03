@@ -6,9 +6,15 @@ import { CargoUnidade } from '@prisma/client';
 export class UpdateCargoUnidadeService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async execute(pessoaId: string, unidadeId: string, cargo: CargoUnidade | null) {
+  async execute(
+    pessoaId: string,
+    unidadeId: string,
+    cargo: CargoUnidade | null,
+  ) {
     const vinculo = await this.prisma.pessoaUnidade.findUnique({
-      where: { pessoa_id_unidade_id: { pessoa_id: pessoaId, unidade_id: unidadeId } },
+      where: {
+        pessoa_id_unidade_id: { pessoa_id: pessoaId, unidade_id: unidadeId },
+      },
     });
 
     if (!vinculo) {
@@ -16,7 +22,9 @@ export class UpdateCargoUnidadeService {
     }
 
     return this.prisma.pessoaUnidade.update({
-      where: { pessoa_id_unidade_id: { pessoa_id: pessoaId, unidade_id: unidadeId } },
+      where: {
+        pessoa_id_unidade_id: { pessoa_id: pessoaId, unidade_id: unidadeId },
+      },
       data: { cargo: cargo ?? null },
     });
   }

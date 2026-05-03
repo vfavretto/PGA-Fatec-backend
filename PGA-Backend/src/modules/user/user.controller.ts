@@ -80,12 +80,15 @@ export class UserController {
   @ApiBody({ type: CreateUserDto })
   @ApiResponse({ status: 201, description: 'Usuário criado com sucesso' })
   @ApiResponse({ status: 400, description: 'Dados inválidos' })
-  async create(@Body() data: CreateUserDto, @Request() req?: ExpressRequest & { user?: any }) {
+  async create(
+    @Body() data: CreateUserDto,
+    @Request() req?: ExpressRequest & { user?: any },
+  ) {
     // req.user pode ser undefined para chamadas públicas
     const reqUser = req?.user ?? null;
-      const result = await this.createUserService.execute(data as any, reqUser);
-      // result has shape { user, email_sent }
-      return result;
+    const result = await this.createUserService.execute(data as any, reqUser);
+    // result has shape { user, email_sent }
+    return result;
   }
 
   @Get()
@@ -250,14 +253,29 @@ export class UserController {
   @Patch(':id/cargo-unidade')
   @UseGuards(RolesGuard)
   @Roles('Administrador', 'CPS', 'Diretor')
-  @ApiOperation({ summary: 'Atualizar cargo na unidade', description: 'Define o cargo de gestão da pessoa na unidade (Equipe Gestora do PGA)' })
+  @ApiOperation({
+    summary: 'Atualizar cargo na unidade',
+    description:
+      'Define o cargo de gestão da pessoa na unidade (Equipe Gestora do PGA)',
+  })
   @ApiParam({ name: 'id', type: 'string', description: 'ID da pessoa' })
-  @ApiBody({ schema: { properties: { unidade_id: { type: 'string' }, cargo: { type: 'string', nullable: true } } } })
+  @ApiBody({
+    schema: {
+      properties: {
+        unidade_id: { type: 'string' },
+        cargo: { type: 'string', nullable: true },
+      },
+    },
+  })
   async updateCargoUnidade(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() body: { unidade_id: string; cargo: CargoUnidade | null },
   ) {
-    return this.updateCargoUnidadeService.execute(id, body.unidade_id, body.cargo ?? null);
+    return this.updateCargoUnidadeService.execute(
+      id,
+      body.unidade_id,
+      body.cargo ?? null,
+    );
   }
 
   @Patch(':id/change-role')

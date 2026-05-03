@@ -14,7 +14,11 @@ describe('DeleteUserService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    service = new DeleteUserService(mockRepo as any, mockPrisma as any, mockAuditRepo as any);
+    service = new DeleteUserService(
+      mockRepo as any,
+      mockPrisma as any,
+      mockAuditRepo as any,
+    );
   });
 
   it('deve lançar NotFoundException se usuário não encontrado', async () => {

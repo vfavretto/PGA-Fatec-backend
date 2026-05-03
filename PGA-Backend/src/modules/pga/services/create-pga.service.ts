@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PgaRepository } from '../pga.repository';
 import { CreatePgaDto } from '../dto/create-pga.dto';
 import { PGA } from '../entities/pga.entity';
@@ -36,4 +40,3 @@ export class CreatePgaService {
     });
   }
 }
-

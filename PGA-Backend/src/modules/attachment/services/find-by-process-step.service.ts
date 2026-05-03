@@ -7,7 +7,11 @@ export class FindByProcessStepService {
 
   async execute(etapaProcessoId: string, user?: any) {
     const active = user?.active_context;
-    if (active) return this.attachmentRepository.findByEtapaProcessoWithContext(etapaProcessoId, active);
+    if (active)
+      return this.attachmentRepository.findByEtapaProcessoWithContext(
+        etapaProcessoId,
+        active,
+      );
     return this.attachmentRepository.findByEtapaProcesso(etapaProcessoId);
   }
 }

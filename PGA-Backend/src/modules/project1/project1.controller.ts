@@ -10,6 +10,8 @@
 } from '@nestjs/common';
 import { Request, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
 import {
   ApiTags,
   ApiOperation,
@@ -31,7 +33,7 @@ import { UpdateProject1Dto } from './dto/update-project1.dto';
 @ApiTags('Projects')
 @ApiBearerAuth('JWT-auth')
 @Controller('project1')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class Project1Controller {
   constructor(
     private readonly createProject1Service: CreateProject1Service,
@@ -67,8 +69,8 @@ export class Project1Controller {
   }
 
   @Post()
+  @Roles('Coordenador', 'Diretor')
   @ApiOperation({
-    summary: 'Criar novo projeto',
     description: 'Cria um novo projeto no sistema',
   })
   @ApiBody({
@@ -100,8 +102,8 @@ export class Project1Controller {
   }
 
   @Put(':id')
+  @Roles('Coordenador', 'Diretor')
   @ApiOperation({
-    summary: 'Atualizar projeto',
     description: 'Atualiza dados de um projeto específico',
   })
   @ApiParam({ name: 'id', type: 'number', description: 'ID do projeto' })
@@ -116,8 +118,8 @@ export class Project1Controller {
   }
 
   @Delete(':id')
+  @Roles('Coordenador', 'Diretor')
   @ApiOperation({
-    summary: 'Excluir projeto',
     description: 'Remove um projeto do sistema',
   })
   @ApiParam({ name: 'id', type: 'number', description: 'ID do projeto' })

@@ -1,11 +1,17 @@
-import { IsInt, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import {
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreatePriorityActionDto {
   @ApiProperty({
     description: 'Grau de prioridade (número)',
     example: 1,
-    type: 'integer'
+    type: 'integer',
   })
   @IsInt()
   @IsNotEmpty()
@@ -14,7 +20,7 @@ export class CreatePriorityActionDto {
   @ApiProperty({
     description: 'Descrição da prioridade de ação',
     example: 'Prioridade Muito Alta',
-    maxLength: 255
+    maxLength: 255,
   })
   @IsString()
   @IsNotEmpty()
@@ -24,7 +30,7 @@ export class CreatePriorityActionDto {
   @ApiProperty({
     description: 'Tipo de gestão relacionado à prioridade',
     example: 'Gestão Acadêmica',
-    maxLength: 100
+    maxLength: 100,
   })
   @IsString()
   @IsNotEmpty()
@@ -33,7 +39,7 @@ export class CreatePriorityActionDto {
 
   @ApiPropertyOptional({
     description: 'Detalhes adicionais sobre a prioridade',
-    example: 'Prioridade que deve ser tratada com máxima urgência...'
+    example: 'Prioridade que deve ser tratada com máxima urgência...',
   })
   @IsOptional()
   @IsString()

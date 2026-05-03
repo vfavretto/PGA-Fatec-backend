@@ -15,17 +15,25 @@ const mockRepo = {
 
 describe('CreatePriorityActionService', () => {
   let service: CreatePriorityActionService;
-  beforeEach(() => { jest.clearAllMocks(); service = new CreatePriorityActionService(mockRepo as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new CreatePriorityActionService(mockRepo as any);
+  });
 
   it('deve criar e retornar ação prioritária', async () => {
     mockRepo.create.mockResolvedValue({ priority_action_id: 1 });
-    expect(await service.execute({ descricao: 'PA 1' } as any)).toEqual({ priority_action_id: 1 });
+    expect(await service.execute({ descricao: 'PA 1' } as any)).toEqual({
+      priority_action_id: 1,
+    });
   });
 });
 
 describe('FindAllPriorityActionService', () => {
   let service: FindAllPriorityActionService;
-  beforeEach(() => { jest.clearAllMocks(); service = new FindAllPriorityActionService(mockRepo as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new FindAllPriorityActionService(mockRepo as any);
+  });
 
   it('deve retornar todas as ações prioritárias', async () => {
     mockRepo.findAll.mockResolvedValue([{ priority_action_id: 1 }]);
@@ -35,7 +43,10 @@ describe('FindAllPriorityActionService', () => {
 
 describe('FindOnePriorityActionService', () => {
   let service: FindOnePriorityActionService;
-  beforeEach(() => { jest.clearAllMocks(); service = new FindOnePriorityActionService(mockRepo as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new FindOnePriorityActionService(mockRepo as any);
+  });
 
   it('deve retornar ação prioritária encontrada', async () => {
     mockRepo.findOne.mockResolvedValue({ priority_action_id: 1 });
@@ -50,23 +61,37 @@ describe('FindOnePriorityActionService', () => {
 
 describe('UpdatePriorityActionService', () => {
   let service: UpdatePriorityActionService;
-  beforeEach(() => { jest.clearAllMocks(); service = new UpdatePriorityActionService(mockRepo as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new UpdatePriorityActionService(mockRepo as any);
+  });
 
   it('deve atualizar e retornar ação prioritária', async () => {
     mockRepo.findOne.mockResolvedValue({ priority_action_id: 1 });
-    mockRepo.update.mockResolvedValue({ priority_action_id: 1, descricao: 'Novo' });
-    expect(((await service.execute('1', { descricao: 'Novo' } as any)) as any).descricao).toBe('Novo');
+    mockRepo.update.mockResolvedValue({
+      priority_action_id: 1,
+      descricao: 'Novo',
+    });
+    expect(
+      ((await service.execute('1', { descricao: 'Novo' } as any)) as any)
+        .descricao,
+    ).toBe('Novo');
   });
 
   it('deve lançar NotFoundException se não encontrada', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute('99', {} as any)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('99', {} as any)).rejects.toThrow(
+      NotFoundException,
+    );
   });
 });
 
 describe('DeletePriorityActionService', () => {
   let service: DeletePriorityActionService;
-  beforeEach(() => { jest.clearAllMocks(); service = new DeletePriorityActionService(mockRepo as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new DeletePriorityActionService(mockRepo as any);
+  });
 
   it('deve deletar a ação prioritária', async () => {
     mockRepo.findOne.mockResolvedValue({ priority_action_id: 1 });

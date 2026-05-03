@@ -49,7 +49,9 @@ export class UnitRepository extends BaseRepository<Unidade> {
   async findOneWithContext(id: string, active_context?: any) {
     if (active_context && active_context.tipo === 'unidade') {
       return this.prisma.unidade.findFirst({
-        where: this.whereActive({ AND: [{ unidade_id: id }, { unidade_id: active_context.id }] }),
+        where: this.whereActive({
+          AND: [{ unidade_id: id }, { unidade_id: active_context.id }],
+        }),
         include: { cursos: { where: this.whereActive() } },
       });
     }
@@ -63,7 +65,9 @@ export class UnitRepository extends BaseRepository<Unidade> {
       if (!unidadeIds.length) return null;
 
       return this.prisma.unidade.findFirst({
-        where: this.whereActive({ AND: [{ unidade_id: id }, { unidade_id: { in: unidadeIds } }] }),
+        where: this.whereActive({
+          AND: [{ unidade_id: id }, { unidade_id: { in: unidadeIds } }],
+        }),
         include: { cursos: { where: this.whereActive() } },
       });
     }

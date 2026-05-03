@@ -6,7 +6,7 @@ export class CreateProjectPersonDto {
   @ApiProperty({
     description: 'ID da ação de projeto',
     example: 1,
-    type: 'integer'
+    type: 'integer',
   })
   @IsNotEmpty()
   @IsUUID('4')
@@ -15,7 +15,7 @@ export class CreateProjectPersonDto {
   @ApiProperty({
     description: 'ID da pessoa vinculada ao projeto',
     example: 5,
-    type: 'integer'
+    type: 'integer',
   })
   @IsNotEmpty()
   @IsUUID('4')
@@ -24,7 +24,7 @@ export class CreateProjectPersonDto {
   @ApiProperty({
     description: 'Papel da pessoa no projeto',
     enum: PapelProjeto,
-    example: 'Coordenador'
+    example: 'Coordenador',
   })
   @IsNotEmpty()
   @IsEnum(PapelProjeto)
@@ -33,7 +33,7 @@ export class CreateProjectPersonDto {
   @ApiPropertyOptional({
     description: 'Carga horária semanal dedicada ao projeto',
     example: 10,
-    type: 'integer'
+    type: 'integer',
   })
   @IsOptional()
   @IsInt()
@@ -42,7 +42,7 @@ export class CreateProjectPersonDto {
   @ApiPropertyOptional({
     description: 'ID do tipo de vínculo HAE',
     example: 2,
-    type: 'integer'
+    type: 'integer',
   })
   @IsOptional()
   @IsUUID('4')

@@ -61,7 +61,7 @@ export class ProcessAccessRequestService {
       const unidadeDiretor = await this.prisma.unidade.findFirst({
         where: {
           diretor_id: usuarioId,
-          ativo: true
+          ativo: true,
         } as any,
       });
 
@@ -113,10 +113,10 @@ export class ProcessAccessRequestService {
       const hashedPassword = await this.hashPassword(tempPassword);
 
       if (tipoUsuario === 'Diretor') {
-        const unidadeAtual = await this.prisma.unidade.findUnique({
+        const unidadeAtual = (await this.prisma.unidade.findUnique({
           where: { unidade_id: solicitacao.unidade_id },
           select: { diretor_id: true, nome_unidade: true } as any,
-        }) as any;
+        })) as any;
 
         if (unidadeAtual?.diretor_id) {
           throw new ConflictException(

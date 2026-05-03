@@ -30,7 +30,12 @@ describe('CreateCourseService', () => {
   });
 
   it('deve criar e retornar o curso', async () => {
-    const dto = { nome: 'TSI', unidade_id: '1', tipo: 'Superior' as any, status: 'Ativo' as any };
+    const dto = {
+      nome: 'TSI',
+      unidade_id: '1',
+      tipo: 'Superior' as any,
+      status: 'Ativo' as any,
+    };
     const created = { curso_id: 1, ...dto };
     mockRepo.create.mockResolvedValue(created);
 
@@ -57,14 +62,18 @@ describe('FindAllCourseService', () => {
 
   it('deve filtrar por unidade quando contexto é unidade', async () => {
     mockRepo.findByUnitId.mockResolvedValue([{ curso_id: 2 }]);
-    const result = await service.execute({ active_context: { tipo: 'unidade', id: 5 } });
+    const result = await service.execute({
+      active_context: { tipo: 'unidade', id: 5 },
+    });
     expect(mockRepo.findByUnitId).toHaveBeenCalledWith(5);
     expect(result).toHaveLength(1);
   });
 
   it('deve filtrar por regional quando contexto é regional', async () => {
     mockRepo.findAllByRegional.mockResolvedValue([{ curso_id: 3 }]);
-    const result = await service.execute({ active_context: { tipo: 'regional', id: 2 } });
+    const result = await service.execute({
+      active_context: { tipo: 'regional', id: 2 },
+    });
     expect(mockRepo.findAllByRegional).toHaveBeenCalledWith(2);
   });
 });
@@ -112,7 +121,9 @@ describe('UpdateCourseService', () => {
   it('deve lançar NotFoundException se curso não encontrado', async () => {
     mockRepo.findOne.mockResolvedValue(null);
 
-    await expect(service.execute('99', {} as any)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('99', {} as any)).rejects.toThrow(
+      NotFoundException,
+    );
   });
 });
 
@@ -168,7 +179,12 @@ describe('CourseController', () => {
 
   it('create deve chamar createService', async () => {
     mockCreate.execute.mockResolvedValue({ curso_id: 1 });
-    const dto = { nome: 'TSI', unidade_id: '1', tipo: 'Superior' as any, status: 'Ativo' as any };
+    const dto = {
+      nome: 'TSI',
+      unidade_id: '1',
+      tipo: 'Superior' as any,
+      status: 'Ativo' as any,
+    };
     await controller.create(dto);
     expect(mockCreate.execute).toHaveBeenCalledWith(dto);
   });

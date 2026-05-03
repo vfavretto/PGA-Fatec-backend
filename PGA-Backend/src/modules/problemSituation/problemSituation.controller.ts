@@ -1,5 +1,22 @@
-﻿import { Controller, Post, Get, Put, Delete, Body, Param, ParseUUIDPipe, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
+﻿import {
+  Controller,
+  Post,
+  Get,
+  Put,
+  Delete,
+  Body,
+  Param,
+  ParseUUIDPipe,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiBody,
+} from '@nestjs/swagger';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { CreateProblemSituationService } from './services/create-problemSituation.service';
@@ -25,25 +42,47 @@ export class ProblemSituationController {
   @Post()
   @UseGuards(RolesGuard)
   @Roles('Administrador', 'CPS')
-  @ApiOperation({ summary: 'Criar situação problema', description: 'Cria uma nova situação problema no sistema' })
+  @ApiOperation({
+    summary: 'Criar situação problema',
+    description: 'Cria uma nova situação problema no sistema',
+  })
   @ApiBody({ type: CreateProblemSituationDto })
-  @ApiResponse({ status: 201, description: 'Situação problema criada com sucesso' })
+  @ApiResponse({
+    status: 201,
+    description: 'Situação problema criada com sucesso',
+  })
   @ApiResponse({ status: 400, description: 'Dados inválidos' })
   create(@Body() dto: CreateProblemSituationDto) {
     return this.createService.execute(dto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Listar situações problema', description: 'Retorna lista de todas as situações problema' })
-  @ApiResponse({ status: 200, description: 'Lista de situações problema retornada com sucesso' })
+  @ApiOperation({
+    summary: 'Listar situações problema',
+    description: 'Retorna lista de todas as situações problema',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de situações problema retornada com sucesso',
+  })
   findAll() {
     return this.findAllService.execute();
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Buscar situação problema por ID', description: 'Retorna dados de uma situação problema específica' })
-  @ApiParam({ name: 'id', type: 'number', description: 'ID da situação problema' })
-  @ApiResponse({ status: 200, description: 'Situação problema encontrada com sucesso' })
+  @ApiOperation({
+    summary: 'Buscar situação problema por ID',
+    description: 'Retorna dados de uma situação problema específica',
+  })
+  @ApiParam({
+    name: 'id',
+    type: 'number',
+    description: 'ID da situação problema',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Situação problema encontrada com sucesso',
+  })
   @ApiResponse({ status: 404, description: 'Situação problema não encontrada' })
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.findOneService.execute(id);
@@ -52,21 +91,44 @@ export class ProblemSituationController {
   @Put(':id')
   @UseGuards(RolesGuard)
   @Roles('Administrador', 'CPS')
-  @ApiOperation({ summary: 'Atualizar situação problema', description: 'Atualiza dados de uma situação problema específica' })
-  @ApiParam({ name: 'id', type: 'number', description: 'ID da situação problema' })
+  @ApiOperation({
+    summary: 'Atualizar situação problema',
+    description: 'Atualiza dados de uma situação problema específica',
+  })
+  @ApiParam({
+    name: 'id',
+    type: 'number',
+    description: 'ID da situação problema',
+  })
   @ApiBody({ type: UpdateProblemSituationDto })
-  @ApiResponse({ status: 200, description: 'Situação problema atualizada com sucesso' })
+  @ApiResponse({
+    status: 200,
+    description: 'Situação problema atualizada com sucesso',
+  })
   @ApiResponse({ status: 404, description: 'Situação problema não encontrada' })
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateProblemSituationDto) {
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateProblemSituationDto,
+  ) {
     return this.updateService.execute(id, dto);
   }
 
   @Delete(':id')
   @UseGuards(RolesGuard)
   @Roles('Administrador', 'CPS')
-  @ApiOperation({ summary: 'Excluir situação problema', description: 'Remove uma situação problema do sistema' })
-  @ApiParam({ name: 'id', type: 'number', description: 'ID da situação problema' })
-  @ApiResponse({ status: 200, description: 'Situação problema excluída com sucesso' })
+  @ApiOperation({
+    summary: 'Excluir situação problema',
+    description: 'Remove uma situação problema do sistema',
+  })
+  @ApiParam({
+    name: 'id',
+    type: 'number',
+    description: 'ID da situação problema',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Situação problema excluída com sucesso',
+  })
   @ApiResponse({ status: 404, description: 'Situação problema não encontrada' })
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.deleteService.execute(id);

@@ -1,4 +1,14 @@
-import { Controller, Post, Body, UseGuards, HttpCode, HttpStatus, Request, Get, Res } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
+  Request,
+  Get,
+  Res,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { LoginService } from './services/login.service';
@@ -18,10 +28,20 @@ const COOKIE_BASE = {
   path: '/',
 };
 
-function setAuthCookies(res: Response, access_token: string, refresh_token?: string) {
-  res.cookie('access_token', access_token, { ...COOKIE_BASE, maxAge: 24 * 60 * 60 * 1000 });
+function setAuthCookies(
+  res: Response,
+  access_token: string,
+  refresh_token?: string,
+) {
+  res.cookie('access_token', access_token, {
+    ...COOKIE_BASE,
+    maxAge: 24 * 60 * 60 * 1000,
+  });
   if (refresh_token) {
-    res.cookie('refresh_token', refresh_token, { ...COOKIE_BASE, maxAge: 30 * 24 * 60 * 60 * 1000 });
+    res.cookie('refresh_token', refresh_token, {
+      ...COOKIE_BASE,
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
   }
 }
 
@@ -44,7 +64,8 @@ export class AuthController {
   @Post('login')
   @ApiOperation({
     summary: 'Realizar login no sistema',
-    description: 'Autentica o usuário e seta cookies HttpOnly com os tokens JWT',
+    description:
+      'Autentica o usuário e seta cookies HttpOnly com os tokens JWT',
   })
   @ApiBody({ type: LoginDto })
   @ApiResponse({ status: 200, description: 'Login realizado com sucesso' })
@@ -78,7 +99,9 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: 'Retorna dados do usuário autenticado pelo token/cookie atual' })
+  @ApiOperation({
+    summary: 'Retorna dados do usuário autenticado pelo token/cookie atual',
+  })
   @ApiResponse({ status: 200, description: 'Usuário autenticado' })
   @ApiResponse({ status: 401, description: 'Token inválido ou ausente' })
   me(@CurrentUser() user: any) {
@@ -88,9 +111,14 @@ export class AuthController {
   @Public()
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Renova o access token usando o refresh token (cookie)' })
+  @ApiOperation({
+    summary: 'Renova o access token usando o refresh token (cookie)',
+  })
   @ApiResponse({ status: 200, description: 'Novo access token emitido' })
-  @ApiResponse({ status: 401, description: 'Refresh token inválido ou ausente' })
+  @ApiResponse({
+    status: 401,
+    description: 'Refresh token inválido ou ausente',
+  })
   refresh(@Request() req: any, @Res({ passthrough: true }) res: Response) {
     const refreshToken = req.cookies?.refresh_token;
     if (!refreshToken) {

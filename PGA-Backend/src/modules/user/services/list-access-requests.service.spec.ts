@@ -43,6 +43,8 @@ describe('ListAccessRequestsService', () => {
   });
 
   it('deve lançar ForbiddenException para tipo não autorizado', async () => {
-    await expect(service.execute('1', 'Docente' as any)).rejects.toThrow(ForbiddenException);
+    await expect(service.execute('1', 'Docente' as any)).rejects.toThrow(
+      ForbiddenException,
+    );
   });
 });

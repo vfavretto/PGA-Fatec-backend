@@ -26,7 +26,9 @@ export class PublishPgaService {
     }
 
     if (!template.is_template) {
-      throw new BadRequestException('Apenas PGAs template podem ser publicados.');
+      throw new BadRequestException(
+        'Apenas PGAs template podem ser publicados.',
+      );
     }
 
     if (template.status !== StatusPGA.EmElaboracao) {
@@ -54,7 +56,9 @@ export class PublishPgaService {
     });
 
     if (!unidades.length) {
-      throw new BadRequestException('Nenhuma unidade ativa encontrada no sistema.');
+      throw new BadRequestException(
+        'Nenhuma unidade ativa encontrada no sistema.',
+      );
     }
 
     // Usa transação: marca template como Publicado e cria todas as cópias
@@ -72,12 +76,14 @@ export class PublishPgaService {
               ano: template.ano,
               versao: template.versao,
               analise_cenario: template.analise_cenario,
-              configuracoes_snapshot: template.configuracoes_snapshot ?? undefined,
+              configuracoes_snapshot:
+                template.configuracoes_snapshot ?? undefined,
               is_template: false,
               template_pga_id: pgaId,
               status: StatusPGA.EmElaboracao,
               usuario_criacao_id: pessoaId,
-              data_limite_submissao: template.data_limite_submissao ?? undefined,
+              data_limite_submissao:
+                template.data_limite_submissao ?? undefined,
             },
           }),
         ),
@@ -87,7 +93,10 @@ export class PublishPgaService {
         template_pga_id: pgaId,
         ano: template.ano,
         copias_geradas: copias.length,
-        unidades: copias.map((c) => ({ pga_id: c.pga_id, unidade_id: c.unidade_id })),
+        unidades: copias.map((c) => ({
+          pga_id: c.pga_id,
+          unidade_id: c.unidade_id,
+        })),
       };
     });
   }

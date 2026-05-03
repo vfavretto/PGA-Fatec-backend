@@ -1,5 +1,24 @@
-﻿import { Controller, Post, Get, Put, Delete, Body, Param, Query, ParseUUIDPipe, Request, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
+﻿import {
+  Controller,
+  Post,
+  Get,
+  Put,
+  Delete,
+  Body,
+  Param,
+  Query,
+  ParseUUIDPipe,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiBody,
+} from '@nestjs/swagger';
 import { CreateAttachmentDto } from './dto/create-attachment.dto';
 import { UpdateAttachmentDto } from './dto/update-attachment.dto';
 import { CreateAttachmentService } from './services/create-attachment.service';
@@ -27,7 +46,10 @@ export class AttachmentController {
   ) {}
 
   @Post()
-  @ApiOperation({ summary: 'Criar anexo', description: 'Cria um novo anexo no sistema' })
+  @ApiOperation({
+    summary: 'Criar anexo',
+    description: 'Cria um novo anexo no sistema',
+  })
   @ApiBody({ type: CreateAttachmentDto })
   @ApiResponse({ status: 201, description: 'Anexo criado com sucesso' })
   @ApiResponse({ status: 400, description: 'Dados inválidos' })
@@ -36,30 +58,55 @@ export class AttachmentController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Listar anexos', description: 'Retorna lista de todos os anexos' })
-  @ApiResponse({ status: 200, description: 'Lista de anexos retornada com sucesso' })
+  @ApiOperation({
+    summary: 'Listar anexos',
+    description: 'Retorna lista de todos os anexos',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de anexos retornada com sucesso',
+  })
   findAll(@Request() req: any) {
     return this.findAllService.execute(req.user);
   }
 
   @Get('etapa-processo/:id')
-  @ApiOperation({ summary: 'Buscar anexos por etapa de processo', description: 'Retorna anexos de uma etapa específica' })
-  @ApiParam({ name: 'id', type: 'number', description: 'ID da etapa do processo' })
+  @ApiOperation({
+    summary: 'Buscar anexos por etapa de processo',
+    description: 'Retorna anexos de uma etapa específica',
+  })
+  @ApiParam({
+    name: 'id',
+    type: 'number',
+    description: 'ID da etapa do processo',
+  })
   @ApiResponse({ status: 200, description: 'Anexos encontrados com sucesso' })
-  findByEtapaProcesso(@Request() req: any, @Param('id', ParseUUIDPipe) id: string) {
+  findByEtapaProcesso(
+    @Request() req: any,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
     return this.findByEtapaProcessoService.execute(id, req.user);
   }
 
   @Get('entregavel/:id')
-  @ApiOperation({ summary: 'Buscar anexos por entregável', description: 'Retorna anexos de um entregável específico' })
+  @ApiOperation({
+    summary: 'Buscar anexos por entregável',
+    description: 'Retorna anexos de um entregável específico',
+  })
   @ApiParam({ name: 'id', type: 'number', description: 'ID do entregável' })
   @ApiResponse({ status: 200, description: 'Anexos encontrados com sucesso' })
-  findByEntregavel(@Request() req: any, @Param('id', ParseUUIDPipe) id: string) {
+  findByEntregavel(
+    @Request() req: any,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
     return this.findByEntregavelService.execute(id, req.user);
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Buscar anexo por ID', description: 'Retorna dados de um anexo específico' })
+  @ApiOperation({
+    summary: 'Buscar anexo por ID',
+    description: 'Retorna dados de um anexo específico',
+  })
   @ApiParam({ name: 'id', type: 'number', description: 'ID do anexo' })
   @ApiResponse({ status: 200, description: 'Anexo encontrado com sucesso' })
   @ApiResponse({ status: 404, description: 'Anexo não encontrado' })
@@ -68,17 +115,26 @@ export class AttachmentController {
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Atualizar anexo', description: 'Atualiza dados de um anexo específico' })
+  @ApiOperation({
+    summary: 'Atualizar anexo',
+    description: 'Atualiza dados de um anexo específico',
+  })
   @ApiParam({ name: 'id', type: 'number', description: 'ID do anexo' })
   @ApiBody({ type: UpdateAttachmentDto })
   @ApiResponse({ status: 200, description: 'Anexo atualizado com sucesso' })
   @ApiResponse({ status: 404, description: 'Anexo não encontrado' })
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateAttachmentDto) {
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateAttachmentDto,
+  ) {
     return this.updateService.execute(id, dto);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Excluir anexo', description: 'Remove um anexo do sistema' })
+  @ApiOperation({
+    summary: 'Excluir anexo',
+    description: 'Remove um anexo do sistema',
+  })
   @ApiParam({ name: 'id', type: 'number', description: 'ID do anexo' })
   @ApiResponse({ status: 200, description: 'Anexo excluído com sucesso' })
   @ApiResponse({ status: 404, description: 'Anexo não encontrado' })

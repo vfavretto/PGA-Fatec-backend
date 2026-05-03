@@ -10,7 +10,9 @@ export class VoiceController {
 
   @Post('command')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Classifica um comando de voz e retorna a ação a executar' })
+  @ApiOperation({
+    summary: 'Classifica um comando de voz e retorna a ação a executar',
+  })
   @ApiResponse({
     status: 200,
     description: 'Ação classificada com sucesso',

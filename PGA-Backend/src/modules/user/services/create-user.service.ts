@@ -53,7 +53,7 @@ export class CreateUserService {
 
         const diretorUnidades = await this.prisma.pessoaUnidade.findMany({
           where: {
-            pessoa_id: reqUser!.pessoa_id as string,
+            pessoa_id: reqUser.pessoa_id as string,
             ativo: true,
           },
           select: { unidade_id: true },
@@ -61,7 +61,7 @@ export class CreateUserService {
 
         const unidadesPermitidas = diretorUnidades.map((u) => u.unidade_id);
 
-        if (!unidadesPermitidas.includes(data.unidade_id as string)) {
+        if (!unidadesPermitidas.includes(data.unidade_id)) {
           throw new ForbiddenException(
             'Diretor só pode criar usuários da sua própria unidade',
           );
@@ -106,7 +106,7 @@ export class CreateUserService {
         data as Prisma.PessoaCreateInput,
       );
       if (String(data.tipo_usuario) === 'Diretor' && data.unidade_id) {
-        await this.setAsUnitDirector(user.pessoa_id, data.unidade_id as string);
+        await this.setAsUnitDirector(user.pessoa_id, data.unidade_id);
       }
       const { senha: _s, ...userSafe } = user;
       return { user: userSafe as Pessoa, email_sent: false };
@@ -121,7 +121,7 @@ export class CreateUserService {
     const user = await this.userRepository.create(createData);
 
     if (String(data.tipo_usuario) === 'Diretor' && data.unidade_id) {
-      await this.setAsUnitDirector(user.pessoa_id, data.unidade_id as string);
+      await this.setAsUnitDirector(user.pessoa_id, data.unidade_id);
     }
 
     let emailSent = false;

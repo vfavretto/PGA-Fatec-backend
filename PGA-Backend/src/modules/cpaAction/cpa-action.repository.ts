@@ -70,13 +70,19 @@ export class CpaActionRepository extends BaseRepository<AcaoCPA> {
   async findOneWithContext(id: string, active_context?: any) {
     if (active_context && active_context.tipo === 'unidade') {
       return this.prisma.acaoCPA.findFirst({
-        where: this.whereActive({ acao_cpa_id: id, unidade_id: active_context.id }),
+        where: this.whereActive({
+          acao_cpa_id: id,
+          unidade_id: active_context.id,
+        }),
       });
     }
 
     if (active_context && active_context.tipo === 'regional') {
       return this.prisma.acaoCPA.findFirst({
-        where: this.whereActive({ acao_cpa_id: id, regional_id: active_context.id }),
+        where: this.whereActive({
+          acao_cpa_id: id,
+          regional_id: active_context.id,
+        }),
       });
     }
 
@@ -86,13 +92,19 @@ export class CpaActionRepository extends BaseRepository<AcaoCPA> {
   async findByPgaIdWithContext(pgaId: string, active_context?: any) {
     if (active_context && active_context.tipo === 'unidade') {
       return this.prisma.acaoCPA.findMany({
-        where: this.whereActive({ pga_id: pgaId, unidade_id: active_context.id }),
+        where: this.whereActive({
+          pga_id: pgaId,
+          unidade_id: active_context.id,
+        }),
       });
     }
 
     if (active_context && active_context.tipo === 'regional') {
       return this.prisma.acaoCPA.findMany({
-        where: this.whereActive({ pga_id: pgaId, regional_id: active_context.id }),
+        where: this.whereActive({
+          pga_id: pgaId,
+          regional_id: active_context.id,
+        }),
       });
     }
 

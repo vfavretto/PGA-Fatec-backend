@@ -16,17 +16,25 @@ export class UserRepository extends BaseRepository<Pessoa> {
     // validar existência da unidade/regional antes de tentar conectar
     if ((data as any).unidade_id) {
       const unidadeId = (data as any).unidade_id;
-      const unidade = await this.prisma.unidade.findUnique({ where: { unidade_id: unidadeId } });
+      const unidade = await this.prisma.unidade.findUnique({
+        where: { unidade_id: unidadeId },
+      });
       if (!unidade) {
-        throw new BadRequestException(`Unidade com id ${unidadeId} não encontrada`);
+        throw new BadRequestException(
+          `Unidade com id ${unidadeId} não encontrada`,
+        );
       }
     }
 
     if ((data as any).regional_id) {
       const regionalId = (data as any).regional_id;
-      const regional = await this.prisma.regional.findUnique({ where: { regional_id: regionalId } });
+      const regional = await this.prisma.regional.findUnique({
+        where: { regional_id: regionalId },
+      });
       if (!regional) {
-        throw new BadRequestException(`Regional com id ${regionalId} não encontrada`);
+        throw new BadRequestException(
+          `Regional com id ${regionalId} não encontrada`,
+        );
       }
     }
 

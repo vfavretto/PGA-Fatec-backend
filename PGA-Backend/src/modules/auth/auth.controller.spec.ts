@@ -38,15 +38,22 @@ describe('AuthController', () => {
 
   describe('contexts', () => {
     it('deve retornar contextos disponíveis para o usuário', async () => {
-      mockContextService.getAvailableContexts.mockResolvedValue({ unidades: [] });
-      const result = await controller.contexts({ user: { tipo_usuario: 'Diretor', pessoa_id: 1 } });
+      mockContextService.getAvailableContexts.mockResolvedValue({
+        unidades: [],
+      });
+      const result = await controller.contexts({
+        user: { tipo_usuario: 'Diretor', pessoa_id: 1 },
+      });
       expect(result).toEqual({ unidades: [] });
     });
   });
 
   describe('selectContext', () => {
     it('deve chamar contextService.selectContext', async () => {
-      mockContextService.selectContext.mockResolvedValue({ access_token: 'token', refresh_token: 'rt' });
+      mockContextService.selectContext.mockResolvedValue({
+        access_token: 'token',
+        refresh_token: 'rt',
+      });
       const result = await controller.selectContext(
         { user: { tipo_usuario: 'Diretor' } },
         { tipo: 'unidade', id: 1 } as any,
@@ -82,7 +89,9 @@ describe('AuthController', () => {
     });
 
     it('deve retornar erro se refresh_token inválido', () => {
-      mockJwtService.verify.mockImplementation(() => { throw new Error('invalid'); });
+      mockJwtService.verify.mockImplementation(() => {
+        throw new Error('invalid');
+      });
       const req = { cookies: { refresh_token: 'bad-token' } };
       const result = controller.refresh(req as any, mockRes as any);
       expect(result).toHaveProperty('error');
