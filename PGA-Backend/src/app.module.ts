@@ -25,6 +25,7 @@ import { RoutineParticipantModule } from './modules/routineParticipant/routine-p
 import { UnitModule } from './modules/unit/unit.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { RegionalModule } from './modules/regional/regional.module';
+import { VoiceModule } from './modules/voice/voice.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { RegionalModule } from './modules/regional/regional.module';
     UnitModule,
     AuditModule,
     RegionalModule,
+    VoiceModule,
   ],
   providers: [
     PrismaService,
