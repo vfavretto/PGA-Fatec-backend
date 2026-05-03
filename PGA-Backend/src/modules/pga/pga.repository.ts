@@ -197,12 +197,18 @@ export class PgaRepository extends BaseRepository<PGA> {
       }
 
       if (active_context.tipo === 'regional') {
-        const vinculos = await this.prisma.pessoaUnidade.findMany({
+        // Verifica se a unidade do PGA pertence à regional do usuário logado
+        const vinculos = await this.prisma.pessoaRegional.findMany({
           where: { pessoa_id: active_context.id, ativo: true },
-          select: { unidade_id: true },
+          select: { regional_id: true },
         });
-        const unidadeIds = vinculos.map((v) => v.unidade_id);
-        if (!pga.unidade_id || !unidadeIds.includes(pga.unidade_id)) return null;
+        const regionalIds = vinculos.map((v) => v.regional_id);
+        if (!pga.unidade_id) return null;
+        const unidade = await this.prisma.unidade.findUnique({
+          where: { unidade_id: pga.unidade_id },
+          select: { regional_id: true },
+        });
+        if (!unidade || !unidade.regional_id || !regionalIds.includes(unidade.regional_id)) return null;
       }
     }
 

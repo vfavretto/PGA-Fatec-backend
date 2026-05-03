@@ -68,6 +68,12 @@ export class UserRepository extends BaseRepository<Pessoa> {
             unidade: true,
           },
         },
+        pessoaRegionais: {
+          where: { ativo: true },
+          include: {
+            regional: true,
+          },
+        },
       },
     });
   }
@@ -79,6 +85,10 @@ export class UserRepository extends BaseRepository<Pessoa> {
         unidades: {
           where: { ativo: true },
           include: { unidade: true },
+        },
+        pessoaRegionais: {
+          where: { ativo: true },
+          include: { regional: true },
         },
       },
     });
