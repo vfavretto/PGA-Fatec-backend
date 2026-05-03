@@ -713,6 +713,20 @@ async function main() {
       ativo: true,
     },
   });
+  const pCPS = await prisma.pessoa.upsert({
+    where: { email: 'gestor@cps.sp.gov.br' },
+    update: {},
+    create: {
+      nome: 'Gestora CPS',
+      email: 'gestor@cps.sp.gov.br',
+      nome_usuario: 'gestor.cps',
+      senha: hash,
+      tipo_usuario: 'CPS',
+      cpf: '00000000002',
+      matricula: 'CPS0001',
+      ativo: true,
+    },
+  });
   const pResponsavelReg = await prisma.pessoa.upsert({
     where: { email: 'regional.rm01@cps.sp.gov.br' },
     update: {},
@@ -2584,7 +2598,7 @@ async function main() {
     '  ├─ 2 Regionais (RM01 – Metropolitana I, RVP01 – Vale do Paraíba)',
   );
   console.log(
-    '  ├─ 17 Pessoas (Admin, 2 Regionais, 3 Diretores, 4 Coordenadores, 4 Docentes, 3 Adm)',
+    '  ├─ 18 Pessoas (Admin, CPS, 2 Regionais, 3 Diretores, 4 Coordenadores, 4 Docentes, 3 Adm)',
   );
   console.log(
     '  ├─ 3 Unidades: Fatec SBC (F088), Fatec Santo André (F047), Fatec SJC (F065)',
@@ -2609,34 +2623,58 @@ async function main() {
   );
   console.log('\nCredenciais de acesso:');
   console.log(
-    '  Admin CPS:       admin@cps.sp.gov.br              / Senha@123',
+    '  Admin CPS:       admin@cps.sp.gov.br                      / Senha@123',
   );
   console.log(
-    '  Regional RM01:   regional.rm01@cps.sp.gov.br      / Senha@123',
+    '  CPS:             gestor@cps.sp.gov.br                     / Senha@123',
   );
   console.log(
-    '  Regional RVP01:  regional.rvp01@cps.sp.gov.br     / Senha@123',
+    '  Regional RM01:   regional.rm01@cps.sp.gov.br              / Senha@123',
   );
   console.log(
-    '  Diretor F088:    diretor@fatec-sbc.sp.gov.br      / Senha@123',
+    '  Regional RVP01:  regional.rvp01@cps.sp.gov.br             / Senha@123',
   );
   console.log(
-    '  Diretor F047:    diretor@fatec-sa.sp.gov.br       / Senha@123',
+    '  Diretor F088:    diretor@fatec-sbc.sp.gov.br              / Senha@123',
   );
   console.log(
-    '  Diretor F065:    diretor@fatec-sjc.sp.gov.br      / Senha@123',
+    '  Diretor F047:    diretor@fatec-sa.sp.gov.br               / Senha@123',
   );
   console.log(
-    '  Coord ADS:       coord.ads@fatec-sbc.sp.gov.br    / Senha@123',
+    '  Diretor F065:    diretor@fatec-sjc.sp.gov.br              / Senha@123',
   );
   console.log(
-    '  Coord Redes:     coord.redes@fatec-sbc.sp.gov.br  / Senha@123',
+    '  Coord ADS:       coord.ads@fatec-sbc.sp.gov.br            / Senha@123',
   );
   console.log(
-    '  Coord GE:        coord.ge@fatec-sa.sp.gov.br      / Senha@123',
+    '  Coord Redes:     coord.redes@fatec-sbc.sp.gov.br          / Senha@123',
   );
   console.log(
-    '  Coord SI:        coord.si@fatec-sjc.sp.gov.br     / Senha@123',
+    '  Coord GE:        coord.ge@fatec-sa.sp.gov.br              / Senha@123',
+  );
+  console.log(
+    '  Coord SI:        coord.si@fatec-sjc.sp.gov.br             / Senha@123',
+  );
+  console.log(
+    '  Docente F088-1:  marcio.silva@fatec-sbc.sp.gov.br         / Senha@123',
+  );
+  console.log(
+    '  Docente F088-2:  patricia.costa@fatec-sbc.sp.gov.br       / Senha@123',
+  );
+  console.log(
+    '  Docente F047:    eduardo.nascimento@fatec-sa.sp.gov.br    / Senha@123',
+  );
+  console.log(
+    '  Docente F065:    camila.pereira@fatec-sjc.sp.gov.br       / Senha@123',
+  );
+  console.log(
+    '  Adm F088:        secretaria@fatec-sbc.sp.gov.br           / Senha@123',
+  );
+  console.log(
+    '  Adm F047:        secretaria@fatec-sa.sp.gov.br            / Senha@123',
+  );
+  console.log(
+    '  Adm F065:        secretaria@fatec-sjc.sp.gov.br           / Senha@123',
   );
 }
 

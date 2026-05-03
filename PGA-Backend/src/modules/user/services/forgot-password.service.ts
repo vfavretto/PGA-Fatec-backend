@@ -11,7 +11,7 @@ export class ForgotPasswordService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async execute(email: string): Promise<void> {
+  async execute(email: string, firstAccess = false): Promise<void> {
     const user = await this.userRepository.findByEmail(email);
 
     if (!user) {
@@ -23,6 +23,6 @@ export class ForgotPasswordService {
       { expiresIn: '1h' },
     );
 
-    await this.sendPasswordReset.execute(email, token);
+    await this.sendPasswordReset.execute(email, token, firstAccess);
   }
 }

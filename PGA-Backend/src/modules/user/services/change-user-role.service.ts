@@ -2,7 +2,6 @@
   Injectable,
   ForbiddenException,
   NotFoundException,
-  ConflictException,
 } from '@nestjs/common';
 import { UserRepository } from '../user.repository';
 import { PrismaService } from '../../../config/prisma.service';
@@ -80,11 +79,12 @@ export class ChangeUserRoleService {
           throw new NotFoundException('Unidade não encontrada');
         }
 
-        // Verificar se já existe diretor
+        // Demover diretor anterior se houver um diferente
         if (unidade.diretor_id && unidade.diretor_id !== userId) {
-          throw new ConflictException(
-            `A unidade já possui um diretor (${unidade.diretor!.nome}). Remova o diretor atual antes de definir um novo.`,
-          );
+          await tx.pessoa.update({
+            where: { pessoa_id: unidade.diretor_id },
+            data: { tipo_usuario: 'Coordenador' },
+          });
         }
 
         // Definir como diretor da unidade
