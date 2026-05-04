@@ -9,7 +9,7 @@ export class ListAccessRequestsService {
   async execute(usuarioId: string, tipoUsuario: TipoUsuario) {
     let solicitacoes: any[];
 
-    if (tipoUsuario === 'Administrador') {
+    if (tipoUsuario === 'Administrador' || tipoUsuario === 'CPS') {
       solicitacoes = await this.prisma.solicitacaoAcesso.findMany({
         include: {
           unidade: {

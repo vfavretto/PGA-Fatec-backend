@@ -78,6 +78,15 @@ export class CreateUserService {
           );
         }
       }
+
+      if (tipo === 'CPS') {
+        const tipoAlvo = data.tipo_usuario as string;
+        if (tipoAlvo === 'Administrador' || tipoAlvo === 'CPS') {
+          throw new ForbiddenException(
+            'CPS não pode criar usuários do tipo Administrador ou CPS',
+          );
+        }
+      }
     } else {
       data.tipo_usuario = 'Administrador';
     }
