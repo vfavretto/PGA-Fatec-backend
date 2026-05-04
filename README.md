@@ -1,4 +1,9 @@
-# PGA-Fatec-backend
+<br id="topo">
+<div align="center">
+  
+![banner](https://github.com/julinhaarte/PGA-Mobile/blob/main/assets/images/PGA.png)
+
+</div>
 
 > Sistema de backend para o Plano de Gestão Acadêmica (PGA) da Fatec
 
