@@ -8,6 +8,7 @@ const mockRepo = {
 };
 const mockPrisma = {
   pessoaUnidade: { findMany: jest.fn() },
+  $transaction: jest.fn(),
 };
 const mockForgotPassword = { execute: jest.fn() };
 
@@ -130,5 +131,74 @@ describe('CreateUserService', () => {
       { tipo_usuario: 'Administrador' } as any,
     );
     expect(result.email_sent).toBe(false);
+  });
+
+  it('deve lançar ForbiddenException se CPS tentar criar Administrador', async () => {
+    mockRepo.countActiveUsers.mockResolvedValue(5);
+    await expect(
+      service.execute(
+        { tipo_usuario: 'Administrador', unidade_id: 1 } as any,
+        { tipo_usuario: 'CPS' } as any,
+      ),
+    ).rejects.toThrow(ForbiddenException);
+  });
+
+  it('deve lançar ForbiddenException se CPS tentar criar CPS', async () => {
+    mockRepo.countActiveUsers.mockResolvedValue(5);
+    await expect(
+      service.execute(
+        { tipo_usuario: 'CPS', unidade_id: 1 } as any,
+        { tipo_usuario: 'CPS' } as any,
+      ),
+    ).rejects.toThrow(ForbiddenException);
+  });
+
+  it('deve permitir CPS criar Docente', async () => {
+    mockRepo.countActiveUsers.mockResolvedValue(5);
+    mockRepo.create.mockResolvedValue({ email: 'a@b.com' });
+    mockForgotPassword.execute.mockResolvedValue(undefined);
+    const result = await service.execute(
+      { tipo_usuario: 'Docente', unidade_id: 1 } as any,
+      { tipo_usuario: 'CPS' } as any,
+    );
+    expect(result.user).toBeDefined();
+  });
+
+  it('deve criar Diretor com senha e vincular unidade via setAsUnitDirector', async () => {
+    mockRepo.countActiveUsers.mockResolvedValue(5);
+    mockPrisma.pessoaUnidade.findMany.mockResolvedValue([{ unidade_id: '5' }]);
+    mockRepo.create.mockResolvedValue({ pessoa_id: 'p1', email: 'dir@b.com' });
+    mockPrisma.$transaction.mockResolvedValue(undefined);
+    const result = await service.execute(
+      { tipo_usuario: 'Diretor', unidade_id: '5', senha: 'Senha@123' } as any,
+      { tipo_usuario: 'Diretor', pessoa_id: 'req-1' } as any,
+    );
+    expect(mockPrisma.$transaction).toHaveBeenCalled();
+    expect(result.email_sent).toBe(false);
+  });
+
+  it('deve criar Diretor sem senha e vincular unidade via setAsUnitDirector', async () => {
+    mockRepo.countActiveUsers.mockResolvedValue(5);
+    mockPrisma.pessoaUnidade.findMany.mockResolvedValue([{ unidade_id: '5' }]);
+    mockRepo.create.mockResolvedValue({ pessoa_id: 'p1', email: 'dir@b.com' });
+    mockForgotPassword.execute.mockResolvedValue(undefined);
+    mockPrisma.$transaction.mockResolvedValue(undefined);
+    const result = await service.execute(
+      { tipo_usuario: 'Diretor', unidade_id: '5' } as any,
+      { tipo_usuario: 'Diretor', pessoa_id: 'req-1' } as any,
+    );
+    expect(mockPrisma.$transaction).toHaveBeenCalled();
+    expect(result.email_sent).toBe(true);
+  });
+
+  it('deve lançar ForbiddenException se Diretor tentar criar Regional', async () => {
+    mockRepo.countActiveUsers.mockResolvedValue(5);
+    mockPrisma.pessoaUnidade.findMany.mockResolvedValue([{ unidade_id: '5' }]);
+    await expect(
+      service.execute(
+        { tipo_usuario: 'Regional', unidade_id: '5' } as any,
+        { tipo_usuario: 'Diretor', pessoa_id: 'req-1' } as any,
+      ),
+    ).rejects.toThrow(ForbiddenException);
   });
 });
