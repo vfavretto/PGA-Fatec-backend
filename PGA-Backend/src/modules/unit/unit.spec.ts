@@ -58,21 +58,21 @@ describe('FindAllUnitsService', () => {
   });
 
   it('deve retornar unidade específica no contexto de unidade', async () => {
-    mockRepo.findOne.mockResolvedValue({ unidade_id: 5 });
-    const result = await service.execute({ active_context: { tipo: 'unidade', id: 5 } });
-    expect(result).toEqual([{ unidade_id: 5 }]);
+    mockRepo.findOne.mockResolvedValue({ unidade_id: 'uuid-5' });
+    const result = await service.execute({ active_context: { tipo: 'unidade', id: 'uuid-5' } });
+    expect(result).toEqual([{ unidade_id: 'uuid-5' }]);
   });
 
   it('deve retornar array vazio se unidade do contexto não encontrada', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    const result = await service.execute({ active_context: { tipo: 'unidade', id: 99 } });
+    const result = await service.execute({ active_context: { tipo: 'unidade', id: 'uuid-99' } });
     expect(result).toEqual([]);
   });
 
   it('deve filtrar por regional quando contexto é regional', async () => {
     mockRepo.findAllByRegional.mockResolvedValue([{ unidade_id: 2 }]);
-    await service.execute({ active_context: { tipo: 'regional', id: 3 } });
-    expect(mockRepo.findAllByRegional).toHaveBeenCalledWith(3);
+    await service.execute({ active_context: { tipo: 'regional', id: 'uuid-3' } });
+    expect(mockRepo.findAllByRegional).toHaveBeenCalledWith('uuid-3');
   });
 });
 
@@ -86,13 +86,13 @@ describe('FindOneUnitService', () => {
 
   it('deve retornar unidade encontrada', async () => {
     mockRepo.findOneWithContext.mockResolvedValue({ unidade_id: 1 });
-    const result = await service.execute(1);
+    const result = await service.execute('uuid-1');
     expect(result).toEqual({ unidade_id: 1 });
   });
 
   it('deve lançar NotFoundException se não encontrada', async () => {
     mockRepo.findOneWithContext.mockResolvedValue(null);
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99')).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -108,13 +108,13 @@ describe('UpdateUnitService', () => {
     mockRepo.findOne.mockResolvedValue({ unidade_id: 1 });
     mockRepo.update.mockResolvedValue({ unidade_id: 1, nome_unidade: 'Novo' });
 
-    const result = await service.execute(1, { nome_unidade: 'Novo' } as any);
+    const result = await service.execute('uuid-1', { nome_unidade: 'Novo' } as any);
     expect(result.nome_unidade).toBe('Novo');
   });
 
   it('deve lançar NotFoundException se não encontrada', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99, {} as any)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99', {} as any)).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -128,22 +128,22 @@ describe('DeleteUnitService', () => {
 
   it('deve lançar NotFoundException se não encontrada', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99')).rejects.toThrow(NotFoundException);
   });
 
   it('deve lançar ConflictException se há PGAs ativos', async () => {
-    mockRepo.findOne.mockResolvedValue({ unidade_id: 1 });
+    mockRepo.findOne.mockResolvedValue({ unidade_id: 'uuid-1' });
     mockPrisma.pGA.count.mockResolvedValue(1);
-    await expect(service.execute(1)).rejects.toThrow(ConflictException);
+    await expect(service.execute('uuid-1')).rejects.toThrow(ConflictException);
   });
 
   it('deve excluir quando sem dependências', async () => {
-    mockRepo.findOne.mockResolvedValue({ unidade_id: 1 });
+    mockRepo.findOne.mockResolvedValue({ unidade_id: 'uuid-1' });
     mockPrisma.pGA.count.mockResolvedValue(0);
-    mockRepo.softDelete.mockResolvedValue({ unidade_id: 1, ativo: false });
+    mockRepo.softDelete.mockResolvedValue({ unidade_id: 'uuid-1', ativo: false });
 
-    await service.execute(1);
-    expect(mockRepo.softDelete).toHaveBeenCalledWith(1);
+    await service.execute('uuid-1');
+    expect(mockRepo.softDelete).toHaveBeenCalledWith('uuid-1');
   });
 });
 

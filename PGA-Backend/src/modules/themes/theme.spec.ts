@@ -40,12 +40,12 @@ describe('FindOneThemeService', () => {
 
   it('deve retornar o tema encontrado', async () => {
     mockRepo.findOne.mockResolvedValue({ tema_id: 1 });
-    expect(await service.execute(1)).toEqual({ tema_id: 1 });
+    expect(await service.execute('uuid-1')).toEqual({ tema_id: 1 });
   });
 
   it('deve retornar null se não encontrado', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    expect(await service.execute(99)).toBeNull();
+    expect(await service.execute('uuid-99')).toBeNull();
   });
 });
 
@@ -56,12 +56,12 @@ describe('UpdateThemeService', () => {
   it('deve atualizar e retornar o tema', async () => {
     mockRepo.findOne.mockResolvedValue({ theme_id: 1 });
     mockRepo.update.mockResolvedValue({ tema_id: 1, descricao: 'Novo' });
-    expect(((await service.execute(1, { descricao: 'Novo' } as any)) as any).descricao).toBe('Novo');
+    expect((await service.execute('uuid-1', { descricao: 'Novo' } as any) as any).descricao).toBe('Novo');
   });
 
   it('deve lançar NotFoundException se não encontrado', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99, {} as any)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99', {} as any)).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -72,12 +72,12 @@ describe('DeleteThemeService', () => {
   it('deve deletar o tema', async () => {
     mockRepo.findOne.mockResolvedValue({ tema_id: 1 });
     mockRepo.delete.mockResolvedValue({ tema_id: 1 });
-    await service.execute(1);
-    expect(mockRepo.delete).toHaveBeenCalledWith(1);
+    await service.execute('uuid-1');
+    expect(mockRepo.delete).toHaveBeenCalledWith('uuid-1');
   });
 
   it('deve lançar NotFoundException se não encontrado', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99')).rejects.toThrow(NotFoundException);
   });
 });
