@@ -14,9 +14,9 @@ describe('UpdateUserService', () => {
     const updated = { pessoa_id: 1, nome: 'Novo Nome' };
     mockRepo.update.mockResolvedValue(updated);
 
-    const result = await service.execute(1, { nome: 'Novo Nome' });
+    const result = await service.execute('uuid-1', { nome: 'Novo Nome' });
 
-    expect(mockRepo.update).toHaveBeenCalledWith(1, { nome: 'Novo Nome' });
+    expect(mockRepo.update).toHaveBeenCalledWith('uuid-1', { nome: 'Novo Nome' });
     expect(result).toBe(updated);
   });
 });

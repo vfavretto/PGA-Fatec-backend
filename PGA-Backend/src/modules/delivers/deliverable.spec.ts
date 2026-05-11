@@ -35,17 +35,17 @@ describe('FindAllDeliverableService', () => {
     expect(await service.execute()).toHaveLength(1);
   });
 
-  it('deve filtrar por unidade', async () => {
-    mockRepo.findAllByUnit.mockResolvedValue([{ deliverable_id: 2 }]);
-    const result = await service.execute({ active_context: { tipo: 'unidade', id: 5 } });
-    expect(mockRepo.findAllByUnit).toHaveBeenCalledWith(5);
+  it('deve retornar todos os entregáveis ignorando contexto de unidade', async () => {
+    mockRepo.findAll.mockResolvedValue([{ deliverable_id: 2 }]);
+    const result = await service.execute({ active_context: { tipo: 'unidade', id: 'uuid-5' } });
+    expect(mockRepo.findAll).toHaveBeenCalled();
     expect(result).toHaveLength(1);
   });
 
-  it('deve filtrar por regional', async () => {
-    mockRepo.findAllByRegional.mockResolvedValue([{ deliverable_id: 3 }]);
-    const result = await service.execute({ active_context: { tipo: 'regional', id: 2 } });
-    expect(mockRepo.findAllByRegional).toHaveBeenCalledWith(2);
+  it('deve retornar todos os entregáveis ignorando contexto de regional', async () => {
+    mockRepo.findAll.mockResolvedValue([{ deliverable_id: 3 }]);
+    const result = await service.execute({ active_context: { tipo: 'regional', id: 'uuid-2' } });
+    expect(mockRepo.findAll).toHaveBeenCalled();
     expect(result).toHaveLength(1);
   });
 });
@@ -55,13 +55,13 @@ describe('FindOneDeliverableService', () => {
   beforeEach(() => { jest.clearAllMocks(); service = new FindOneDeliverableService(mockRepo as any); });
 
   it('deve retornar o entregável encontrado', async () => {
-    mockRepo.findOneWithContext.mockResolvedValue({ entregavel_id: 1 });
-    expect(await service.execute(1)).toEqual({ entregavel_id: 1 });
+    mockRepo.findOneWithContext.mockResolvedValue({ entregavel_id: 'uuid-1' });
+    expect(await service.execute('uuid-1')).toEqual({ entregavel_id: 'uuid-1' });
   });
 
   it('deve lançar NotFoundException se não encontrado', async () => {
     mockRepo.findOneWithContext.mockResolvedValue(null);
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99')).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -72,12 +72,12 @@ describe('UpdateDeliverableService', () => {
   it('deve atualizar e retornar o entregável', async () => {
     mockRepo.findOne.mockResolvedValue({ deliverable_id: 1 });
     mockRepo.update.mockResolvedValue({ entregavel_id: 1, descricao: 'Novo' });
-    expect(((await service.execute(1, { descricao: 'Novo' } as any)) as any).descricao).toBe('Novo');
+    expect(((await service.execute('uuid-1', { descricao: 'Novo' } as any)) as any).descricao).toBe('Novo');
   });
 
   it('deve lançar NotFoundException se não encontrado', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99, {} as any)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99', {} as any)).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -88,12 +88,12 @@ describe('DeleteDeliverableService', () => {
   it('deve deletar o entregável', async () => {
     mockRepo.findOne.mockResolvedValue({ deliverable_id: 1 });
     mockRepo.softDelete.mockResolvedValue({ deliverable_id: 1 });
-    await service.execute(1);
-    expect(mockRepo.softDelete).toHaveBeenCalledWith(1);
+    await service.execute('uuid-1');
+    expect(mockRepo.softDelete).toHaveBeenCalledWith('uuid-1');
   });
 
   it('deve lançar NotFoundException se não encontrado', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99')).rejects.toThrow(NotFoundException);
   });
 });

@@ -20,32 +20,32 @@ describe('DeleteUserService', () => {
   it('deve lançar NotFoundException se usuário não encontrado', async () => {
     mockRepo.findById.mockResolvedValue(null);
 
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99')).rejects.toThrow(NotFoundException);
   });
 
   it('deve lançar ConflictException se usuário vinculado a projetos ativos', async () => {
-    mockRepo.findById.mockResolvedValue({ pessoa_id: 1 });
+    mockRepo.findById.mockResolvedValue({ pessoa_id: 'uuid-1' });
     mockPrisma.projetoPessoa.count.mockResolvedValue(2);
 
-    await expect(service.execute(1)).rejects.toThrow(ConflictException);
+    await expect(service.execute('uuid-1')).rejects.toThrow(ConflictException);
   });
 
   it('deve lançar ConflictException se usuário é coordenador de cursos ativos', async () => {
-    mockRepo.findById.mockResolvedValue({ pessoa_id: 1 });
+    mockRepo.findById.mockResolvedValue({ pessoa_id: 'uuid-1' });
     mockPrisma.projetoPessoa.count.mockResolvedValue(0);
     mockPrisma.curso.count.mockResolvedValue(1);
 
-    await expect(service.execute(1)).rejects.toThrow(ConflictException);
+    await expect(service.execute('uuid-1')).rejects.toThrow(ConflictException);
   });
 
   it('deve executar a transação de exclusão quando sem conflitos', async () => {
-    const user = { pessoa_id: 1, nome: 'Test' };
+    const user = { pessoa_id: 'uuid-1', nome: 'Test' };
     mockRepo.findById.mockResolvedValue(user);
     mockPrisma.projetoPessoa.count.mockResolvedValue(0);
     mockPrisma.curso.count.mockResolvedValue(0);
     mockPrisma.$transaction.mockResolvedValue(user);
 
-    const result = await service.execute(1);
+    const result = await service.execute('uuid-1');
     expect(mockPrisma.$transaction).toHaveBeenCalled();
     expect(result).toBe(user);
   });

@@ -709,15 +709,25 @@ enum StatusSolicitacao {
 }
 
 model PessoaUnidade {
-  pessoa_id  String
-  unidade_id String
-  data_vinculo DateTime @default(now())
-  ativo      Boolean @default(true)
-  
+  pessoa_id    String
+  unidade_id   String
+  data_vinculo DateTime       @default(now())
+  ativo        Boolean        @default(true)
+  cargo        CargoUnidade?
+
   pessoa  Pessoa  @relation(fields: [pessoa_id], references: [pessoa_id], onDelete: Cascade)
   unidade Unidade @relation(fields: [unidade_id], references: [unidade_id], onDelete: Cascade)
-  
+
   @@id([pessoa_id, unidade_id])
+}
+
+enum CargoUnidade {
+  AssessorIV
+  ChefeServicoAdministrativo
+  ChefeServicoAcademico
+  AssistenteTecnico
+  PsicologoInstitucional
+  AgenteFacilitadorInova
 }
 
 model PessoaRegional {

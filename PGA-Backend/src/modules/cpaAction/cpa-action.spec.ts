@@ -39,15 +39,15 @@ describe('FindAllCpaActionService', () => {
 
   it('deve filtrar por unidade quando active_context tipo unidade', async () => {
     mockRepo.findAllByUnit.mockResolvedValue([{ cpa_action_id: 2 }]);
-    const result = await service.execute({ active_context: { tipo: 'unidade', id: 5 } });
-    expect(mockRepo.findAllByUnit).toHaveBeenCalledWith(5);
+    const result = await service.execute({ active_context: { tipo: 'unidade', id: 'uuid-5' } });
+    expect(mockRepo.findAllByUnit).toHaveBeenCalledWith('uuid-5');
     expect(result).toHaveLength(1);
   });
 
   it('deve filtrar por regional quando active_context tipo regional', async () => {
     mockRepo.findAllByRegional.mockResolvedValue([{ cpa_action_id: 3 }]);
-    const result = await service.execute({ active_context: { tipo: 'regional', id: 2 } });
-    expect(mockRepo.findAllByRegional).toHaveBeenCalledWith(2);
+    const result = await service.execute({ active_context: { tipo: 'regional', id: 'uuid-2' } });
+    expect(mockRepo.findAllByRegional).toHaveBeenCalledWith('uuid-2');
     expect(result).toHaveLength(1);
   });
 });
@@ -57,13 +57,13 @@ describe('FindOneCpaActionService', () => {
   beforeEach(() => { jest.clearAllMocks(); service = new FindOneCpaActionService(mockRepo as any); });
 
   it('deve retornar ação CPA encontrada', async () => {
-    mockRepo.findOneWithContext.mockResolvedValue({ cpa_action_id: 1 });
-    expect(await service.execute(1)).toEqual({ cpa_action_id: 1 });
+    mockRepo.findOneWithContext.mockResolvedValue({ cpa_action_id: 'uuid-1' });
+    expect(await service.execute('uuid-1')).toEqual({ cpa_action_id: 'uuid-1' });
   });
 
   it('deve lançar NotFoundException se não encontrada', async () => {
     mockRepo.findOneWithContext.mockResolvedValue(null);
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99')).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -72,15 +72,15 @@ describe('UpdateCpaActionService', () => {
   beforeEach(() => { jest.clearAllMocks(); service = new UpdateCpaActionService(mockRepo as any); });
 
   it('deve atualizar e retornar ação CPA', async () => {
-    mockRepo.findOne.mockResolvedValue({ cpa_action_id: 1 });
-    mockRepo.update.mockResolvedValue({ cpa_action_id: 1, descricao: 'Novo' });
-    const result = await service.execute(1, { descricao: 'Novo' } as any);
+    mockRepo.findOne.mockResolvedValue({ cpa_action_id: 'uuid-1' });
+    mockRepo.update.mockResolvedValue({ cpa_action_id: 'uuid-1', descricao: 'Novo' });
+    const result = await service.execute('uuid-1', { descricao: 'Novo' } as any);
     expect(result.descricao).toBe('Novo');
   });
 
   it('deve lançar NotFoundException se não encontrada', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99, {} as any)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99', {} as any)).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -89,14 +89,14 @@ describe('DeleteCpaActionService', () => {
   beforeEach(() => { jest.clearAllMocks(); service = new DeleteCpaActionService(mockRepo as any); });
 
   it('deve deletar a ação CPA', async () => {
-    mockRepo.findOne.mockResolvedValue({ cpa_action_id: 1 });
-    mockRepo.softDelete.mockResolvedValue({ cpa_action_id: 1 });
-    await service.execute(1);
-    expect(mockRepo.softDelete).toHaveBeenCalledWith(1);
+    mockRepo.findOne.mockResolvedValue({ cpa_action_id: 'uuid-1' });
+    mockRepo.softDelete.mockResolvedValue({ cpa_action_id: 'uuid-1' });
+    await service.execute('uuid-1');
+    expect(mockRepo.softDelete).toHaveBeenCalledWith('uuid-1');
   });
 
   it('deve lançar NotFoundException se não encontrada', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99')).rejects.toThrow(NotFoundException);
   });
 });

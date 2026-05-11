@@ -84,7 +84,24 @@ export class PgaRepository extends BaseRepository<PGA> {
     return this.prisma.pGA.findFirst({
       where: this.whereActive({ pga_id: id }),
       include: {
-        unidade: true,
+        unidade: {
+          include: {
+            diretor: { select: { nome: true, telefone: true, email: true } },
+            cursos: {
+              where: { ativo: true },
+              include: {
+                coordenador: { select: { nome: true, telefone: true, email: true } },
+              },
+              orderBy: [{ nome: 'asc' }],
+            },
+            pessoas: {
+              where: { ativo: true },
+              include: {
+                pessoa: { select: { nome: true, telefone: true, email: true } },
+              },
+            },
+          },
+        },
         regionalResponsavel: true,
         situacoesProblemas: {
           where: this.whereActive(),
@@ -142,9 +159,8 @@ export class PgaRepository extends BaseRepository<PGA> {
   /**
    * Método dedicado para atualizações internas de fluxo (status, pareceres,
    * campos de auditoria) que não fazem parte do UpdatePgaDto público.
-   * Aceita diretamente o tipo Prisma para garantir type-safety sem `as any`.
    */
-  async updateWorkflow(id: string, data: Prisma.PGAUpdateInput) {
+  async updateWorkflow(id: string, data: Prisma.PGAUncheckedUpdateInput) {
     return this.prisma.pGA.update({
       where: { pga_id: id },
       data,

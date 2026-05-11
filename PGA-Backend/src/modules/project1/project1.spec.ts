@@ -63,15 +63,15 @@ describe('FindAllProject1Service', () => {
 
   it('deve filtrar por unidade', async () => {
     mockRepo.findAllByUnit.mockResolvedValue([{ acao_projeto_id: 2 }]);
-    const result = await service.execute({ active_context: { tipo: 'unidade', id: 3 } });
-    expect(mockRepo.findAllByUnit).toHaveBeenCalledWith(3);
+    const result = await service.execute({ active_context: { tipo: 'unidade', id: 'uuid-3' } });
+    expect(mockRepo.findAllByUnit).toHaveBeenCalledWith('uuid-3');
     expect(result).toHaveLength(1);
   });
 
   it('deve filtrar por regional', async () => {
     mockRepo.findAllByRegional.mockResolvedValue([{ acao_projeto_id: 3 }]);
-    const result = await service.execute({ active_context: { tipo: 'regional', id: 1 } });
-    expect(mockRepo.findAllByRegional).toHaveBeenCalledWith(1);
+    const result = await service.execute({ active_context: { tipo: 'regional', id: 'uuid-1' } });
+    expect(mockRepo.findAllByRegional).toHaveBeenCalledWith('uuid-1');
     expect(result).toHaveLength(1);
   });
 });
@@ -82,12 +82,12 @@ describe('FindOneProject1Service', () => {
 
   it('deve retornar o projeto encontrado', async () => {
     mockRepo.findOneWithContext.mockResolvedValue({ acao_projeto_id: 1 });
-    expect(await service.execute(1)).toEqual({ acao_projeto_id: 1 });
+    expect(await service.execute('uuid-1')).toEqual({ acao_projeto_id: 1 });
   });
 
   it('deve lançar NotFoundException se não encontrado', async () => {
     mockRepo.findOneWithContext.mockResolvedValue(null);
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99')).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -98,61 +98,61 @@ describe('UpdateProject1Service', () => {
   it('deve atualizar e retornar o projeto', async () => {
     mockRepo.update.mockResolvedValue(undefined);
     mockRepo.findOne.mockResolvedValue({ acao_projeto_id: 1, titulo: 'Novo' });
-    const result = await service.execute(1, { titulo: 'Novo' } as any);
+    const result = await service.execute('uuid-1', { titulo: 'Novo' } as any);
     expect((result as any).titulo).toBe('Novo');
     expect(mockRepo.update).toHaveBeenCalled();
   });
 
   it('deve atualizar situacoes_problema_ids vazias (só deleteMany)', async () => {
-    mockRepo.findOne.mockResolvedValue({ acao_projeto_id: 1 });
+    mockRepo.findOne.mockResolvedValue({ acao_projeto_id: 'uuid-1' });
     mockPrisma.acaoProjetoSituacaoProblema.deleteMany.mockResolvedValue({});
-    await service.execute(1, { situacoes_problema_ids: [] } as any);
+    await service.execute('uuid-1', { situacoes_problema_ids: [] } as any);
     expect(mockPrisma.acaoProjetoSituacaoProblema.deleteMany).toHaveBeenCalled();
     expect(mockPrisma.acaoProjetoSituacaoProblema.createMany).not.toHaveBeenCalled();
   });
 
   it('deve atualizar situacoes_problema_ids com valores válidos (deleteMany + createMany)', async () => {
-    mockRepo.findOne.mockResolvedValue({ acao_projeto_id: 1 });
+    mockRepo.findOne.mockResolvedValue({ acao_projeto_id: 'uuid-1' });
     mockPrisma.acaoProjetoSituacaoProblema.deleteMany.mockResolvedValue({});
     mockPrisma.acaoProjetoSituacaoProblema.createMany.mockResolvedValue({});
-    await service.execute(1, { situacoes_problema_ids: [1, 2] } as any);
+    await service.execute('uuid-1', { situacoes_problema_ids: [1, 2] } as any);
     expect(mockPrisma.acaoProjetoSituacaoProblema.deleteMany).toHaveBeenCalled();
     expect(mockPrisma.acaoProjetoSituacaoProblema.createMany).toHaveBeenCalled();
   });
 
   it('deve criar novas pessoas (sem projeto_pessoa_id)', async () => {
-    mockRepo.findOne.mockResolvedValue({ acao_projeto_id: 1 });
+    mockRepo.findOne.mockResolvedValue({ acao_projeto_id: 'uuid-1' });
     mockPrisma.projetoPessoa.deleteMany.mockResolvedValue({});
     mockPrisma.projetoPessoa.create.mockResolvedValue({});
     const pessoas = [{ pessoa_id: 10, papel: 'Colaborador' }];
-    await service.execute(1, { pessoas } as any);
+    await service.execute('uuid-1', { pessoas } as any);
     expect(mockPrisma.projetoPessoa.create).toHaveBeenCalled();
   });
 
   it('deve atualizar pessoas existentes (com projeto_pessoa_id)', async () => {
-    mockRepo.findOne.mockResolvedValue({ acao_projeto_id: 1 });
+    mockRepo.findOne.mockResolvedValue({ acao_projeto_id: 'uuid-1' });
     mockPrisma.projetoPessoa.deleteMany.mockResolvedValue({});
     mockPrisma.projetoPessoa.update.mockResolvedValue({});
     const pessoas = [{ pessoa_id: 10, projeto_pessoa_id: 5, papel: 'Líder' }];
-    await service.execute(1, { pessoas } as any);
+    await service.execute('uuid-1', { pessoas } as any);
     expect(mockPrisma.projetoPessoa.update).toHaveBeenCalled();
   });
 
   it('deve criar novas etapas (sem etapa_id)', async () => {
-    mockRepo.findOne.mockResolvedValue({ acao_projeto_id: 1 });
+    mockRepo.findOne.mockResolvedValue({ acao_projeto_id: 'uuid-1' });
     mockPrisma.etapaProcesso.deleteMany.mockResolvedValue({});
     mockPrisma.etapaProcesso.create.mockResolvedValue({});
     const etapas = [{ descricao: 'Etapa nova' }];
-    await service.execute(1, { etapas } as any);
+    await service.execute('uuid-1', { etapas } as any);
     expect(mockPrisma.etapaProcesso.create).toHaveBeenCalled();
   });
 
   it('deve atualizar etapas existentes (com etapa_id)', async () => {
-    mockRepo.findOne.mockResolvedValue({ acao_projeto_id: 1 });
+    mockRepo.findOne.mockResolvedValue({ acao_projeto_id: 'uuid-1' });
     mockPrisma.etapaProcesso.deleteMany.mockResolvedValue({});
     mockPrisma.etapaProcesso.update.mockResolvedValue({});
     const etapas = [{ etapa_id: 7, descricao: 'Etapa existente' }];
-    await service.execute(1, { etapas } as any);
+    await service.execute('uuid-1', { etapas } as any);
     expect(mockPrisma.etapaProcesso.update).toHaveBeenCalled();
   });
 });
@@ -166,15 +166,15 @@ describe('DeleteProject1Service', () => {
 
   it('deve lançar NotFoundException se não encontrado', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute(99)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99')).rejects.toThrow(NotFoundException);
   });
 
   it('deve executar $transaction para excluir o projeto e dependências', async () => {
-    mockRepo.findOne.mockResolvedValue({ acao_projeto_id: 1 });
+    mockRepo.findOne.mockResolvedValue({ acao_projeto_id: 'uuid-1' });
     mockPrisma.$transaction.mockImplementation(async (fn: any) =>
       fn({ etapaProcesso: { updateMany: jest.fn() }, projetoPessoa: { updateMany: jest.fn() }, anexo: { updateMany: jest.fn() }, acaoProjetoSituacaoProblema: { updateMany: jest.fn() } }),
     );
-    await service.execute(1);
+    await service.execute('uuid-1');
     expect(mockPrisma.$transaction).toHaveBeenCalled();
   });
 });

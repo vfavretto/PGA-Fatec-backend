@@ -23,7 +23,7 @@ export class ReviewPgaCpsService {
     return this.repository.updateWorkflow(pgaId, {
       status: StatusPGA.AprovadoCPS,
       parecer_cps: parecer ?? null,
-      cpsAprovador: { connect: { pessoa_id: pessoaId } },
+      cps_aprovador_id: pessoaId,
       data_parecer_cps: new Date(),
     });
   }
@@ -45,7 +45,7 @@ export class ReviewPgaCpsService {
     return this.repository.updateWorkflow(pgaId, {
       status: StatusPGA.Reprovado,
       parecer_cps: parecer,
-      cpsAprovador: { connect: { pessoa_id: pessoaId } },
+      cps_aprovador_id: pessoaId,
       data_parecer_cps: new Date(),
     });
   }
