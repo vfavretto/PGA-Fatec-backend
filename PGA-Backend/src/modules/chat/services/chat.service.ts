@@ -14,18 +14,22 @@ export class ChatService implements OnModuleInit {
   private readonly model = 'deepseek-ai/deepseek-v4-flash';
   private chatbotContext = '';
   private additionalDocs = '';
-  private client: OpenAI;
+  private client?: OpenAI;
   private readonly logger = new Logger(ChatService.name);
 
   constructor(private readonly config: ConfigService) {
     const key = this.config.get<string>('NVIDIA_API_KEY');
     if (!key) {
-      throw new Error('NVIDIA_API_KEY não configurada em .env');
+      this.logger.warn(
+        '⚠️ NVIDIA_API_KEY não configurada em .env. O Chatbot não funcionará.',
+      );
+    } else {
+      this.client = new OpenAI({
+        apiKey: key,
+        baseURL: 'https://integrate.api.nvidia.com/v1',
+        timeout: 90000,
+      });
     }
-    this.client = new OpenAI({
-      apiKey: key,
-      baseURL: 'https://integrate.api.nvidia.com/v1',
-    });
   }
 
   async onModuleInit() {
@@ -102,6 +106,12 @@ REGRAS CRÍTICAS:
   }
 
   async sendMessage(messages: ChatMessage[]): Promise<string> {
+    if (!this.client) {
+      throw new Error(
+        'O serviço de chatbot não está configurado (NVIDIA_API_KEY ausente).',
+      );
+    }
+
     this.logger.log(
       `[sendMessage] Chamada recebida com ${messages.length} mensagens.`,
     );
@@ -125,10 +135,21 @@ REGRAS CRÍTICAS:
 
       this.logger.log('[sendMessage] Resposta recebida com sucesso.');
 
-      const msg = completion.choices[0]?.message as unknown as Record<string, unknown>;
-      return (msg?.content as string) || 'Erro: nenhuma resposta gerada.';
+      return completion.choices[0]?.message?.content || 'Erro: nenhuma resposta gerada.';
     } catch (error) {
       this.logger.error('[sendMessage] Erro ao chamar a API.');
+
+      if (error instanceof OpenAI.APITimeoutError) {
+        this.logger.error('Timeout ao chamar a API da NVIDIA');
+        throw new Error('A API demorou muito para responder. Tente novamente.');
+      }
+
+      if (error instanceof OpenAI.APIConnectionError) {
+        this.logger.error('Erro de conexão com a API da NVIDIA');
+        throw new Error(
+          'Não foi possível conectar à API da NVIDIA. Verifique sua conexão.',
+        );
+      }
 
       if (error instanceof OpenAI.APIError) {
         if (error.status === 401) {
@@ -137,7 +158,9 @@ REGRAS CRÍTICAS:
         }
         if (error.status === 429) {
           this.logger.warn('Rate limit atingido');
-          throw new Error('Limite de requisições atingido. Aguarde um momento e tente novamente.');
+          throw new Error(
+            'Limite de requisições atingido. Aguarde um momento e tente novamente.',
+          );
         }
         this.logger.error(`Erro API [${error.status}]: ${error.message}`);
         throw new Error(`Erro ao chamar a API: ${error.message}`);

@@ -12,8 +12,10 @@ import {
   ApiResponse,
   ApiBody,
   ApiProperty,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import {
+  ArrayNotEmpty,
   IsArray,
   IsIn,
   IsNotEmpty,
@@ -22,7 +24,6 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ChatService } from './services/chat.service';
-import { Public } from '../auth/decorators/is-public.decorator';
 
 export class ChatMessageDto {
   @ApiProperty({
@@ -54,6 +55,7 @@ export class ChatRequestDto {
     type: [ChatMessageDto],
   })
   @IsArray({ message: 'A propriedade "messages" deve ser um array' })
+  @ArrayNotEmpty({ message: 'A lista de mensagens não pode estar vazia' })
   @ValidateNested({ each: true })
   @Type(() => ChatMessageDto)
   messages: ChatMessageDto[];
@@ -68,11 +70,11 @@ export class ChatResponseDto {
 }
 
 @ApiTags('Chat')
+@ApiBearerAuth('JWT-auth')
 @Controller('chat')
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
-  @Public()
   @Post()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -90,15 +92,12 @@ export class ChatController {
     status: 400,
     description: 'Payload inválido ou erro de processamento',
   })
+  @ApiResponse({
+    status: 401,
+    description: 'Não autorizado — token JWT ausente ou inválido',
+  })
   async chat(@Body() body: ChatRequestDto): Promise<ChatResponseDto> {
-    if (!body.messages || body.messages.length === 0) {
-      throw new BadRequestException(
-        'A lista de mensagens não pode estar vazia',
-      );
-    }
-
     try {
-      // Map ChatMessageDto[] to ChatMessage[]
       const reply = await this.chatService.sendMessage(body.messages as any);
       return { reply };
     } catch (error) {
