@@ -52,7 +52,7 @@ export class ChatService implements OnModuleInit {
       const docsDir = join(process.cwd(), 'docs');
       const files = await readdir(docsDir).catch(() => {
         this.logger.debug('Pasta "docs/" não encontrada no root.');
-        return [];
+        return [] as string[];
       });
 
       const mdAndTxt = files.filter(
