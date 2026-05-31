@@ -1,6 +1,11 @@
 import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
+import {
+  APIConnectionTimeoutError,
+  APIConnectionError,
+  APIError,
+} from 'openai/error';
 import { readFile, readdir } from 'fs/promises';
 import { join } from 'path';
 
@@ -138,19 +143,19 @@ REGRAS CRÍTICAS:
     } catch (error) {
       this.logger.error('[sendMessage] Erro ao chamar a API.');
 
-      if (error instanceof OpenAI.APITimeoutError) {
+      if (error instanceof APIConnectionTimeoutError) {
         this.logger.error('Timeout ao chamar a API da NVIDIA');
         throw new Error('A API demorou muito para responder. Tente novamente.');
       }
 
-      if (error instanceof OpenAI.APIConnectionError) {
+      if (error instanceof APIConnectionError) {
         this.logger.error('Erro de conexão com a API da NVIDIA');
         throw new Error(
           'Não foi possível conectar à API da NVIDIA. Verifique sua conexão.',
         );
       }
 
-      if (error instanceof OpenAI.APIError) {
+      if (error instanceof APIError) {
         if (error.status === 401) {
           this.logger.error('Chave NVIDIA_API_KEY inválida ou expirada');
           throw new Error('Chave de API inválida. Verifique NVIDIA_API_KEY no .env');

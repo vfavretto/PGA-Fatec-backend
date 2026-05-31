@@ -40,15 +40,22 @@ describe('AuthController', () => {
 
   describe('contexts', () => {
     it('deve retornar contextos disponíveis para o usuário', async () => {
-      mockContextService.getAvailableContexts.mockResolvedValue({ unidades: [] });
-      const result = await controller.contexts({ user: { tipo_usuario: 'Diretor', pessoa_id: 1 } });
+      mockContextService.getAvailableContexts.mockResolvedValue({
+        unidades: [],
+      });
+      const result = await controller.contexts({
+        user: { tipo_usuario: 'Diretor', pessoa_id: 1 },
+      });
       expect(result).toEqual({ unidades: [] });
     });
   });
 
   describe('selectContext', () => {
     it('deve chamar contextService.selectContext e retornar ok', async () => {
-      mockContextService.selectContext.mockResolvedValue({ access_token: 'token', refresh_token: 'rt' });
+      mockContextService.selectContext.mockResolvedValue({
+        access_token: 'token',
+        refresh_token: 'rt',
+      });
       const result = await controller.selectContext(
         { user: { tipo_usuario: 'Diretor' } },
         { tipo: 'unidade', id: 'uuid-1' } as any,
@@ -72,7 +79,10 @@ describe('AuthController', () => {
       mockJwtService.verify.mockReturnValue({ email: 'a@a.com', pessoa_id: 1 });
       mockJwtService.sign.mockReturnValue('new-access-token');
 
-      const result = controller.refresh({ cookies: { refresh_token: 'valid-refresh-token' } } as any, mockRes);
+      const result = controller.refresh(
+        { cookies: { refresh_token: 'valid-refresh-token' } } as any,
+        mockRes,
+      );
       expect(result).toEqual({ ok: true });
     });
 
@@ -82,8 +92,13 @@ describe('AuthController', () => {
     });
 
     it('deve retornar erro se refresh_token inválido', () => {
-      mockJwtService.verify.mockImplementation(() => { throw new Error('invalid'); });
-      const result = controller.refresh({ cookies: { refresh_token: 'bad-token' } } as any, mockRes);
+      mockJwtService.verify.mockImplementation(() => {
+        throw new Error('invalid');
+      });
+      const result = controller.refresh(
+        { cookies: { refresh_token: 'bad-token' } } as any,
+        mockRes,
+      );
       expect(result).toHaveProperty('error');
     });
   });

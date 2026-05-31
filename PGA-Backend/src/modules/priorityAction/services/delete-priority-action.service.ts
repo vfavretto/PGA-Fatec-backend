@@ -5,7 +5,7 @@ import { PriorityActionRepository } from '../priority-action.repository';
 export class DeletePriorityActionService {
   constructor(private readonly repo: PriorityActionRepository) {}
 
-  async execute(id: string, usuario_id?: string) {
+  async execute(id: string, _usuario_id?: string) {
     const priority = await this.repo.findOne(id);
     if (!priority)
       throw new NotFoundException('Prioridade de ação não encontrada');

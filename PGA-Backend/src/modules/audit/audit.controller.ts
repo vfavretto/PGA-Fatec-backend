@@ -24,13 +24,7 @@ import { ConfigurationSnapshotService } from './services/configuration-snapshot.
 import { VersionManagerService } from './services/version-manager.service';
 import { AuditLogService } from './services/audit-log.service';
 import { CreateAuditDto } from './dto/create-audit.dto';
-import { TipoOperacaoAuditoria } from '@prisma/client';
-import {
-  ReportEntry,
-  YearSummary,
-  AuditSummaryResponse,
-  ChangesReportResponse,
-} from './types/audit.types';
+import { AuditSummaryResponse } from './types/audit.types';
 
 @ApiTags('Audit')
 @ApiBearerAuth('JWT-auth')
@@ -81,8 +75,14 @@ export class AuditController {
     status: 200,
     description: 'Configurações retornadas com sucesso',
   })
-  async getConfigurationsByYear(@Request() req: any, @Param('ano', ParseIntPipe) ano: number) {
-    return this.auditLogService.getConfigurationsByYear(ano, req.user?.active_context);
+  async getConfigurationsByYear(
+    @Request() req: any,
+    @Param('ano', ParseIntPipe) ano: number,
+  ) {
+    return this.auditLogService.getConfigurationsByYear(
+      ano,
+      req.user?.active_context,
+    );
   }
 
   @Get('configurations/situacoes-problema/year/:ano')

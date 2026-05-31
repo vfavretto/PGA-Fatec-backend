@@ -10,4 +10,3 @@ export class ListRegionalPgasService {
     return this.repository.findPgasByRegional(regionalId, filters);
   }
 }
-

@@ -5,7 +5,7 @@ import { ProblemSituationRepository } from '../problemSituation.repository';
 export class DeleteProblemSituationService {
   constructor(private readonly repo: ProblemSituationRepository) {}
 
-  async execute(id: string, usuario_id?: string) {
+  async execute(id: string, _usuario_id?: string) {
     const situation = await this.repo.findOne(id);
     if (!situation)
       throw new NotFoundException('Situação Problema não encontrada');

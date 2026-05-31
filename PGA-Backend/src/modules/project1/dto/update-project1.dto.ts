@@ -1,4 +1,4 @@
-﻿import { IsOptional, IsArray, IsNumber } from 'class-validator';
+﻿import { IsOptional, IsArray } from 'class-validator';
 import { Prisma, StatusProjetoRegional } from '@prisma/client';
 
 export class UpdateProject1Dto {

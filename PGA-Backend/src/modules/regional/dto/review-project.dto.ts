@@ -1,6 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { StatusProjetoRegional } from '@prisma/client';
-import { IsIn, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import {
+  IsIn,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 
 export class ReviewProjectDto {
   @ApiProperty({
@@ -24,4 +30,3 @@ export class ReviewProjectDto {
   @MaxLength(2000)
   parecer?: string;
 }
-

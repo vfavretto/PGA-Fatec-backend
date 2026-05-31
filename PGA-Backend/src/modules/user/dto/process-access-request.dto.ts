@@ -1,4 +1,4 @@
-﻿import { IsEnum, IsNotEmpty, IsOptional, ValidateIf } from 'class-validator';
+﻿import { IsEnum, IsNotEmpty, ValidateIf } from 'class-validator';
 import { TipoUsuario } from '@prisma/client';
 
 export class ProcessAccessRequestDto {

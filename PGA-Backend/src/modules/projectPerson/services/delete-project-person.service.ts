@@ -7,7 +7,7 @@ export class DeleteProjectPersonService {
     private readonly projectPersonRepository: ProjectPersonRepository,
   ) {}
 
-  async execute(id: string, usuarioLogadoId?: string, motivo?: string) {
+  async execute(id: string, _usuarioLogadoId?: string, _motivo?: string) {
     const projetoPessoa = await this.projectPersonRepository.findOne(id);
     if (!projetoPessoa)
       throw new NotFoundException('Pessoa no projeto não encontrada');

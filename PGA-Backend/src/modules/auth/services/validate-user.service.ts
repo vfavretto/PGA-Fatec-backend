@@ -32,7 +32,7 @@ export class ValidateUserService {
         throw new UnauthorizedException('Credenciais inválidas');
       }
 
-      const { senha, ...result } = user;
+      const { senha: _senha, ...result } = user;
       return result;
     } catch (error) {
       if (error instanceof UnauthorizedException) {

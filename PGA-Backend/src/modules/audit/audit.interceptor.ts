@@ -17,7 +17,7 @@ export class AuditInterceptor implements NestInterceptor {
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
-    const { method, url, body, params, user } = request;
+    const { method, url, body, user } = request;
 
     let operacao: TipoOperacaoAuditoria;
     switch (method) {
@@ -46,6 +46,7 @@ export class AuditInterceptor implements NestInterceptor {
     );
 
     return next.handle().pipe(
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       tap(async (response) => {
         try {
           const endTime = Date.now();

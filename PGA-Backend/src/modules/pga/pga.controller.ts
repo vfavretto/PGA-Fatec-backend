@@ -68,7 +68,10 @@ export class PgaController {
 
   @Get()
   @ApiOperation({ summary: 'Listar PGAs' })
-  @ApiResponse({ status: 200, description: 'Lista de PGAs retornada com sucesso' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de PGAs retornada com sucesso',
+  })
   findAll(@Request() req: any) {
     return this.findAllPgaService.execute(req.user);
   }
@@ -115,7 +118,10 @@ export class PgaController {
   @ApiParam({ name: 'id', type: 'string', description: 'UUID do PGA' })
   @ApiBody({ type: UpdatePgaDto })
   @ApiResponse({ status: 200, description: 'PGA atualizado com sucesso' })
-  @ApiResponse({ status: 403, description: 'Sem permissão para editar este PGA' })
+  @ApiResponse({
+    status: 403,
+    description: 'Sem permissão para editar este PGA',
+  })
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdatePgaDto,
@@ -141,7 +147,8 @@ export class PgaController {
   @Roles('Administrador', 'CPS', 'Diretor')
   @ApiOperation({
     summary: 'Submeter PGA para análise regional',
-    description: 'Diretor submete o PGA da própria unidade. Administrador e CPS podem submeter qualquer PGA.',
+    description:
+      'Diretor submete o PGA da própria unidade. Administrador e CPS podem submeter qualquer PGA.',
   })
   @ApiParam({ name: 'id', type: 'string', description: 'UUID do PGA' })
   @ApiResponse({ status: 200, description: 'PGA submetido com sucesso' })
@@ -160,7 +167,10 @@ export class PgaController {
   })
   @ApiParam({ name: 'id', type: 'string', description: 'UUID do PGA template' })
   @ApiResponse({ status: 201, description: 'PGA publicado, cópias geradas' })
-  @ApiResponse({ status: 400, description: 'PGA não é template ou já foi publicado' })
+  @ApiResponse({
+    status: 400,
+    description: 'PGA não é template ou já foi publicado',
+  })
   publish(@Param('id', ParseUUIDPipe) id: string, @Request() req: any) {
     return this.publishPgaService.execute(id, req.user.pessoa_id);
   }
@@ -177,7 +187,11 @@ export class PgaController {
     @Body('parecer') parecer: string,
     @Request() req: any,
   ) {
-    return this.reviewPgaRegionalService.aprovar(id, req.user.pessoa_id, parecer);
+    return this.reviewPgaRegionalService.aprovar(
+      id,
+      req.user.pessoa_id,
+      parecer,
+    );
   }
 
   @Post(':id/reprovar-regional')
@@ -185,14 +199,22 @@ export class PgaController {
   @Roles('Regional')
   @ApiOperation({ summary: 'Reprovar PGA na regional (devolve ao Diretor)' })
   @ApiParam({ name: 'id', type: 'string', description: 'UUID do PGA' })
-  @ApiBody({ schema: { properties: { parecer: { type: 'string', description: 'Obrigatório' } } } })
+  @ApiBody({
+    schema: {
+      properties: { parecer: { type: 'string', description: 'Obrigatório' } },
+    },
+  })
   @ApiResponse({ status: 200, description: 'PGA reprovado pela regional' })
   reprovarRegional(
     @Param('id', ParseUUIDPipe) id: string,
     @Body('parecer') parecer: string,
     @Request() req: any,
   ) {
-    return this.reviewPgaRegionalService.reprovar(id, req.user.pessoa_id, parecer);
+    return this.reviewPgaRegionalService.reprovar(
+      id,
+      req.user.pessoa_id,
+      parecer,
+    );
   }
 
   @Post(':id/aprovar-cps')
@@ -215,7 +237,11 @@ export class PgaController {
   @Roles('Administrador', 'CPS')
   @ApiOperation({ summary: 'Reprovar PGA pelo CPS' })
   @ApiParam({ name: 'id', type: 'string', description: 'UUID do PGA' })
-  @ApiBody({ schema: { properties: { parecer: { type: 'string', description: 'Obrigatório' } } } })
+  @ApiBody({
+    schema: {
+      properties: { parecer: { type: 'string', description: 'Obrigatório' } },
+    },
+  })
   @ApiResponse({ status: 200, description: 'PGA reprovado pelo CPS' })
   reprovarCps(
     @Param('id', ParseUUIDPipe) id: string,

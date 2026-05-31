@@ -5,7 +5,7 @@ import { RoutineParticipantRepository } from '../routine-participant.repository'
 export class DeleteRoutineParticipantService {
   constructor(private readonly repository: RoutineParticipantRepository) {}
 
-  async execute(id: string, usuarioLogadoId?: string, motivo?: string) {
+  async execute(id: string, _usuarioLogadoId?: string, _motivo?: string) {
     const participante = await this.repository.findOne(id);
     if (!participante)
       throw new NotFoundException('RotinaParticipante não encontrada');

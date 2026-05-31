@@ -9,7 +9,8 @@ export class FindOneProjectPersonService {
   async execute(id: string, user?: any): Promise<ProjectPerson> {
     const active = user?.active_context ?? null;
     const projectPerson = await this.repository.findOneWithContext(id, active);
-    if (!projectPerson) throw new NotFoundException('Vínculo não encontrado ou sem acesso');
+    if (!projectPerson)
+      throw new NotFoundException('Vínculo não encontrado ou sem acesso');
     return projectPerson;
   }
 }

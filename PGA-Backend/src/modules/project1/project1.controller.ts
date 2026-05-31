@@ -18,8 +18,6 @@ import {
   ApiParam,
   ApiBody,
 } from '@nestjs/swagger';
-import { Prisma } from '@prisma/client';
-
 import { CreateProject1Service } from './services/createProject1.service';
 import { DeleteProject1Service } from './services/deleteProject1.service';
 import { FindAllProject1Service } from './services/findAllProject1.service';

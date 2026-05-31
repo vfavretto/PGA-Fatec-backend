@@ -12,7 +12,7 @@ export class CreateAttachmentDto {
   @ApiPropertyOptional({
     description: 'ID da etapa de processo relacionada',
     example: 1,
-    type: 'integer'
+    type: 'integer',
   })
   @IsOptional()
   @IsUUID('4', { message: 'O campo deve ser um UUID válido' })
@@ -21,7 +21,7 @@ export class CreateAttachmentDto {
   @ApiProperty({
     description: 'ID do entregável relacionado',
     example: 1,
-    type: 'integer'
+    type: 'integer',
   })
   @IsNotEmpty({ message: 'O ID do entregável é obrigatório' })
   @IsUUID('4', { message: 'O campo deve ser um UUID válido' })
@@ -30,7 +30,7 @@ export class CreateAttachmentDto {
   @ApiProperty({
     description: 'Nome do item do anexo',
     example: 'Notebook Dell',
-    type: 'string'
+    type: 'string',
   })
   @IsNotEmpty({ message: 'O item é obrigatório' })
   @IsString({ message: 'O item deve ser uma string' })
@@ -38,8 +38,9 @@ export class CreateAttachmentDto {
 
   @ApiProperty({
     description: 'Descrição detalhada do item',
-    example: 'Notebook Dell Inspiron 15 3000, Intel Core i5, 8GB RAM, 256GB SSD',
-    type: 'string'
+    example:
+      'Notebook Dell Inspiron 15 3000, Intel Core i5, 8GB RAM, 256GB SSD',
+    type: 'string',
   })
   @IsNotEmpty({ message: 'A descrição é obrigatória' })
   @IsString({ message: 'A descrição deve ser uma string' })
@@ -49,7 +50,7 @@ export class CreateAttachmentDto {
     description: 'Quantidade do item',
     example: 10,
     minimum: 1,
-    type: 'number'
+    type: 'number',
   })
   @IsNotEmpty({ message: 'A quantidade é obrigatória' })
   @IsNumber({}, { message: 'A quantidade deve ser um número' })
@@ -58,9 +59,9 @@ export class CreateAttachmentDto {
 
   @ApiProperty({
     description: 'Preço unitário estimado do item em reais',
-    example: 2500.00,
+    example: 2500.0,
     minimum: 0,
-    type: 'number'
+    type: 'number',
   })
   @IsNotEmpty({ message: 'O preço unitário estimado é obrigatório' })
   @IsNumber({}, { message: 'O preço unitário estimado deve ser um número' })
@@ -69,9 +70,9 @@ export class CreateAttachmentDto {
 
   @ApiProperty({
     description: 'Preço total estimado (quantidade × preço unitário)',
-    example: 25000.00,
+    example: 25000.0,
     minimum: 0,
-    type: 'number'
+    type: 'number',
   })
   @IsNotEmpty({ message: 'O preço total estimado é obrigatório' })
   @IsNumber({}, { message: 'O preço total estimado deve ser um número' })

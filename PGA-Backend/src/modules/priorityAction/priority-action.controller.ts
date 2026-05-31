@@ -1,5 +1,22 @@
-﻿import { Controller, Post, Get, Put, Delete, Param, Body, ParseUUIDPipe, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
+﻿import {
+  Controller,
+  Post,
+  Get,
+  Put,
+  Delete,
+  Param,
+  Body,
+  ParseUUIDPipe,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiBody,
+} from '@nestjs/swagger';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { CreatePriorityActionService } from './services/create-priority-action.service';
@@ -25,7 +42,10 @@ export class PriorityActionController {
   @Post()
   @UseGuards(RolesGuard)
   @Roles('Administrador', 'CPS')
-  @ApiOperation({ summary: 'Criar prioridade de ação', description: 'Cria uma nova prioridade de ação no sistema' })
+  @ApiOperation({
+    summary: 'Criar prioridade de ação',
+    description: 'Cria uma nova prioridade de ação no sistema',
+  })
   @ApiBody({ type: CreatePriorityActionDto })
   @ApiResponse({ status: 201, description: 'Prioridade criada com sucesso' })
   @ApiResponse({ status: 400, description: 'Dados inválidos' })
@@ -34,16 +54,28 @@ export class PriorityActionController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Listar prioridades', description: 'Retorna lista de todas as prioridades de ação' })
-  @ApiResponse({ status: 200, description: 'Lista de prioridades retornada com sucesso' })
+  @ApiOperation({
+    summary: 'Listar prioridades',
+    description: 'Retorna lista de todas as prioridades de ação',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de prioridades retornada com sucesso',
+  })
   findAll() {
     return this.findAllService.execute();
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Buscar prioridade por ID', description: 'Retorna dados de uma prioridade específica' })
+  @ApiOperation({
+    summary: 'Buscar prioridade por ID',
+    description: 'Retorna dados de uma prioridade específica',
+  })
   @ApiParam({ name: 'id', type: 'number', description: 'ID da prioridade' })
-  @ApiResponse({ status: 200, description: 'Prioridade encontrada com sucesso' })
+  @ApiResponse({
+    status: 200,
+    description: 'Prioridade encontrada com sucesso',
+  })
   @ApiResponse({ status: 404, description: 'Prioridade não encontrada' })
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.findOneService.execute(id);
@@ -52,19 +84,31 @@ export class PriorityActionController {
   @Put(':id')
   @UseGuards(RolesGuard)
   @Roles('Administrador', 'CPS')
-  @ApiOperation({ summary: 'Atualizar prioridade', description: 'Atualiza dados de uma prioridade específica' })
+  @ApiOperation({
+    summary: 'Atualizar prioridade',
+    description: 'Atualiza dados de uma prioridade específica',
+  })
   @ApiParam({ name: 'id', type: 'number', description: 'ID da prioridade' })
   @ApiBody({ type: UpdatePriorityActionDto })
-  @ApiResponse({ status: 200, description: 'Prioridade atualizada com sucesso' })
+  @ApiResponse({
+    status: 200,
+    description: 'Prioridade atualizada com sucesso',
+  })
   @ApiResponse({ status: 404, description: 'Prioridade não encontrada' })
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdatePriorityActionDto) {
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdatePriorityActionDto,
+  ) {
     return this.updateService.execute(id, dto);
   }
 
   @Delete(':id')
   @UseGuards(RolesGuard)
   @Roles('Administrador', 'CPS')
-  @ApiOperation({ summary: 'Excluir prioridade', description: 'Remove uma prioridade do sistema' })
+  @ApiOperation({
+    summary: 'Excluir prioridade',
+    description: 'Remove uma prioridade do sistema',
+  })
   @ApiParam({ name: 'id', type: 'number', description: 'ID da prioridade' })
   @ApiResponse({ status: 200, description: 'Prioridade excluída com sucesso' })
   @ApiResponse({ status: 404, description: 'Prioridade não encontrada' })

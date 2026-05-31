@@ -7,8 +7,12 @@ export class FindOneProject1Service {
 
   async execute(id: string, user?: any) {
     const active = user?.active_context ?? null;
-    const projeto = await this.project1Repository.findOneWithContext(id, active);
-    if (!projeto) throw new NotFoundException('Projeto não encontrado ou sem acesso');
+    const projeto = await this.project1Repository.findOneWithContext(
+      id,
+      active,
+    );
+    if (!projeto)
+      throw new NotFoundException('Projeto não encontrado ou sem acesso');
     return projeto;
   }
 }

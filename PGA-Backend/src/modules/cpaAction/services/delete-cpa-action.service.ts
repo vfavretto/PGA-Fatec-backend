@@ -5,7 +5,7 @@ import { CpaActionRepository } from '../cpa-action.repository';
 export class DeleteCpaActionService {
   constructor(private readonly repository: CpaActionRepository) {}
 
-  async execute(id: string, usuarioLogadoId?: string, motivo?: string) {
+  async execute(id: string, _usuarioLogadoId?: string, _motivo?: string) {
     const action = await this.repository.findOne(id);
     if (!action) throw new NotFoundException('Ação CPA não encontrada');
 

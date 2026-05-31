@@ -1,6 +1,6 @@
 import { PrismaService } from '../../config/prisma.service';
 
-export abstract class BaseRepository<T> {
+export abstract class BaseRepository<_T> {
   constructor(protected readonly prisma: PrismaService) {}
 
   /**

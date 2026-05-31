@@ -5,7 +5,7 @@ import { ProcessStepRepository } from '../process-step.repository';
 export class DeleteProcessStepService {
   constructor(private readonly repository: ProcessStepRepository) {}
 
-  async execute(id: string, usuarioLogadoId?: string, motivo?: string) {
+  async execute(id: string, _usuarioLogadoId?: string, _motivo?: string) {
     const step = await this.repository.findOne(id);
     if (!step) throw new NotFoundException('Etapa do processo não encontrada');
 

@@ -40,7 +40,6 @@ export class CreateProject1Service {
       },
     });
 
-    
     if (situacao_problema_ids && situacao_problema_ids.length > 0) {
       for (const situacao_id of situacao_problema_ids) {
         await this.prisma.acaoProjetoSituacaoProblema.create({
@@ -52,7 +51,6 @@ export class CreateProject1Service {
         });
       }
 
-      
       return this.prisma.acaoProjeto.findUnique({
         where: { acao_projeto_id: projeto.acao_projeto_id },
         include: {

@@ -8,6 +8,7 @@ import { PrismaService } from '../../../config/prisma.service';
 import { SendAccessApproved } from '../../mail/services/sendAccessApproved.service';
 import { TipoUsuario } from '@prisma/client';
 import * as crypto from 'crypto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class ProcessAccessRequestService {
@@ -61,7 +62,7 @@ export class ProcessAccessRequestService {
       const unidadeDiretor = await this.prisma.unidade.findFirst({
         where: {
           diretor_id: usuarioId,
-          ativo: true
+          ativo: true,
         } as any,
       });
 
@@ -86,10 +87,9 @@ export class ProcessAccessRequestService {
       const nivelSolicitado = this.getNivelUsuario(tipoUsuario);
 
       if (
-        processador.tipo_usuario === 'Administrador' ||
-        processador.tipo_usuario === 'CPS'
+        processador.tipo_usuario !== 'Administrador' &&
+        processador.tipo_usuario !== 'CPS'
       ) {
-      } else {
         if (nivelSolicitado <= nivelProcessador) {
           throw new UnauthorizedException(
             'Você não pode criar usuários do mesmo nível ou superior ao seu',
@@ -113,10 +113,10 @@ export class ProcessAccessRequestService {
       const hashedPassword = await this.hashPassword(tempPassword);
 
       if (tipoUsuario === 'Diretor') {
-        const unidadeAtual = await this.prisma.unidade.findUnique({
+        const unidadeAtual = (await this.prisma.unidade.findUnique({
           where: { unidade_id: solicitacao.unidade_id },
           select: { diretor_id: true, nome_unidade: true } as any,
-        }) as any;
+        })) as any;
 
         if (unidadeAtual?.diretor_id) {
           throw new ConflictException(
@@ -170,7 +170,6 @@ export class ProcessAccessRequestService {
   }
 
   private async hashPassword(password: string): Promise<string> {
-    const bcrypt = require('bcrypt');
     const salt = await bcrypt.genSalt(10);
     return bcrypt.hash(password, salt);
   }

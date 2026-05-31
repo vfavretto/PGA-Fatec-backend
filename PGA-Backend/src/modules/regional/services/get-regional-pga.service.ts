@@ -17,4 +17,3 @@ export class GetRegionalPgaService {
     return pga;
   }
 }
-

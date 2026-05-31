@@ -13,7 +13,7 @@ export class DeleteWorkloadHaeService {
     private readonly prisma: PrismaService,
   ) {}
 
-  async execute(id: string, usuarioLogadoId?: string, motivo?: string) {
+  async execute(id: string, _usuarioLogadoId?: string, _motivo?: string) {
     const workloadHae = await this.repository.findOne(id);
     if (!workloadHae)
       throw new NotFoundException('Tipo de vínculo HAE não encontrado');

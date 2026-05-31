@@ -1,6 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { StatusPGA } from '@prisma/client';
-import { IsIn, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import {
+  IsIn,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 
 export class ReviewPgaDto {
   @ApiProperty({
@@ -24,4 +30,3 @@ export class ReviewPgaDto {
   @MaxLength(2000)
   parecer?: string;
 }
-

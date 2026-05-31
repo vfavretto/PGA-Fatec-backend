@@ -1,4 +1,14 @@
-﻿import { IsBoolean, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, MaxLength, IsDateString, IsUUID } from 'class-validator';
+﻿import {
+  IsBoolean,
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+  IsDateString,
+  IsUUID,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { StatusPGA } from '@prisma/client';
 
@@ -6,7 +16,7 @@ export class CreatePgaDto {
   @ApiPropertyOptional({
     description: 'ID da unidade responsável pelo PGA (omitir para templates)',
     example: 'uuid-da-unidade',
-    type: 'string'
+    type: 'string',
   })
   @IsOptional()
   @IsUUID('4')
@@ -15,7 +25,7 @@ export class CreatePgaDto {
   @ApiProperty({
     description: 'Ano de referência do PGA',
     example: 2024,
-    type: 'integer'
+    type: 'integer',
   })
   @IsNotEmpty()
   @IsInt()
@@ -24,7 +34,7 @@ export class CreatePgaDto {
   @ApiPropertyOptional({
     description: 'Versão do PGA',
     example: '1.0',
-    maxLength: 10
+    maxLength: 10,
   })
   @IsOptional()
   @IsString()
@@ -33,7 +43,7 @@ export class CreatePgaDto {
 
   @ApiPropertyOptional({
     description: 'Análise do cenário atual',
-    example: 'Análise detalhada do cenário institucional...'
+    example: 'Análise detalhada do cenário institucional...',
   })
   @IsOptional()
   @IsString()
@@ -43,7 +53,7 @@ export class CreatePgaDto {
     description: 'Data de elaboração do PGA',
     example: '2024-01-15',
     type: 'string',
-    format: 'date'
+    format: 'date',
   })
   @IsOptional()
   @IsDateString()
@@ -53,7 +63,7 @@ export class CreatePgaDto {
     description: 'Data do parecer GPR',
     example: '2024-02-15',
     type: 'string',
-    format: 'date'
+    format: 'date',
   })
   @IsOptional()
   @IsDateString()
@@ -62,14 +72,15 @@ export class CreatePgaDto {
   @ApiPropertyOptional({
     description: 'Status atual do PGA',
     enum: StatusPGA,
-    example: 'EmElaboracao'
+    example: 'EmElaboracao',
   })
   @IsOptional()
   @IsEnum(StatusPGA)
   status?: StatusPGA;
 
   @ApiPropertyOptional({
-    description: 'Indica se este PGA é um template (criado pelo Admin/CPS antes de publicar)',
+    description:
+      'Indica se este PGA é um template (criado pelo Admin/CPS antes de publicar)',
     example: true,
   })
   @IsOptional()

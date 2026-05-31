@@ -5,7 +5,7 @@ import { ThemesRepository } from '../themes.repository';
 export class DeleteThemeService {
   constructor(private readonly repo: ThemesRepository) {}
 
-  async execute(id: string, usuario_id?: string) {
+  async execute(id: string, _usuario_id?: string) {
     const theme = await this.repo.findOne(id);
     if (!theme) throw new NotFoundException('Tema não encontrado');
 
