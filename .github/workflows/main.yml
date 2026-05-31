@@ -38,6 +38,10 @@ jobs:
         run: npm run test:e2e
         working-directory: ./PGA-Backend
 
+      - name: Run lifecycle tests
+        run: npm run test:lifecycle
+        working-directory: ./PGA-Backend
+
       # Versionamento Semântico
       - name: Install semver
         if: github.ref == 'refs/heads/main'
