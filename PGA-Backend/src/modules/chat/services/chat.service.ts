@@ -11,7 +11,7 @@ export interface ChatMessage {
 
 @Injectable()
 export class ChatService implements OnModuleInit {
-  private readonly model = 'deepseek-ai/deepseek-v4-flash';
+  private readonly model = 'nvidia/nemotron-mini-4b-instruct';
   private chatbotContext = '';
   private additionalDocs = '';
   private client?: OpenAI;
@@ -117,7 +117,7 @@ REGRAS CRÍTICAS:
     );
 
     try {
-      this.logger.log(`[sendMessage] Enviando para DeepSeek (${this.model})...`);
+      this.logger.log(`[sendMessage] Enviando para Nemotron (${this.model})...`);
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const completion = await (this.client.chat.completions.create as any)({
@@ -126,11 +126,10 @@ REGRAS CRÍTICAS:
           { role: 'system', content: this.buildSystemPrompt() },
           ...messages,
         ],
-        temperature: 1,
-        top_p: 0.95,
-        max_tokens: 16384,
+        temperature: 0.2,
+        top_p: 0.7,
+        max_tokens: 1024,
         stream: false,
-        chat_template_kwargs: { thinking: true, reasoning_effort: 'high' },
       });
 
       this.logger.log('[sendMessage] Resposta recebida com sucesso.');
