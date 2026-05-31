@@ -35,7 +35,7 @@ jobs:
         working-directory: ./PGA-Backend
 
       - name: Run tests
-        run: npm run test:e2e
+        run: npm run test:cov
         working-directory: ./PGA-Backend
 
       - name: Run lifecycle tests
