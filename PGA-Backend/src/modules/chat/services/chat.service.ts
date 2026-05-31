@@ -16,7 +16,7 @@ export interface ChatMessage {
 
 @Injectable()
 export class ChatService implements OnModuleInit {
-  private readonly model = 'nvidia/nemotron-mini-4b-instruct';
+  private readonly model = 'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning';
   private chatbotContext = '';
   private additionalDocs = '';
   private client?: OpenAI;
