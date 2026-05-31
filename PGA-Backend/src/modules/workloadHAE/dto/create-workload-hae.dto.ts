@@ -5,7 +5,7 @@ export class CreateWorkloadHaeDto {
   @ApiProperty({
     description: 'Sigla do tipo de carga horária HAE',
     example: 'HAE01',
-    maxLength: 10
+    maxLength: 10,
   })
   @IsString()
   @IsNotEmpty()
@@ -15,7 +15,7 @@ export class CreateWorkloadHaeDto {
   @ApiProperty({
     description: 'Descrição da carga horária HAE',
     example: 'Hora Atividade Específica - Coordenação de Curso',
-    maxLength: 255
+    maxLength: 255,
   })
   @IsString()
   @IsNotEmpty()
@@ -24,7 +24,7 @@ export class CreateWorkloadHaeDto {
 
   @ApiPropertyOptional({
     description: 'Detalhes adicionais sobre a carga horária HAE',
-    example: 'Atividades relacionadas à coordenação pedagógica do curso...'
+    example: 'Atividades relacionadas à coordenação pedagógica do curso...',
   })
   @IsOptional()
   @IsString()

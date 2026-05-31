@@ -43,14 +43,20 @@ export class CourseRepository extends BaseRepository<Curso> {
   async findOneWithContext(id: string, active_context?: any) {
     if (active_context && active_context.tipo === 'unidade') {
       return this.prisma.curso.findFirst({
-        where: this.whereActive({ curso_id: id, unidade_id: active_context.id }),
+        where: this.whereActive({
+          curso_id: id,
+          unidade_id: active_context.id,
+        }),
         include: { coordenador: true, unidade: true },
       });
     }
 
     if (active_context && active_context.tipo === 'regional') {
       return this.prisma.curso.findFirst({
-        where: this.whereActive({ curso_id: id, regional_id: active_context.id }),
+        where: this.whereActive({
+          curso_id: id,
+          regional_id: active_context.id,
+        }),
         include: { coordenador: true, unidade: true },
       });
     }

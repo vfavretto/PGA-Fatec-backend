@@ -26,6 +26,7 @@ describe('LoginService', () => {
 
     expect(result.access_token).toBeDefined();
     expect(result.refresh_token).toBeDefined();
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(jwtService.sign).toHaveBeenCalledTimes(2);
   });
 
@@ -34,10 +35,14 @@ describe('LoginService', () => {
   });
 
   it('deve lançar UnauthorizedException se email estiver ausente', () => {
-    expect(() => service.execute({ pessoa_id: 1 } as any)).toThrow(UnauthorizedException);
+    expect(() => service.execute({ pessoa_id: 1 } as any)).toThrow(
+      UnauthorizedException,
+    );
   });
 
   it('deve lançar UnauthorizedException se pessoa_id estiver ausente', () => {
-    expect(() => service.execute({ email: 'x@x.com' } as any)).toThrow(UnauthorizedException);
+    expect(() => service.execute({ email: 'x@x.com' } as any)).toThrow(
+      UnauthorizedException,
+    );
   });
 });

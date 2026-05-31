@@ -37,7 +37,9 @@ export class ReviewPgaRegionalService {
 
   async reprovar(pgaId: string, pessoaId: string, parecer: string) {
     if (!parecer?.trim()) {
-      throw new BadRequestException('O parecer é obrigatório ao reprovar o PGA.');
+      throw new BadRequestException(
+        'O parecer é obrigatório ao reprovar o PGA.',
+      );
     }
 
     const pga = await this.repository.findOne(pgaId);
@@ -59,9 +61,14 @@ export class ReviewPgaRegionalService {
     });
   }
 
-  private async checkRegionalAccess(unidadeId: string | null, pessoaId: string) {
+  private async checkRegionalAccess(
+    unidadeId: string | null,
+    pessoaId: string,
+  ) {
     if (!unidadeId) {
-      throw new BadRequestException('PGA template não pode ser revisado pela regional.');
+      throw new BadRequestException(
+        'PGA template não pode ser revisado pela regional.',
+      );
     }
 
     const unidade = await this.prisma.unidade.findUnique({
@@ -72,7 +79,11 @@ export class ReviewPgaRegionalService {
 
     // Verifica se o usuário Regional tem vínculo com a regional desta unidade
     const vinculo = await this.prisma.pessoaRegional.findFirst({
-      where: { pessoa_id: pessoaId, regional_id: unidade.regional_id, ativo: true },
+      where: {
+        pessoa_id: pessoaId,
+        regional_id: unidade.regional_id,
+        ativo: true,
+      },
     });
 
     if (!vinculo) {

@@ -44,7 +44,7 @@ export class ChangeUserRoleService {
     // 3. Processar a alteração em uma transação
     return this.prisma.$transaction(async (tx) => {
       // Dados para auditoria
-      const dadosAntigos = { ...usuario };
+      const _dadosAntigos = { ...usuario };
 
       // 3.1 Caso esteja removendo o tipo Diretor
       if (usuario.tipo_usuario === 'Diretor' && novoTipo !== 'Diretor') {
@@ -95,7 +95,7 @@ export class ChangeUserRoleService {
       }
 
       // 3.3 Atualizar o tipo do usuário
-      const usuarioAtualizado = await tx.pessoa.update({
+      await tx.pessoa.update({
         where: { pessoa_id: userId },
         data: { tipo_usuario: novoTipo },
       });

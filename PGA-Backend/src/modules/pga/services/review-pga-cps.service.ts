@@ -30,7 +30,9 @@ export class ReviewPgaCpsService {
 
   async reprovar(pgaId: string, pessoaId: string, parecer: string) {
     if (!parecer?.trim()) {
-      throw new BadRequestException('O parecer é obrigatório ao reprovar o PGA.');
+      throw new BadRequestException(
+        'O parecer é obrigatório ao reprovar o PGA.',
+      );
     }
 
     const pga = await this.repository.findOne(pgaId);

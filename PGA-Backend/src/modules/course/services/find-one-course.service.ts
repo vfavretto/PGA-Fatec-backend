@@ -7,7 +7,10 @@ export class FindOneCourseService {
   constructor(private readonly repository: CourseRepository) {}
 
   async execute(id: string, user?: any): Promise<Course> {
-    const course = await this.repository.findOneWithContext(id, user?.active_context);
+    const course = await this.repository.findOneWithContext(
+      id,
+      user?.active_context,
+    );
     if (!course) throw new NotFoundException('Curso não encontrado');
     return course;
   }

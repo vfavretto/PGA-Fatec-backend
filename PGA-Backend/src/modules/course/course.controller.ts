@@ -1,5 +1,23 @@
-﻿import { Controller, Post, Body, Get, Param, Put, Delete, ParseUUIDPipe, Request, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
+﻿import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Param,
+  Put,
+  Delete,
+  ParseUUIDPipe,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiBody,
+} from '@nestjs/swagger';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { CreateCourseService } from './services/create-course.service';
@@ -23,7 +41,10 @@ export class CourseController {
   ) {}
 
   @Post()
-  @ApiOperation({ summary: 'Criar curso', description: 'Cria um novo curso no sistema' })
+  @ApiOperation({
+    summary: 'Criar curso',
+    description: 'Cria um novo curso no sistema',
+  })
   @ApiBody({ type: CreateCourseDto })
   @ApiResponse({ status: 201, description: 'Curso criado com sucesso' })
   @ApiResponse({ status: 400, description: 'Dados inválidos' })
@@ -32,14 +53,23 @@ export class CourseController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Listar cursos', description: 'Retorna lista de todos os cursos' })
-  @ApiResponse({ status: 200, description: 'Lista de cursos retornada com sucesso' })
+  @ApiOperation({
+    summary: 'Listar cursos',
+    description: 'Retorna lista de todos os cursos',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de cursos retornada com sucesso',
+  })
   findAll(@Request() req: any) {
     return this.findAllService.execute(req.user);
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Buscar curso por ID', description: 'Retorna dados de um curso específico' })
+  @ApiOperation({
+    summary: 'Buscar curso por ID',
+    description: 'Retorna dados de um curso específico',
+  })
   @ApiParam({ name: 'id', type: 'number', description: 'ID do curso' })
   @ApiResponse({ status: 200, description: 'Curso encontrado com sucesso' })
   @ApiResponse({ status: 404, description: 'Curso não encontrado' })
@@ -48,7 +78,10 @@ export class CourseController {
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Atualizar curso', description: 'Atualiza dados de um curso específico' })
+  @ApiOperation({
+    summary: 'Atualizar curso',
+    description: 'Atualiza dados de um curso específico',
+  })
   @ApiParam({ name: 'id', type: 'number', description: 'ID do curso' })
   @ApiBody({ type: UpdateCourseDto })
   @ApiResponse({ status: 200, description: 'Curso atualizado com sucesso' })
@@ -58,7 +91,10 @@ export class CourseController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Excluir curso', description: 'Remove um curso do sistema' })
+  @ApiOperation({
+    summary: 'Excluir curso',
+    description: 'Remove um curso do sistema',
+  })
   @ApiParam({ name: 'id', type: 'number', description: 'ID do curso' })
   @ApiResponse({ status: 200, description: 'Curso excluído com sucesso' })
   @ApiResponse({ status: 404, description: 'Curso não encontrado' })

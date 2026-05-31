@@ -9,7 +9,7 @@ export class DeleteInstitutionalRoutineService {
     private readonly prisma: PrismaService,
   ) {}
 
-  async execute(id: string, usuarioLogadoId?: string, motivo?: string) {
+  async execute(id: string, _usuarioLogadoId?: string, _motivo?: string) {
     const routine = await this.repository.findOne(id);
     if (!routine)
       throw new NotFoundException('Rotina institucional não encontrada');

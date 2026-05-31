@@ -30,8 +30,14 @@ export class ProjectPersonRepository extends BaseRepository<ProjetoPessoa> {
 
   async findAllByUnit(unidadeId: string) {
     return this.prisma.projetoPessoa.findMany({
-      where: this.whereActive({ acao_projeto: { pga: { unidade_id: unidadeId } } }),
-      include: { pessoa: true, acaoProjeto: { include: { pga: true } }, tipo_vinculo_hae: true },
+      where: this.whereActive({
+        acao_projeto: { pga: { unidade_id: unidadeId } },
+      }),
+      include: {
+        pessoa: true,
+        acaoProjeto: { include: { pga: true } },
+        tipo_vinculo_hae: true,
+      },
     });
   }
 
@@ -44,8 +50,14 @@ export class ProjectPersonRepository extends BaseRepository<ProjetoPessoa> {
     if (!unidadeIds.length) return [];
 
     return this.prisma.projetoPessoa.findMany({
-      where: this.whereActive({ acao_projeto: { pga: { unidade_id: { in: unidadeIds } } } }),
-      include: { pessoa: true, acaoProjeto: { include: { pga: true } }, tipo_vinculo_hae: true },
+      where: this.whereActive({
+        acao_projeto: { pga: { unidade_id: { in: unidadeIds } } },
+      }),
+      include: {
+        pessoa: true,
+        acaoProjeto: { include: { pga: true } },
+        tipo_vinculo_hae: true,
+      },
     });
   }
 
@@ -60,7 +72,10 @@ export class ProjectPersonRepository extends BaseRepository<ProjetoPessoa> {
     });
   }
 
-  async findOneWithContext(id: string, active_context?: { tipo: string; id?: string } | null) {
+  async findOneWithContext(
+    id: string,
+    active_context?: { tipo: string; id?: string } | null,
+  ) {
     const item = await this.findOne(id);
     if (!item) return null;
 
@@ -75,7 +90,11 @@ export class ProjectPersonRepository extends BaseRepository<ProjetoPessoa> {
           select: { unidade_id: true },
         });
         const ids = vinculos.map((v) => v.unidade_id);
-        if (!item.acaoProjeto.pga.unidade_id || !ids.includes(item.acaoProjeto.pga.unidade_id)) return null;
+        if (
+          !item.acaoProjeto.pga.unidade_id ||
+          !ids.includes(item.acaoProjeto.pga.unidade_id)
+        )
+          return null;
       }
     }
 
@@ -106,12 +125,18 @@ export class ProjectPersonRepository extends BaseRepository<ProjetoPessoa> {
     });
   }
 
-  async findByProjectIdWithContext(projetoId: string, active_context?: { tipo: string; id?: string } | null) {
+  async findByProjectIdWithContext(
+    projetoId: string,
+    active_context?: { tipo: string; id?: string } | null,
+  ) {
     if (!active_context) return this.findByProjectId(projetoId);
 
     if (active_context.tipo === 'unidade') {
       return this.prisma.projetoPessoa.findMany({
-        where: this.whereActive({ acao_projeto_id: projetoId, acao_projeto: { pga: { unidade_id: active_context.id } } }),
+        where: this.whereActive({
+          acao_projeto_id: projetoId,
+          acao_projeto: { pga: { unidade_id: active_context.id } },
+        }),
         include: { pessoa: true, tipo_vinculo_hae: true },
       });
     }
@@ -125,7 +150,10 @@ export class ProjectPersonRepository extends BaseRepository<ProjetoPessoa> {
       if (!unidadeIds.length) return [];
 
       return this.prisma.projetoPessoa.findMany({
-        where: this.whereActive({ acao_projeto_id: projetoId, acao_projeto: { pga: { unidade_id: { in: unidadeIds } } } }),
+        where: this.whereActive({
+          acao_projeto_id: projetoId,
+          acao_projeto: { pga: { unidade_id: { in: unidadeIds } } },
+        }),
         include: { pessoa: true, tipo_vinculo_hae: true },
       });
     }

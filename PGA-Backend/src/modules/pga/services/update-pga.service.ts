@@ -32,7 +32,9 @@ export class UpdatePgaService {
           user?.active_context?.tipo === 'unidade' &&
           user?.active_context?.id === pga.unidade_id;
         if (!contextIsUnit) {
-          throw new ForbiddenException('Você só pode editar o PGA da sua própria unidade.');
+          throw new ForbiddenException(
+            'Você só pode editar o PGA da sua própria unidade.',
+          );
         }
         if (pga.status !== StatusPGA.EmElaboracao) {
           throw new ForbiddenException(
@@ -40,7 +42,9 @@ export class UpdatePgaService {
           );
         }
       } else {
-        throw new ForbiddenException('Você não tem permissão para editar este PGA.');
+        throw new ForbiddenException(
+          'Você não tem permissão para editar este PGA.',
+        );
       }
     }
 
@@ -56,4 +60,3 @@ export class UpdatePgaService {
     return this.repository.update(id, payload);
   }
 }
-

@@ -2,19 +2,31 @@ import { NotFoundException, ConflictException } from '@nestjs/common';
 import { DeleteUserService } from './delete-user.service';
 
 const mockRepo = { findById: jest.fn() };
+const mockTx = {
+  pessoaUnidade: { updateMany: jest.fn() },
+  pessoa: { update: jest.fn() },
+};
 const mockPrisma = {
   projetoPessoa: { count: jest.fn() },
   curso: { count: jest.fn() },
-  $transaction: jest.fn(),
+  $transaction: jest.fn().mockImplementation((fn: any) => fn(mockTx)),
 };
-const mockAuditRepo = { create: jest.fn() };
+const mockAuditRepo = { createAuditLog: jest.fn() };
 
 describe('DeleteUserService', () => {
   let service: DeleteUserService;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    service = new DeleteUserService(mockRepo as any, mockPrisma as any, mockAuditRepo as any);
+    service = new DeleteUserService(
+      mockRepo as any,
+      mockPrisma as any,
+      mockAuditRepo as any,
+    );
+    mockPrisma.$transaction.mockImplementation((fn: any) => fn(mockTx));
+    mockTx.pessoaUnidade.updateMany.mockResolvedValue({});
+    mockAuditRepo.createAuditLog.mockResolvedValue({});
+    mockTx.pessoa.update.mockResolvedValue({ pessoa_id: 'uuid-1', ativo: false });
   });
 
   it('deve lançar NotFoundException se usuário não encontrado', async () => {
@@ -43,10 +55,12 @@ describe('DeleteUserService', () => {
     mockRepo.findById.mockResolvedValue(user);
     mockPrisma.projetoPessoa.count.mockResolvedValue(0);
     mockPrisma.curso.count.mockResolvedValue(0);
-    mockPrisma.$transaction.mockResolvedValue(user);
 
     const result = await service.execute('uuid-1');
     expect(mockPrisma.$transaction).toHaveBeenCalled();
-    expect(result).toBe(user);
+    expect(mockTx.pessoaUnidade.updateMany).toHaveBeenCalled();
+    expect(mockTx.pessoa.update).toHaveBeenCalled();
+    expect(mockAuditRepo.createAuditLog).toHaveBeenCalled();
+    expect((result as any).ativo).toBe(false);
   });
 });

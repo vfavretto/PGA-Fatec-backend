@@ -5,7 +5,7 @@ import { DeliverableRepository } from '../deliverable.repository';
 export class DeleteDeliverableService {
   constructor(private readonly repo: DeliverableRepository) {}
 
-  async execute(id: string, usuario_id?: string) {
+  async execute(id: string, _usuario_id?: string) {
     const deliverable = await this.repo.findOne(id);
     if (!deliverable) throw new NotFoundException('Entregável não encontrado');
 

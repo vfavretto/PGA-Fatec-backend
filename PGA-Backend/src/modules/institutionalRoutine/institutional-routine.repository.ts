@@ -104,14 +104,20 @@ export class InstitutionalRoutineRepository extends BaseRepository<RotinaInstitu
   async findOneWithContext(id: string, active_context?: any) {
     if (active_context && active_context.tipo === 'unidade') {
       return this.prisma.rotinaInstitucional.findFirst({
-        where: this.whereActive({ rotina_id: id, unidade_id: active_context.id }),
+        where: this.whereActive({
+          rotina_id: id,
+          unidade_id: active_context.id,
+        }),
         include: { curso: true, responsavel: true },
       });
     }
 
     if (active_context && active_context.tipo === 'regional') {
       return this.prisma.rotinaInstitucional.findFirst({
-        where: this.whereActive({ rotina_id: id, regional_id: active_context.id }),
+        where: this.whereActive({
+          rotina_id: id,
+          regional_id: active_context.id,
+        }),
         include: { curso: true, responsavel: true },
       });
     }
@@ -122,14 +128,20 @@ export class InstitutionalRoutineRepository extends BaseRepository<RotinaInstitu
   async findByPgaIdWithContext(pgaId: string, active_context?: any) {
     if (active_context && active_context.tipo === 'unidade') {
       return this.prisma.rotinaInstitucional.findMany({
-        where: this.whereActive({ pga_id: pgaId, unidade_id: active_context.id }),
+        where: this.whereActive({
+          pga_id: pgaId,
+          unidade_id: active_context.id,
+        }),
         include: { curso: true, responsavel: true },
       });
     }
 
     if (active_context && active_context.tipo === 'regional') {
       return this.prisma.rotinaInstitucional.findMany({
-        where: this.whereActive({ pga_id: pgaId, regional_id: active_context.id }),
+        where: this.whereActive({
+          pga_id: pgaId,
+          regional_id: active_context.id,
+        }),
         include: { curso: true, responsavel: true },
       });
     }

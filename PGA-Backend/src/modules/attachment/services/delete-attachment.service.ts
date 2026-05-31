@@ -6,7 +6,7 @@ export class DeleteAttachmentService {
   // Corrigido
   constructor(private readonly repository: AttachmentRepository) {} // Corrigido
 
-  async execute(id: string, usuarioLogadoId?: string, motivo?: string) {
+  async execute(id: string, _usuarioLogadoId?: string, _motivo?: string) {
     // Alterado tipo para number
     const attachment = await this.repository.findOne(id);
     if (!attachment) throw new NotFoundException('Attachment não encontrado');

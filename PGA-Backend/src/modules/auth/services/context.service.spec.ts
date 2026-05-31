@@ -1,5 +1,4 @@
 import { BadRequestException, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { ContextService } from './context.service';
 
 const mockPrisma = {
@@ -20,10 +19,16 @@ describe('ContextService', () => {
 
   describe('getAvailableContexts', () => {
     it('deve retornar regionais e unidades para Administrador', async () => {
-      mockPrisma.pessoa.findMany.mockResolvedValue([{ pessoa_id: 2, nome: 'Regional 1', email: 'r@r.com' }]);
-      mockPrisma.unidade.findMany.mockResolvedValue([{ unidade_id: 1, nome_unidade: 'Unidade 1' }]);
+      mockPrisma.pessoa.findMany.mockResolvedValue([
+        { pessoa_id: 2, nome: 'Regional 1', email: 'r@r.com' },
+      ]);
+      mockPrisma.unidade.findMany.mockResolvedValue([
+        { unidade_id: 1, nome_unidade: 'Unidade 1' },
+      ]);
 
-      const result = await service.getAvailableContexts({ tipo_usuario: 'Administrador' });
+      const result = await service.getAvailableContexts({
+        tipo_usuario: 'Administrador',
+      });
 
       expect(result.regionais).toHaveLength(1);
       expect(result.unidades).toHaveLength(1);
@@ -33,7 +38,9 @@ describe('ContextService', () => {
       mockPrisma.pessoa.findMany.mockResolvedValue([]);
       mockPrisma.unidade.findMany.mockResolvedValue([]);
 
-      const result = await service.getAvailableContexts({ tipo_usuario: 'CPS' });
+      const result = await service.getAvailableContexts({
+        tipo_usuario: 'CPS',
+      });
 
       expect(result).toHaveProperty('regionais');
       expect(result).toHaveProperty('unidades');
@@ -57,7 +64,10 @@ describe('ContextService', () => {
       mockPrisma.pessoa.findUnique.mockResolvedValue(null);
 
       await expect(
-        service.getAvailableContexts({ tipo_usuario: 'Diretor', pessoa_id: 99 }),
+        service.getAvailableContexts({
+          tipo_usuario: 'Diretor',
+          pessoa_id: 99,
+        }),
       ).rejects.toThrow(UnauthorizedException);
     });
   });
@@ -67,7 +77,12 @@ describe('ContextService', () => {
       mockPrisma.unidade.findFirst.mockResolvedValue({ unidade_id: 1 });
 
       const result = await service.selectContext(
-        { tipo_usuario: 'Administrador', email: 'a@a.com', pessoa_id: 'uuid-1', nome: 'A' },
+        {
+          tipo_usuario: 'Administrador',
+          email: 'a@a.com',
+          pessoa_id: 'uuid-1',
+          nome: 'A',
+        },
         'unidade',
         'uuid-1',
       );
@@ -79,7 +94,11 @@ describe('ContextService', () => {
       mockPrisma.unidade.findFirst.mockResolvedValue(null);
 
       await expect(
-        service.selectContext({ tipo_usuario: 'Administrador' }, 'unidade', 'uuid-999'),
+        service.selectContext(
+          { tipo_usuario: 'Administrador' },
+          'unidade',
+          'uuid-999',
+        ),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -87,7 +106,11 @@ describe('ContextService', () => {
       mockPrisma.pessoa.findFirst.mockResolvedValue(null);
 
       await expect(
-        service.selectContext({ tipo_usuario: 'Administrador' }, 'regional', 'uuid-999'),
+        service.selectContext(
+          { tipo_usuario: 'Administrador' },
+          'regional',
+          'uuid-999',
+        ),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -95,7 +118,11 @@ describe('ContextService', () => {
       mockPrisma.pessoaUnidade.findFirst.mockResolvedValue(null);
 
       await expect(
-        service.selectContext({ tipo_usuario: 'Diretor', pessoa_id: 'uuid-1' }, 'unidade', 'uuid-5'),
+        service.selectContext(
+          { tipo_usuario: 'Diretor', pessoa_id: 'uuid-1' },
+          'unidade',
+          'uuid-5',
+        ),
       ).rejects.toThrow(BadRequestException);
     });
   });

@@ -82,14 +82,20 @@ export class ProcessStepRepository extends BaseRepository<EtapaProcesso> {
   async findOneWithContext(id: string, active_context?: any) {
     if (active_context && active_context.tipo === 'unidade') {
       return this.prisma.etapaProcesso.findFirst({
-        where: this.whereActive({ etapa_id: id, unidade_id: active_context.id }),
+        where: this.whereActive({
+          etapa_id: id,
+          unidade_id: active_context.id,
+        }),
         include: { entregavel_link_sei: true },
       });
     }
 
     if (active_context && active_context.tipo === 'regional') {
       return this.prisma.etapaProcesso.findFirst({
-        where: this.whereActive({ etapa_id: id, regional_id: active_context.id }),
+        where: this.whereActive({
+          etapa_id: id,
+          regional_id: active_context.id,
+        }),
         include: { entregavel_link_sei: true },
       });
     }
@@ -100,7 +106,10 @@ export class ProcessStepRepository extends BaseRepository<EtapaProcesso> {
   async findByProjectIdWithContext(projectId: string, active_context?: any) {
     if (active_context && active_context.tipo === 'unidade') {
       return this.prisma.etapaProcesso.findMany({
-        where: this.whereActive({ acao_projeto_id: projectId, unidade_id: active_context.id }),
+        where: this.whereActive({
+          acao_projeto_id: projectId,
+          unidade_id: active_context.id,
+        }),
         include: { entregavel_link_sei: true },
         orderBy: { data_verificacao_prevista: 'asc' },
       });
@@ -108,7 +117,10 @@ export class ProcessStepRepository extends BaseRepository<EtapaProcesso> {
 
     if (active_context && active_context.tipo === 'regional') {
       return this.prisma.etapaProcesso.findMany({
-        where: this.whereActive({ acao_projeto_id: projectId, regional_id: active_context.id }),
+        where: this.whereActive({
+          acao_projeto_id: projectId,
+          regional_id: active_context.id,
+        }),
         include: { entregavel_link_sei: true },
         orderBy: { data_verificacao_prevista: 'asc' },
       });

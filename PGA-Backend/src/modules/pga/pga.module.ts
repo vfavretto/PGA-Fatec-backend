@@ -47,4 +47,3 @@ import { ExportPgaPdfService } from './services/export-pga-pdf.service';
   ],
 })
 export class PgaModule {}
-

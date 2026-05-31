@@ -24,7 +24,7 @@ export class ResetPasswordService {
       await this.userRepository.update(user.pessoa_id, {
         senha: hashedPassword,
       });
-    } catch (error) {
+    } catch {
       throw new UnauthorizedException('Token inválido ou expirado');
     }
   }

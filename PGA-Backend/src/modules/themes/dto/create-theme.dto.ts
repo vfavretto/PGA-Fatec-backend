@@ -5,7 +5,7 @@ export class CreateThemeDto {
   @ApiProperty({
     description: 'Número identificador do tema',
     example: 1,
-    type: 'integer'
+    type: 'integer',
   })
   @IsInt()
   tema_num: number;
@@ -13,7 +13,7 @@ export class CreateThemeDto {
   @ApiProperty({
     description: 'ID do eixo temático ao qual o tema pertence',
     example: 2,
-    type: 'integer'
+    type: 'integer',
   })
   @IsUUID('4')
   eixo_id: string;
@@ -21,7 +21,7 @@ export class CreateThemeDto {
   @ApiProperty({
     description: 'Descrição do tema',
     example: 'Inclusão e Acessibilidade',
-    maxLength: 255
+    maxLength: 255,
   })
   @IsString()
   @IsNotEmpty()

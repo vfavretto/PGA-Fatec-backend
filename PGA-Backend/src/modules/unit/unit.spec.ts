@@ -33,13 +33,18 @@ describe('CreateUnitService', () => {
     mockPrisma.regional.findUnique.mockResolvedValue({ regional_id: 1 });
     mockRepo.create.mockResolvedValue({ unidade_id: 1 });
 
-    const result = await service.execute({ regional_id: 1, nome_unidade: 'U1' } as any);
+    const result = await service.execute({
+      regional_id: 1,
+      nome_unidade: 'U1',
+    } as any);
     expect(result).toEqual({ unidade_id: 1 });
   });
 
   it('deve lançar NotFoundException se regional não existe', async () => {
     mockPrisma.regional.findUnique.mockResolvedValue(null);
-    await expect(service.execute({ regional_id: 99, nome_unidade: 'U1' } as any)).rejects.toThrow(NotFoundException);
+    await expect(
+      service.execute({ regional_id: 99, nome_unidade: 'U1' } as any),
+    ).rejects.toThrow(NotFoundException);
   });
 });
 
@@ -59,19 +64,25 @@ describe('FindAllUnitsService', () => {
 
   it('deve retornar unidade específica no contexto de unidade', async () => {
     mockRepo.findOne.mockResolvedValue({ unidade_id: 'uuid-5' });
-    const result = await service.execute({ active_context: { tipo: 'unidade', id: 'uuid-5' } });
+    const result = await service.execute({
+      active_context: { tipo: 'unidade', id: 'uuid-5' },
+    });
     expect(result).toEqual([{ unidade_id: 'uuid-5' }]);
   });
 
   it('deve retornar array vazio se unidade do contexto não encontrada', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    const result = await service.execute({ active_context: { tipo: 'unidade', id: 'uuid-99' } });
+    const result = await service.execute({
+      active_context: { tipo: 'unidade', id: 'uuid-99' },
+    });
     expect(result).toEqual([]);
   });
 
   it('deve filtrar por regional quando contexto é regional', async () => {
     mockRepo.findAllByRegional.mockResolvedValue([{ unidade_id: 2 }]);
-    await service.execute({ active_context: { tipo: 'regional', id: 'uuid-3' } });
+    await service.execute({
+      active_context: { tipo: 'regional', id: 'uuid-3' },
+    });
     expect(mockRepo.findAllByRegional).toHaveBeenCalledWith('uuid-3');
   });
 });
@@ -108,13 +119,17 @@ describe('UpdateUnitService', () => {
     mockRepo.findOne.mockResolvedValue({ unidade_id: 1 });
     mockRepo.update.mockResolvedValue({ unidade_id: 1, nome_unidade: 'Novo' });
 
-    const result = await service.execute('uuid-1', { nome_unidade: 'Novo' } as any);
+    const result = await service.execute('uuid-1', {
+      nome_unidade: 'Novo',
+    } as any);
     expect(result.nome_unidade).toBe('Novo');
   });
 
   it('deve lançar NotFoundException se não encontrada', async () => {
     mockRepo.findOne.mockResolvedValue(null);
-    await expect(service.execute('uuid-99', {} as any)).rejects.toThrow(NotFoundException);
+    await expect(service.execute('uuid-99', {} as any)).rejects.toThrow(
+      NotFoundException,
+    );
   });
 });
 
@@ -140,7 +155,10 @@ describe('DeleteUnitService', () => {
   it('deve excluir quando sem dependências', async () => {
     mockRepo.findOne.mockResolvedValue({ unidade_id: 'uuid-1' });
     mockPrisma.pGA.count.mockResolvedValue(0);
-    mockRepo.softDelete.mockResolvedValue({ unidade_id: 'uuid-1', ativo: false });
+    mockRepo.softDelete.mockResolvedValue({
+      unidade_id: 'uuid-1',
+      ativo: false,
+    });
 
     await service.execute('uuid-1');
     expect(mockRepo.softDelete).toHaveBeenCalledWith('uuid-1');

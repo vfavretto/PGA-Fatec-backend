@@ -1,4 +1,4 @@
-﻿import { IsString, IsInt, IsOptional, IsBoolean, IsUUID } from 'class-validator';
+﻿import { IsString, IsInt, IsOptional, IsUUID } from 'class-validator';
 
 export class CreateVersionDto {
   @IsString()
